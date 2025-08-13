@@ -73,7 +73,7 @@ const CommonModal = ({
                 </button>
 
                 <button
-                  className={`flex flex-col  py-3 rounded-lg border-0 w-full bg-primary-normal`}
+                  className={`flex flex-col py-3 rounded-lg border-0 w-full bg-primary-normal`}
                   onClick={onClickConfirm}
                 >
                   <span

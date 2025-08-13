@@ -1,7 +1,7 @@
 "use client";
 
 import { ToastProps } from "@/type/etc.type";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 // Toast 컴포넌트
 const Toast: React.FC<ToastProps> = ({
@@ -12,16 +12,33 @@ const Toast: React.FC<ToastProps> = ({
   onClose,
   duration = 3000,
 }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Toast가 나타날 때 애니메이션 시작
+  useEffect(() => {
+    if (isVisible) {
+      setIsAnimating(true);
+    }
+  }, [isVisible]);
+
   // 자동으로 닫히도록 설정
-  React.useEffect(() => {
+  useEffect(() => {
     if (isVisible && duration > 0) {
       const timer = setTimeout(() => {
-        onClose?.();
+        handleClose();
       }, duration);
-
       return () => clearTimeout(timer);
     }
-  }, [isVisible, duration, onClose]);
+  }, [isVisible, duration]);
+
+  // Toast 닫기 처리
+  const handleClose = () => {
+    setIsAnimating(false);
+    // 애니메이션이 끝난 후 실제로 닫기
+    setTimeout(() => {
+      onClose?.();
+    }, 300); // 애니메이션 지속 시간과 동일
+  };
 
   // Toast가 보이지 않으면 렌더링하지 않음
   if (!isVisible) return null;
@@ -124,9 +141,15 @@ const Toast: React.FC<ToastProps> = ({
   const { icon, bgColor } = getToastStyles();
 
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary-neutral rounded-lg">
+    <div
+      className={`fixed top-12 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-out ${
+        isAnimating
+          ? "translate-y-0 opacity-100"
+          : "-translate-y-full opacity-0"
+      }`}
+    >
       <div
-        className={`w-80 px-4 py-2.5 ${bgColor} rounded-lg inline-flex justify-start items-center gap-4`}
+        className={`w-80 px-4 py-2.5 ${bgColor} rounded-lg inline-flex justify-start items-center gap-4 shadow-lg`}
       >
         <div className="flex-1 flex justify-start items-center gap-2">
           {icon}

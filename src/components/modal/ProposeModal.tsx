@@ -44,7 +44,7 @@ const ProposeModal = ({
             <div className="flex flex-col self-stretch bg-white rounded-t-2xl">
               {/* 제목과 아이콘 */}
               <div className="flex items-start self-stretch mb-4">
-                <span className="flex-1 text-[#131211] text-xl font-bold mr-[145px] whitespace-pre-line">
+                <span className="flex-1 text-[#131211] text-xl font-bold whitespace-pre-line">
                   {"제안 전 아래 내용을\n확인 후 제안해 주세요."}
                 </span>
 

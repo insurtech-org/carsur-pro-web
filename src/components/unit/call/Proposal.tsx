@@ -9,7 +9,7 @@ export default function Proposal() {
   const { proposeData } = usePropoesStore();
 
   return (
-    <div className="flex flex-col items-center self-stretch bg-neutral-100 h-screen">
+    <div className="flex flex-col items-center self-stretch bg-neutral-100 h-screen p-4 gap-3">
       {proposeData.length > 0 ? (
         proposeData.map((data, idx) => (
           <ProposeCard proposeData={data} key={idx} />
@@ -44,15 +44,15 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
   return (
     <>
       <div
-        className="flex flex-col self-stretch bg-white py-4 mb-3 mx-5 gap-2 rounded-xl"
+        className="flex flex-col self-stretch bg-white p-4 gap-2 rounded-xl"
         style={{
           boxShadow: "0px 4px 20px #0A0C1112",
         }}
       >
-        <div className="flex flex-col items-start self-stretch mx-4 gap-2">
+        <div className="flex flex-col items-start self-stretch gap-2">
           {/* 보험사 태그 */}
-          <div className="flex flex-col items-start bg-white text-left py-1 px-2 rounded-md border border-solid border-[#FF934D]">
-            <span className="text-[#ED6C00] text-xs font-bold">
+          <div className="flex flex-col items-start bg-white text-left py-1 px-2 rounded-md border border-solid border-line-primary">
+            <span className="text-line-primary text-xs font-bold">
               {proposeData.company || "AXA손해보험"}
             </span>
           </div>
@@ -108,28 +108,29 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
         </div>
 
         {/* 버튼 영역 */}
-        <div className="flex items-start self-stretch mx-4 gap-2">
+        <div className="flex items-start self-stretch gap-2">
           {/* 제안 취소 버튼 */}
           <button
-            className="flex flex-1 flex-col items-center bg-neutral-100 pt-3 pb-[13px] px-[43px] rounded-lg hover:bg-neutral-200 transition-colors"
+            className="flex flex-1 flex-col items-center bg-neutral-100 py-3 rounded-lg hover:bg-neutral-200 transition-colors"
             onClick={() => setIsOpen(true)}
           >
             <span className="text-primary-neutral text-base font-medium">
-              {"제안 취소"}
+              제안 취소
             </span>
           </button>
 
           {/* 상세보기 버튼 */}
           <button
-            className="flex flex-1 flex-col items-center bg-white pt-3 pb-[13px] px-[46px] rounded-lg border border-solid border-[#D6D6D6] hover:bg-neutral-50 transition-colors"
+            className="flex flex-1 flex-col items-center bg-white py-3 rounded-lg border border-solid border-[#D6D6D6] hover:bg-neutral-50 transition-colors"
             onClick={() => onClickDetail(proposeData.id)}
           >
             <span className="text-primary-neutral text-base font-medium">
-              {"상세보기"}
+              상세보기
             </span>
           </button>
         </div>
       </div>
+
       <CommonModal
         title="제안을 취소하시겠어요?"
         description="제안을 취소하시면 이 예약은 다른 공업사에 배정될 수 있어요."
