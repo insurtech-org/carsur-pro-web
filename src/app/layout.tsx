@@ -7,12 +7,12 @@ import { useToastStore } from "@/store/toast";
 import Toast from "@/components/common/Toast";
 
 const geistSans = localFont({
-  src: "./../fonts/GeistVF.woff",
+  src: "../../public/fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
 const geistMono = localFont({
-  src: "./../fonts/GeistMonoVF.woff",
+  src: "../../public/fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
 });
@@ -20,7 +20,7 @@ const geistMono = localFont({
 const pretendard = localFont({
   src: [
     {
-      path: "./../fonts/PretendardVariable.woff2",
+      path: "../../public/fonts/PretendardVariable.woff2",
       weight: "100 900",
       style: "normal",
     },
@@ -34,33 +34,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    // User Agent로 모바일 기기 감지
-    const checkMobile = () => {
-      const userAgent = navigator.userAgent.toLowerCase();
-      const mobileKeywords = [
-        "android",
-        "iphone",
-        "ipad",
-        "ipod",
-        "blackberry",
-        "windows phone",
-        "mobile",
-        "tablet",
-      ];
-
-      const isMobileDevice = mobileKeywords.some((keyword) =>
-        userAgent.includes(keyword)
-      );
-
-      setIsMobile(isMobileDevice);
-    };
-
-    checkMobile();
-  }, []);
-
   return (
     <html lang="ko">
       <body
