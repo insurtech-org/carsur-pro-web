@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Atomic 컬러 시스템 */
+  /* Blue 컬러 */
+  --blue-50: #f0f6ff;
+  --blue-100: #d6e8ff;
+  --blue-200: #a8ceff;
+  --blue-300: #7ab3ff;
+  --blue-400: #4d98ff;
+  --blue-500: #155eef;
+  --blue-600: #124ecc;
+  --blue-700: #103fab;
+  --blue-800: #0d3189;
+  --blue-900: #0a2366;
+
+  /* Neutral 컬러 */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #ededed;
+  --neutral-300: #d6d6d6;
+  --neutral-400: #bdbdbd;
+  --neutral-500: #9e9e9e;
+  --neutral-600: #757575;
+  --neutral-700: #616161;
+  --neutral-800: #424242;
+  --neutral-900: #212121;
+  --neutral-1000: #171717;
+
+  /* Orange 컬러 */
+  --orange-50: #fff5ec;
+  --orange-100: #ffe0c2;
+  --orange-200: #ffb680;
+  --orange-300: #ff934d;
+  --orange-400: #f97a1a;
+  --orange-450: #ed6c00;
+  --orange-500: #e55b00;
+  --orange-600: #c44f00;
+  --orange-700: #a44400;
+  --orange-800: #843900;
+  --orange-900: #642f00;
+
+  /* Red 컬러 */
+  --red-50: #fff0f0;
+  --red-100: #ffd6d6;
+  --red-200: #ffa8a8;
+  --red-300: #ff7a7a;
+  --red-400: #ff4242;
+  --red-500: #da0000;
+  --red-600: #b80000;
+  --red-700: #960000;
+  --red-800: #740000;
+  --red-900: #520000;
+
+  /* Yellow 컬러 */
+  --yellow-50: #fffbe5;
+  --yellow-100: #fff3b8;
+  --yellow-200: #ffeb80;
+  --yellow-300: #ffe24d;
+  --yellow-400: #ffda1a;
+  --yellow-500: #ffd600;
+  --yellow-600: #e6c200;
+  --yellow-700: #ccad00;
+  --yellow-800: #b39800;
+  --yellow-900: #997f00;
+
+  /* Common 컬러 */
+  --common-black: #000000;
+  --common-white: #ffffff;
+
+  /* Spacing 시스템 */
+  --opacity-0: 0rem;
+  --opacity-5: 0.3125rem;
+  --opacity-8: 0.5rem;
+  --opacity-12: 0.75rem;
+  --opacity-16: 1rem;
+  --opacity-22: 1.375rem;
+  --opacity-28: 1.75rem;
+  --opacity-35: 2.1875rem;
+  --opacity-43: 2.6875rem;
+  --opacity-52: 3.25rem;
+  --opacity-61: 3.8125rem;
+  --opacity-74: 4.625rem;
+  --opacity-88: 5.5rem;
+  --opacity-97: 6.0625rem;
+  --opacity-100: 6.25rem;
+
+  /* Semantic 컬러 시스템 */
+  --bg-alternative: var(--neutral-50);
+  --bg-main: #f5f5f5;
+  --bg-normal: var(--common-white);
+  --line-alternative: var(--neutral-100);
+  --line-neutral: var(--neutral-200);
+  --line-normal: var(--neutral-300);
+  --line-primary: var(--orange-300);
+  --material-dimmer: #1717178a;
+  --primary-alternative: #212121a3;
+  --primary-assistive: #21212147;
+  --primary-disabled: #21212124;
+  --primary-neutral: #212121e5;
+  --primary-normal: #131212;
+  --primary-strong: var(--common-black);
+  --secondary-alternative: var(--orange-100);
+  --secondary-netural: var(--orange-300);
+  --secondary-normal: var(--orange-450);
+  --secondary-bg: var(--orange-50);
+  --status-cautionary: #f8cd35;
+  --status-destructive: var(--red-400);
+  --status-positive: #55b938;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-pretendard), Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+/* Pretendard 폰트 강제 적용 */
+.font-pretendard {
+  font-family: var(--font-pretendard), Pretendard, sans-serif !important;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* 모바일에서 반응형 */
+.hybrid-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 768px 이상 (데스크톱/웹)에서는 375px 고정 너비 */
+@media (min-width: 768px) {
+  .hybrid-container {
+    max-width: 430px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 768px 이상 (데스크톱/웹)에서는 430px 고정 너비 */
+@media (min-width: 768px) {
+  .responseNavigator {
+    width: 430px;
+    margin: 0 auto;
+  }
+}
+
+/* 모달 슬라이드 애니메이션 */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
