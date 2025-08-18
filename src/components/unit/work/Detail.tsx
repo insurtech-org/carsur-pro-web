@@ -12,7 +12,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function WorkDetail() {
-  const { myWorkData, updateMyWorkData } = useMyWorkStore();
+  const { myWorkData, updateMyWorkData, deleteMyWorkData } = useMyWorkStore();
 
   const params = useParams();
   const id = Number(params.id);
@@ -71,6 +71,8 @@ export default function WorkDetail() {
 
   const onClickCancelConfirm = () => {
     setCancelSelectModalOpen(false);
+    deleteMyWorkData(id);
+
     showSuccess("입고 확정이 취소되었어요.");
     router.back();
   };
