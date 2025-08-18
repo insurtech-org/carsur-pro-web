@@ -49,8 +49,8 @@ const CallCard = ({ callData }: { callData: any }) => {
         }}
       >
         <div className="flex flex-col items-start self-stretch gap-2">
-          <div className="flex flex-col items-start bg-white text-left py-1 px-2 rounded-md border border-solid border-line-primary">
-            <span className="text-line-primary text-xs font-bold">
+          <div className="flex flex-col items-start bg-secondary-bg text-left py-1 px-2 rounded-md">
+            <span className="text-secondary-normal text-xs font-medium">
               {callData.company}
             </span>
           </div>
@@ -88,10 +88,10 @@ const CallCard = ({ callData }: { callData: any }) => {
             </div>
 
             <div className="flex items-center self-stretch">
-              <span className="text-primary-alternative text-sm font-medium mr-1.5">
+              <span className="text-primary-alternative text-sm font-medium mr-0.5">
                 {callData.location}
               </span>
-              <span className="text-primary-alternative text-sm font-medium mr-2.5">
+              <span className="text-primary-alternative text-sm font-medium mr-0.5">
                 {"・"}
               </span>
               <span className="text-primary-alternative text-sm font-medium">
@@ -103,7 +103,7 @@ const CallCard = ({ callData }: { callData: any }) => {
 
         <div className="flex items-start self-stretch gap-2">
           <button
-            className="flex flex-col shrink-0 items-center bg-neutral-100 py-3 px-5 rounded-lg hover:bg-neutral-200 transition-colors"
+            className="flex flex-col flex-1 items-center bg-neutral-100 py-3 rounded-lg hover:bg-neutral-200 transition-colors"
             onClick={() => onClickDetail(callData.id)}
           >
             <span className="text-primary-neutral text-base font-semibold ">
@@ -111,7 +111,7 @@ const CallCard = ({ callData }: { callData: any }) => {
             </span>
           </button>
           <button
-            className="flex flex-1 flex-col items-center bg-primary-normal text-left py-3 px-16 rounded-lg border-0 hover:bg-primary-dark transition-colors"
+            className="flex flex-col flex-1 items-center bg-primary-normal text-left py-3 rounded-lg border-0 hover:bg-primary-dark transition-colors"
             onClick={() => setIsProposeModalOpen(true)}
           >
             <span className="text-white text-base font-semibold">제안하기</span>

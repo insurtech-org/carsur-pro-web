@@ -43,7 +43,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
 
   return (
     <>
-      <div className="flex flex-col bg-white">
+      <div className="flex flex-col bg-white py-4">
         <div className="self-stretch bg-white ">
           <div className="flex flex-col self-stretch mb-20 px-5 gap-8">
             <div className="flex flex-col items-start self-stretch gap-4">

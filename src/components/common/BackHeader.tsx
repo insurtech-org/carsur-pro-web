@@ -2,13 +2,17 @@
 
 export default function BackHeader({
   title,
+  bgColor = "bg-white",
   onBack,
 }: {
   title: string;
   onBack: () => void;
+  bgColor?: string;
 }) {
   return (
-    <div className="sticky top-0 z-50 bg-white flex justify-between items-start self-stretch py-2.5 px-5 mb-6 h-[44px]">
+    <div
+      className={`sticky top-0 z-50 flex justify-between items-center self-stretch px-5 h-[44px] ${bgColor}`}
+    >
       <button onClick={onBack}>
         <img
           src={"/images/icon/ic_arrow-left-3.svg"}

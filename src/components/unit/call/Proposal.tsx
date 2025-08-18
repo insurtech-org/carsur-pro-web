@@ -51,8 +51,8 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
       >
         <div className="flex flex-col items-start self-stretch gap-2">
           {/* 보험사 태그 */}
-          <div className="flex flex-col items-start bg-white text-left py-1 px-2 rounded-md border border-solid border-line-primary">
-            <span className="text-line-primary text-xs font-bold">
+          <div className="flex flex-col items-start bg-secondary-bg text-left py-1 px-2 rounded-md">
+            <span className="text-secondary-normal text-xs font-medium">
               {proposeData.company || "AXA손해보험"}
             </span>
           </div>
@@ -94,10 +94,10 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
 
             {/* 위치 및 차량 정보 */}
             <div className="flex items-center self-stretch">
-              <span className="text-primary-alternative text-sm font-medium mr-1.5">
+              <span className="text-primary-alternative text-sm font-medium mr-0.5">
                 {proposeData.location || "인천 연수구"}
               </span>
-              <span className="text-primary-alternative text-sm font-medium mr-2.5">
+              <span className="text-primary-alternative text-sm font-medium mr-0.5">
                 {"・"}
               </span>
               <span className="text-primary-alternative text-sm font-medium">

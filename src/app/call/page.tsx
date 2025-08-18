@@ -53,32 +53,56 @@ export default function CallPage() {
   };
 
   return (
-    <div className="flex flex-col items-center self-stretch bg-neutral-100">
-      {/* 탭 헤더 */}
-      <div className="sticky top-0 z-10  flex items-center self-stretch px-5 gap-12 mb-4 bg-bg-main">
-        <div className="flex flex-1 items-start gap-4">
+    <div className="flex flex-col items-center self-stretch">
+      <div className="sticky top-0 z-10 flex flex-col items-center self-stretch bg-white">
+        {/* 헤더 */}
+        <div className="h-11 w-full flex flex-row justify-start items-center px-5">
+          <img
+            className="w-[68px] h-[23px]"
+            src="/images/logo_header.png"
+            alt="header"
+          />
+        </div>
+
+        {/* 탭 */}
+        <div className="flex w-full items-start gap-4 border-b-[1px] border-neutral-200">
           <button
-            className={`flex flex-col shrink-0 items-center pt-[12px] pb-[2px] cursor-pointer transition-colors ${
+            className={`flex flex-col shrink-0 flex-1 items-center pt-[12px] pb-[2px] cursor-pointer transition-colors ${
               activeTab === "call"
                 ? "text-[#131211] border-b-2 border-[#131211]"
                 : "text-[#212121] hover:text-[#131211]"
             }`}
             onClick={() => onClickTab("call")}
           >
-            <span className="text-[22px] font-bold">{"내 지역 콜"}</span>
+            <span
+              className={`text-base font-semibold ${
+                activeTab === "call"
+                  ? "text-primary-normal"
+                  : "text-primary-assistive"
+              }`}
+            >
+              {"내 지역 콜"}
+            </span>
           </button>
           <button
-            className={`flex flex-col shrink-0 items-center pt-[12px] pb-[2px] cursor-pointer transition-colors ${
+            className={`flex flex-col shrink-0 flex-1 items-center pt-[12px] pb-[2px] cursor-pointer transition-colors ${
               activeTab === "proposal"
                 ? "text-[#131211] border-b-2 border-[#131211]"
                 : "text-[#212121] hover:text-[#131211]"
             }`}
             onClick={() => onClickTab("proposal")}
           >
-            <span className="text-[22px] font-bold">{"제안 중"}</span>
+            <span
+              className={`text-base font-semibold ${
+                activeTab === "proposal"
+                  ? "text-primary-normal"
+                  : "text-primary-assistive"
+              }`}
+            >
+              {"제안 중"}
+            </span>
           </button>
         </div>
-        <div className="w-[62px] h-6"></div>
       </div>
 
       {/* 탭 컨텐츠 */}
