@@ -2,11 +2,13 @@
 
 import List from "@/components/unit/work/List";
 import { useEffect, useState } from "react";
-import { workData, workStatus } from "@/mock/data";
+import { workStatus } from "@/mock/data";
+import { useMyWorkStore } from "@/store/mywork";
 
 export default function WorkPage() {
   const [activeTab, setActiveTab] = useState("전체");
   const [workTab, setWorkTab] = useState(workStatus);
+  const { myWorkData } = useMyWorkStore();
 
   useEffect(() => {
     setWorkTab(workStatus);
@@ -53,7 +55,7 @@ export default function WorkPage() {
                   : "text-secondary-normal"
               }`}
             >
-              {workData.length}
+              {myWorkData.length}
             </span>
           </button>
 
@@ -89,7 +91,10 @@ export default function WorkPage() {
           ))}
         </div>
       </div>
-      <List currentStatus={activeTab} />
+
+      <div className="flex flex-col items-center self-stretch bg-bg-main flex-1 overflow-y-auto min-h-screen">
+        <List currentStatus={activeTab} />
+      </div>
     </>
   );
 }

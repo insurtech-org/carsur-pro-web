@@ -1,5 +1,7 @@
 "use client";
 
+import MainButton from "@/components/common/MainButton";
+import SubButton from "@/components/common/SubButton";
 import ProposeModal from "@/components/modal/ProposeModal";
 import { callData } from "@/mock/data";
 import { usePropoesStore } from "@/store/propoes";
@@ -102,20 +104,15 @@ const CallCard = ({ callData }: { callData: any }) => {
         </div>
 
         <div className="flex items-start self-stretch gap-2">
-          <button
-            className="flex flex-col flex-1 items-center bg-neutral-100 py-3 rounded-lg hover:bg-neutral-200 transition-colors"
+          <SubButton
+            text="상세보기"
             onClick={() => onClickDetail(callData.id)}
-          >
-            <span className="text-primary-neutral text-base font-semibold ">
-              상세보기
-            </span>
-          </button>
-          <button
-            className="flex flex-col flex-1 items-center bg-primary-normal text-left py-3 rounded-lg border-0 hover:bg-primary-dark transition-colors"
+          />
+
+          <MainButton
+            text="제안하기"
             onClick={() => setIsProposeModalOpen(true)}
-          >
-            <span className="text-white text-base font-semibold">제안하기</span>
-          </button>
+          />
         </div>
       </div>
 

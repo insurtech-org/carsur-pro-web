@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { workData } from "@/mock/data";
+import { useMyWorkStore } from "@/store/mywork";
 
 // 네비게이션 아이템 타입 정의
 interface NavItem {
@@ -83,6 +83,8 @@ const navItems: NavItem[] = [
 export default function BottomNavigator() {
   const router = useRouter();
   const pathname = usePathname();
+  const { myWorkData } = useMyWorkStore();
+
   const [activeTab, setActiveTab] = useState(pathname);
 
   // 네비게이션 클릭 핸들러
@@ -95,6 +97,7 @@ export default function BottomNavigator() {
   const hiddenPaths = [
     "/login", // 로그인 페이지
     "/call/[id]", // 콜 상세 페이지 (동적 라우트)
+    "/work/[id]", // 작업 상세 페이지 (동적 라우트)
   ];
 
   // 현재 경로가 숨겨야 할 페이지인지 확인
@@ -129,7 +132,7 @@ export default function BottomNavigator() {
                 <div className="w-5 h-4 bg-status-destructive rounded-full flex items-center justify-center absolute top-[0px] right-[-15px]">
                   <span className="text-common-white text-xs font-medium">
                     {
-                      workData.filter((item) => item.status === "입고확정")
+                      myWorkData.filter((item) => item.status === "입고확정")
                         .length
                     }
                   </span>

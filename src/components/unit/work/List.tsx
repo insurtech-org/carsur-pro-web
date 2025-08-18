@@ -1,19 +1,20 @@
 "use client";
 
-import { workData } from "@/mock/data";
+import { useMyWorkStore } from "@/store/mywork";
 import { statusColor } from "@/utils/util";
 import { useRouter } from "next/navigation";
 
 export default function WorkList({ currentStatus }: { currentStatus: string }) {
+  const { myWorkData } = useMyWorkStore();
   return (
     <>
-      <div className="flex flex-col items-start self-stretch gap-2 bg-bg-main pt-4 flex-1 pb-24">
-        <span className="text-[#212121] text-sm font-bold mx-5">
-          {"날짜순"}
+      <div className="flex flex-col items-start self-stretch gap-2 bg-bg-main pt-4 flex-1 pb-24 min-h-screen">
+        <span className="text-primary-neutral text-sm font-medium mx-5">
+          날짜순
         </span>
         {currentStatus === "전체"
-          ? workData.map((data, idx) => <WorkCard data={data} key={idx} />)
-          : workData
+          ? myWorkData.map((data, idx) => <WorkCard data={data} key={idx} />)
+          : myWorkData
               .filter((item) => item.status === currentStatus)
               .map((data, idx) => <WorkCard data={data} key={idx} />)}
       </div>

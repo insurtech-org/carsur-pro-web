@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import SubButton from "../common/SubButton";
+import MainButton from "../common/MainButton";
 
 interface ProposeModalProps {
   title: string;
@@ -63,25 +65,9 @@ const CommonModal = ({
 
               {/* 버튼 영역 */}
               <div className="flex flex-row bg-white py-4 gap-2">
-                <button
-                  className="flex flex-col items-center bg-neutral-100 rounded-lg py-3 w-full"
-                  onClick={onClickClose}
-                >
-                  <span className="text-[#212121] text-base font-bold">
-                    {cancelButtonText}
-                  </span>
-                </button>
+                <SubButton text={cancelButtonText} onClick={onClickClose} />
 
-                <button
-                  className={`flex flex-col py-3 rounded-lg border-0 w-full bg-primary-normal`}
-                  onClick={onClickConfirm}
-                >
-                  <span
-                    className={`text-white text-base font-bold text-bg-normal`}
-                  >
-                    {confirmButtonText}
-                  </span>
-                </button>
+                <MainButton text={confirmButtonText} onClick={onClickConfirm} />
               </div>
             </div>
           </div>

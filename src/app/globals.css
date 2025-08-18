@@ -183,3 +183,25 @@ body {
 .animate-slide-up {
   animation: slide-up 0.3s ease-out forwards;
 }
+
+/* 라디오 버튼 디자인 */
+.customRadio {
+  @apply w-6 h-6 bg-bg-normal rounded-full border-2 border-neutral-400 appearance-none;
+  position: relative;
+}
+
+.customRadio:checked {
+  @apply bg-white border-2 border-primary-normal;
+}
+
+.customRadio:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: var(--primary-normal);
+  border-radius: 50%;
+}

@@ -1,13 +1,116 @@
 "use client";
 
-import { workData, workDetailStatus, workStatus, workSteps } from "@/mock/data";
+import MainButton from "@/components/common/MainButton";
+import TextButton from "@/components/common/TextButton";
+import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
+import CancelSelectModal from "@/components/modal/CancelSelectModal";
+import { workDetailStatus, workStatus, workSteps } from "@/mock/data";
+import { useMyWorkStore } from "@/store/mywork";
+import { useToastStore } from "@/store/toast";
 import { getWorkUnderStatus, statusColor } from "@/utils/util";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function WorkDetail() {
+  const { myWorkData, updateMyWorkData } = useMyWorkStore();
+
   const params = useParams();
   const id = Number(params.id);
-  const detailData = workData.find((data) => data.id === id);
+  const detailData = myWorkData.find((data) => data.id === id);
+  const router = useRouter();
+  const { showSuccess } = useToastStore();
+
+  const [cancelSelectModalOpen, setCancelSelectModalOpen] = useState(false);
+  const [calendarSelectModalOpen, setCalendarSelectModalOpen] = useState(false);
+  const [mainButtonText, setMainButtonText] = useState("입고 완료");
+  const [calendarText, setCalendarText] = useState("입고가 완료된");
+
+  useEffect(() => {
+    switch (detailData?.status) {
+      case "입고확정":
+        setMainButtonText("입고 완료");
+        break;
+      case "차량입고":
+        setMainButtonText("수리 시작");
+        break;
+      case "수리중":
+        setMainButtonText("수리 완료");
+        break;
+      case "수리완료":
+        setMainButtonText("차량 출고 완료");
+        break;
+      case "차량출고":
+        setMainButtonText("청구 완료");
+        break;
+      case "청구완료":
+        setMainButtonText("청구 완료");
+        break;
+    }
+  }, [detailData?.status]);
+
+  useEffect(() => {
+    switch (detailData?.status) {
+      case "입고확정":
+        setCalendarText("입고가 완료된");
+        break;
+      case "차량입고":
+        setCalendarText("수리가 시작된");
+        break;
+      case "수리중":
+        setCalendarText("수리가 완료된");
+        break;
+      case "수리완료":
+        setCalendarText("출고가 완료된");
+        break;
+    }
+  }, [detailData?.status]);
+
+  const onClickMainButton = (status: string) => {
+    setCalendarSelectModalOpen(true);
+  };
+
+  const onClickCancelConfirm = () => {
+    setCancelSelectModalOpen(false);
+    showSuccess("입고 확정이 취소되었어요.");
+    router.back();
+  };
+
+  const onClickCalendarConfirm = (date: string, time: string) => {
+    const status = detailData?.status;
+
+    if (status === "입고확정") {
+      updateMyWorkData(id, {
+        inDate: date,
+        inTime: time,
+        status: "차량입고",
+      });
+      showSuccess("차량 입고가 완료되었어요.");
+    } else if (status === "차량입고") {
+      updateMyWorkData(id, {
+        startDate: date,
+        startTime: time,
+        status: "수리중",
+      });
+      showSuccess("차량 수리가 시작되었어요.");
+    } else if (status === "수리중") {
+      updateMyWorkData(id, {
+        endDate: date,
+        endTime: time,
+        status: "수리완료",
+      });
+      showSuccess("차량 수리가 완료되었어요.");
+    } else if (status === "수리완료") {
+      updateMyWorkData(id, {
+        outDate: date,
+        outTime: time,
+        status: "차량출고",
+      });
+      showSuccess("차량 출고가 완료되었어요.");
+    }
+
+    setCalendarSelectModalOpen(false);
+    router.back();
+  };
 
   return (
     <>
@@ -121,9 +224,7 @@ export default function WorkDetail() {
             </span>
             <div className="flex items-center gap-1">
               <img
-                src={
-                  "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/bU8Au7d4Df/rjw13z2p_expires_30_days.png"
-                }
+                src={"/images/img/img_call-orange.png"}
                 className="w-6 h-6 object-fill"
               />
               <span className="text-primary-normal text-base font-medium">
@@ -299,14 +400,32 @@ export default function WorkDetail() {
       </div>
 
       {/* 청구 완료 버튼 */}
-      <button
-        className="flex flex-col items-center self-stretch bg-[#131211] text-left py-3 my-4 mx-5 rounded-lg border-0"
-        onClick={() => alert("Pressed!")}
-      >
-        <div className="flex flex-col items-center pb-[1px]">
-          <span className="text-white text-base font-bold">{"청구 완료"}</span>
-        </div>
-      </button>
+      <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch py-4 mx-5 gap-1 rounded-xl bg-bg-normal">
+        <MainButton
+          text={mainButtonText}
+          onClick={() => onClickMainButton(detailData?.status as string)}
+          disabled={detailData?.status === "청구완료"}
+        />
+        {detailData?.status === "입고확정" && (
+          <TextButton
+            text="입고 확정 취소"
+            onClick={() => setCancelSelectModalOpen(true)}
+          />
+        )}
+      </div>
+
+      <CancelSelectModal
+        isOpen={cancelSelectModalOpen}
+        onClose={() => setCancelSelectModalOpen(false)}
+        onClickConfirm={() => onClickCancelConfirm()}
+      />
+
+      <CalendarSelectModal
+        title={`${calendarText} 날짜를 입력해 주세요.`}
+        isOpen={calendarSelectModalOpen}
+        onClose={() => setCalendarSelectModalOpen(false)}
+        onClickConfirm={(date, time) => onClickCalendarConfirm(date, time)}
+      />
     </>
   );
 }

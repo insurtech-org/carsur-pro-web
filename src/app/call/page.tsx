@@ -58,8 +58,8 @@ export default function CallPage() {
         {/* 헤더 */}
         <div className="h-11 w-full flex flex-row justify-start items-center px-5">
           <img
-            className="w-[68px] h-[23px]"
-            src="/images/logo_header.png"
+            className="w-[91] h-[23px]"
+            src="/images/logo_hearder-horizen.png"
             alt="header"
           />
         </div>
