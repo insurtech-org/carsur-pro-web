@@ -1,12 +1,13 @@
 "use client";
 
 import List from "@/components/unit/work/List";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { workStatus, workStatusCount } from "@/mock/data";
 import { useMyWorkStore } from "@/store/mywork";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function WorkPage() {
+// useSearchParams를 사용하는 컴포넌트를 별도로 분리
+function WorkPageContent() {
   const { myWorkData } = useMyWorkStore();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function WorkPage() {
 
     //params 초기화
     router.replace(`/work?status=${activeTab}`);
-  }, [activeTab]);
+  }, [activeTab, myWorkData, router]);
 
   const onClickTab = (tab: string) => {
     setActiveTab(tab);
@@ -105,5 +106,14 @@ export default function WorkPage() {
         <List currentStatus={activeTab} />
       </div>
     </>
+  );
+}
+
+// 메인 컴포넌트에서 Suspense로 감싸기
+export default function WorkPage() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <WorkPageContent />
+    </Suspense>
   );
 }
