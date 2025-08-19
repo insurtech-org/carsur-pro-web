@@ -59,7 +59,7 @@ function WorkPageContent() {
       <div className="sticky top-0 z-10 flex flex-col items-center self-stretch bg-white overflow-hidden">
         {/* 헤더 */}
         <div className="h-11 w-full flex flex-row justify-start items-center px-5">
-          <span className="text-primary-normal text-2xl font-semibold">
+          <span className="text-primary-normal text-xl font-semibold">
             내 작업 일정
           </span>
         </div>
