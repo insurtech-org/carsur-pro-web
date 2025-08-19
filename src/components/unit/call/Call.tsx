@@ -4,12 +4,25 @@ import MainButton from "@/components/common/MainButton";
 import SubButton from "@/components/common/SubButton";
 import ProposeModal from "@/components/modal/ProposeModal";
 import { callData } from "@/mock/data";
+import { useLoadingStore } from "@/store/loading";
 import { usePropoesStore } from "@/store/propoes";
 import { useToastStore } from "@/store/toast";
+import { sleep } from "@/utils/util";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Call() {
+  const { setIsLoading } = useLoadingStore();
+
+  useEffect(() => {
+    const loading = async () => {
+      setIsLoading(true);
+      await sleep(500);
+      setIsLoading(false);
+    };
+    loading();
+  }, []);
+
   return (
     <div className="flex flex-col items-center self-stretch bg-neutral-100 h-screen p-4 gap-3">
       {callData.length > 0 ? (

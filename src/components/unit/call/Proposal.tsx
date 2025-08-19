@@ -1,13 +1,24 @@
 "use client";
 import { usePropoesStore } from "@/store/propoes";
 import CommonModal from "@/components/modal/CommonModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToastStore } from "@/store/toast";
 import { useRouter } from "next/navigation";
+import { sleep } from "@/utils/util";
+import { useLoadingStore } from "@/store/loading";
 
 export default function Proposal() {
   const { proposeData } = usePropoesStore();
+  const { setIsLoading } = useLoadingStore();
 
+  useEffect(() => {
+    const loading = async () => {
+      setIsLoading(true);
+      await sleep(500);
+      setIsLoading(false);
+    };
+    loading();
+  }, []);
   return (
     <div className="flex flex-col items-center self-stretch bg-neutral-100 h-screen p-4 gap-3">
       {proposeData.length > 0 ? (

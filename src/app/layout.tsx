@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import BottomNavigator from "@/components/common/BottomNavigator";
 import { useToastStore } from "@/store/toast";
 import Toast from "@/components/common/Toast";
+import LoadingPage from "@/components/common/LoadingPage";
+import { useLoadingStore } from "@/store/loading";
 
 const geistSans = localFont({
   src: "../../public/fonts/GeistVF.woff",
@@ -34,6 +36,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isLoading } = useLoadingStore();
+
   return (
     <html lang="ko">
       <body
@@ -42,6 +46,7 @@ export default function RootLayout({
         <div className="min-h-screen bg-gray-50">
           <div className="hybrid-container">
             <div className="flex-1 w-full">{children}</div>
+            {isLoading && <LoadingPage />}
             <BottomNavigator />
           </div>
         </div>

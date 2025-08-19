@@ -1,11 +1,25 @@
 "use client";
 
+import { useLoadingStore } from "@/store/loading";
 import { useMyWorkStore } from "@/store/mywork";
-import { statusColor } from "@/utils/util";
+import { sleep, statusColor } from "@/utils/util";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function WorkList({ currentStatus }: { currentStatus: string }) {
   const { myWorkData } = useMyWorkStore();
+  const { setIsLoading } = useLoadingStore();
+
+  useEffect(() => {
+    const loading = async () => {
+      setIsLoading(true);
+      await sleep(500);
+      setIsLoading(false);
+      console.log("loading");
+    };
+    loading();
+  }, []);
+
   return (
     <>
       <div className="flex flex-col items-start self-stretch gap-2 bg-bg-main pt-4 flex-1 pb-24 min-h-screen">

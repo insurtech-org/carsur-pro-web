@@ -52,3 +52,8 @@ export const getWorkUnderStatus = (currentStatus: string) => {
   const currentIndex = workSteps.filter((step) => step === currentStatus);
   return currentIndex;
 };
+
+//지연함수
+export const sleep = async (ms: number) => {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+};

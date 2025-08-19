@@ -3,21 +3,33 @@
 import CommonModal from "@/components/modal/CommonModal";
 import ProposeModal from "@/components/modal/ProposeModal";
 import { callData } from "@/mock/data";
+import { useLoadingStore } from "@/store/loading";
 import { usePropoesStore } from "@/store/propoes";
 import { useToastStore } from "@/store/toast";
+import { sleep } from "@/utils/util";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Detail({ id, hash }: { id: number; hash: string }) {
   const router = useRouter();
   const { addProposeData, deleteProposeData } = usePropoesStore();
   const { showSuccess } = useToastStore();
+  const { setIsLoading } = useLoadingStore();
 
   const isProposal = hash.includes("proposal");
 
   const [proposeModalOpen, setProposeModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const detailData = callData.find((data) => data.id === id);
+
+  useEffect(() => {
+    const loading = async () => {
+      setIsLoading(true);
+      await sleep(300);
+      setIsLoading(false);
+    };
+    loading();
+  }, []);
 
   const onClickDoPropose = () => {
     setProposeModalOpen(false);

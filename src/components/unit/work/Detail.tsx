@@ -6,9 +6,10 @@ import AccountModal from "@/components/modal/AccountModal";
 import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
 import CancelSelectModal from "@/components/modal/CancelSelectModal";
 import { workDetailStatus, workStatus, workSteps } from "@/mock/data";
+import { useLoadingStore } from "@/store/loading";
 import { useMyWorkStore } from "@/store/mywork";
 import { useToastStore } from "@/store/toast";
-import { getWorkUnderStatus, statusColor } from "@/utils/util";
+import { getWorkUnderStatus, sleep, statusColor } from "@/utils/util";
 import dayjs from "dayjs";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,6 +22,7 @@ export default function WorkDetail() {
   const detailData = myWorkData.find((data) => data.id === id);
   const router = useRouter();
   const { showSuccess } = useToastStore();
+  const { setIsLoading } = useLoadingStore();
 
   const [cancelSelectModalOpen, setCancelSelectModalOpen] = useState(false);
   const [calendarSelectModalOpen, setCalendarSelectModalOpen] = useState(false);
@@ -30,6 +32,15 @@ export default function WorkDetail() {
   const [calendarText, setCalendarText] = useState("입고가 완료된");
 
   const [workStatus, setWorkStatus] = useState(detailData?.status);
+
+  useEffect(() => {
+    const loading = async () => {
+      setIsLoading(true);
+      await sleep(300);
+      setIsLoading(false);
+    };
+    loading();
+  }, []);
 
   useEffect(() => {
     switch (workStatus) {
