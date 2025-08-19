@@ -2,7 +2,6 @@
 
 import CommonModal from "@/components/modal/CommonModal";
 import ProposeModal from "@/components/modal/ProposeModal";
-import { callData } from "@/mock/data";
 import { useCallDataStore } from "@/store/callData";
 import { useLoadingStore } from "@/store/loading";
 import { usePropoesStore } from "@/store/propoes";
