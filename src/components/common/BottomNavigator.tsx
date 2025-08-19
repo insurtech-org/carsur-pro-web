@@ -133,16 +133,18 @@ export default function BottomNavigator() {
             }`}
           >
             <div className="flex items-center justify-center w-6 h-6 relative">
-              {item.id === "my-work" && (
-                <div className="w-5 h-4 bg-status-destructive rounded-full flex items-center justify-center absolute top-[0px] right-[-15px]">
-                  <span className="text-common-white text-xs font-medium">
-                    {
-                      myWorkData.filter((item) => item.status === "입고확정")
-                        .length
-                    }
-                  </span>
-                </div>
-              )}
+              {item.id === "my-work" &&
+                myWorkData.filter((item) => item.status === "입고확정").length >
+                  0 && (
+                  <div className="w-5 h-4 bg-status-destructive rounded-full flex items-center justify-center absolute top-[0px] right-[-15px]">
+                    <span className="text-common-white text-xs font-medium">
+                      {
+                        myWorkData.filter((item) => item.status === "입고확정")
+                          .length
+                      }
+                    </span>
+                  </div>
+                )}
               {item.icon}
             </div>
             <span

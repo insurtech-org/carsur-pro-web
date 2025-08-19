@@ -236,8 +236,8 @@ export default function CalendarSelectModal({
       <div className="fixed inset-0 z-[9999] flex items-end justify-center">
         <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300" />
 
-        <div className="relative w-full max-w-md max-h-[80vh] transform transition-transform duration-300 ease-out translate-y-full animate-slide-up px-2 bg-bg-normal rounded-t-2xl overflow-hidden">
-          <div className="w-full left-0 inline-flex flex-col justify-start items-center px-4 max-h-[80vh] overflow-y-auto">
+        <div className="relative w-full max-w-md max-h-[88vh] transform transition-transform duration-300 ease-out translate-y-full animate-slide-up px-2 bg-bg-normal rounded-t-2xl overflow-hidden">
+          <div className="w-full left-0 inline-flex flex-col justify-start items-center px-4 max-h-[88vh] overflow-y-auto">
             {/* 헤더 섹션 */}
             <div className="w-full flex flex-col justify-start items-center sticky top-0 bg-bg-normal">
               {/* 핸들바 */}

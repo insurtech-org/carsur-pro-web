@@ -1,7 +1,7 @@
 "use client";
 
 import List from "@/components/unit/work/List";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { workStatus, workStatusCount } from "@/mock/data";
 import { useMyWorkStore } from "@/store/mywork";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +15,7 @@ function WorkPageContent() {
 
   const [activeTab, setActiveTab] = useState(initialStatus);
   const [workTab, setWorkTab] = useState(workStatusCount(myWorkData));
+  const filterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const workStatusData = workStatusCount(myWorkData);
@@ -23,6 +24,30 @@ function WorkPageContent() {
     //params 초기화
     router.replace(`/work?status=${activeTab}`);
   }, [activeTab, myWorkData, router]);
+
+  // 활성 탭이 변경될 때 해당 필터로 스크롤
+  useEffect(() => {
+    if (filterContainerRef.current) {
+      const container = filterContainerRef.current;
+      const activeButton = container.querySelector(
+        `[data-status="${activeTab}"]`
+      ) as HTMLElement;
+
+      if (activeButton) {
+        // 활성 버튼이 컨테이너의 중앙에 오도록 스크롤
+        const containerWidth = container.offsetWidth;
+        const buttonLeft = activeButton.offsetLeft;
+        const buttonWidth = activeButton.offsetWidth;
+
+        const scrollLeft = buttonLeft - containerWidth / 2 + buttonWidth / 2;
+
+        container.scrollTo({
+          left: Math.max(0, scrollLeft),
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [activeTab]);
 
   const onClickTab = (tab: string) => {
     setActiveTab(tab);
@@ -40,9 +65,13 @@ function WorkPageContent() {
         </div>
 
         {/* 필터 */}
-        <div className="flex w-full items-start gap-1.5 overflow-x-auto scrollbar-hide py-4 px-5">
+        <div
+          ref={filterContainerRef}
+          className="flex w-full items-start gap-1.5 overflow-x-auto scrollbar-hide py-4 px-5"
+        >
           {Object.keys(workTab).map((item, idx) => (
             <button
+              data-status={item}
               key={idx}
               className={`flex shrink-0 items-center justify-center min-w-[70px]  text-left py-2 px-2.5 gap-1 rounded-full  ${
                 activeTab === item
