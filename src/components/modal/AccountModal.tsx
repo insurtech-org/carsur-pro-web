@@ -9,7 +9,11 @@ interface AccountModalProps {
   title: string;
   isOpen: boolean;
   onClose: () => void;
-  onClickConfirm: (totalPrice: number) => void;
+  onClickConfirm: (
+    totalPrice: number,
+    partsPrice: number,
+    laborPrice: number
+  ) => void;
 }
 
 export default function AccountModal({
@@ -98,8 +102,8 @@ export default function AccountModal({
       <div className="fixed inset-0 z-[9999] flex items-end justify-center">
         <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300" />
 
-        <div className="relative w-full max-w-md max-h-[80vh] transform transition-transform duration-300 ease-out translate-y-full animate-slide-up px-2 bg-bg-normal rounded-t-2xl overflow-hidden">
-          <div className="w-full left-0 inline-flex flex-col justify-start items-center px-4 max-h-[80vh] overflow-y-auto">
+        <div className="relative w-full max-w-md max-h-[80vh] transform transition-transform duration-300 ease-out translate-y-full animate-slide-up bg-bg-normal rounded-t-2xl overflow-hidden px-4">
+          <div className="w-full left-0 inline-flex flex-col justify-start items-center max-h-[80vh] overflow-y-auto">
             {/* 헤더 섹션 */}
             <div className="w-full flex flex-col justify-start items-center sticky top-0 bg-bg-normal">
               {/* 핸들바 */}
@@ -229,11 +233,11 @@ export default function AccountModal({
               </div>
             </div>
 
-            {/* 청구 금액 입력 섹션 */}
-            <div className="self-stretch h-56 px-2 inline-flex flex-col justify-start items-start my-2">
+            {/* 키패드 섹션 */}
+            <div className="self-stretch h-56 inline-flex flex-col justify-start items-start my-2">
               <div className="self-stretch flex-1 inline-flex justify-start items-center">
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("1")}
                 >
                   <div className="w-2.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -241,7 +245,7 @@ export default function AccountModal({
                   </div>
                 </button>
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("2")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -249,7 +253,7 @@ export default function AccountModal({
                   </div>
                 </button>
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("3")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -259,7 +263,7 @@ export default function AccountModal({
               </div>
               <div className="self-stretch flex-1 inline-flex justify-start items-center">
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("4")}
                 >
                   <div className="w-4 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -267,7 +271,7 @@ export default function AccountModal({
                   </div>
                 </button>
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("5")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -275,7 +279,7 @@ export default function AccountModal({
                   </div>
                 </button>
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("6")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -285,7 +289,7 @@ export default function AccountModal({
               </div>
               <div className="self-stretch flex-1 inline-flex justify-start items-center">
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("7")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -293,7 +297,7 @@ export default function AccountModal({
                   </div>
                 </button>
                 <div
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("8")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -301,7 +305,7 @@ export default function AccountModal({
                   </div>
                 </div>
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("9")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -311,7 +315,7 @@ export default function AccountModal({
               </div>
               <div className="self-stretch flex-1 inline-flex justify-start items-center">
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("00")}
                 >
                   <div className="w-7 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -319,7 +323,7 @@ export default function AccountModal({
                   </div>
                 </button>
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={() => handleNumberInput("0")}
                 >
                   <div className="w-3.5 self-stretch text-center justify-center text-primary-normal text-2xl font-medium leading-loose">
@@ -327,7 +331,7 @@ export default function AccountModal({
                   </div>
                 </button>
                 <button
-                  className="flex-1 self-stretch px-2 rounded-lg flex justify-center items-center hover:bg-neutral-50"
+                  className="flex-1 self-stretch rounded-lg flex justify-center items-center active:bg-neutral-50"
                   onClick={handleBackspace}
                 >
                   <div className="w-7 h-7 relative overflow-hidden">
@@ -338,13 +342,21 @@ export default function AccountModal({
             </div>
 
             {/* 버튼 섹션 */}
-            <div className="py-4 sticky bottom-0 bg-bg-normal w-full">
+            <div className="pb-8 pt-4 sticky bottom-0 bg-bg-normal w-full">
               <div className="flex justify-center gap-2">
                 <SubButton text="취소" onClick={onClickClose} />
                 <MainButton
                   text="청구하기"
-                  onClick={() => onClickConfirm(totalPrice)}
-                  disabled={totalPrice === 0}
+                  onClick={() =>
+                    onClickConfirm(
+                      totalPrice,
+                      Number(inputPrice1),
+                      Number(inputPrice2)
+                    )
+                  }
+                  disabled={
+                    Number(inputPrice1) === 0 || Number(inputPrice2) === 0
+                  }
                 />
               </div>
             </div>

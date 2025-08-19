@@ -5,22 +5,26 @@ import TextButton from "@/components/common/TextButton";
 import AccountModal from "@/components/modal/AccountModal";
 import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
 import CancelSelectModal from "@/components/modal/CancelSelectModal";
-import { workDetailStatus, workStatus, workSteps } from "@/mock/data";
 import { useLoadingStore } from "@/store/loading";
 import { useMyWorkStore } from "@/store/mywork";
 import { useToastStore } from "@/store/toast";
-import { getWorkUnderStatus, sleep, statusColor } from "@/utils/util";
+import { sleep, statusColor } from "@/utils/util";
 import dayjs from "dayjs";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import StatusBarCard from "./elements/StatusBarCard";
+import ComplatedCard from "./elements/ComplatedCard";
 
 export default function WorkDetail() {
-  const { myWorkData, updateMyWorkData, deleteMyWorkData } = useMyWorkStore();
+  const { myWorkData, updateMyWorkData, deleteMyWorkData, getMyWorkData } =
+    useMyWorkStore();
 
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = Number(params.id);
   const detailData = myWorkData.find((data) => data.id === id);
   const router = useRouter();
+
   const { showSuccess } = useToastStore();
   const { setIsLoading } = useLoadingStore();
 
@@ -31,6 +35,7 @@ export default function WorkDetail() {
   const [mainButtonText, setMainButtonText] = useState("입고 완료");
   const [calendarText, setCalendarText] = useState("입고가 완료된");
 
+  const [workData, setWorkData] = useState(detailData);
   const [workStatus, setWorkStatus] = useState(detailData?.status);
 
   useEffect(() => {
@@ -40,7 +45,11 @@ export default function WorkDetail() {
       setIsLoading(false);
     };
     loading();
-  }, []);
+
+    //prarams 수정
+
+    router.replace(`/work/${id}?status=${workData?.status}`);
+  }, [workData]);
 
   useEffect(() => {
     switch (workStatus) {
@@ -134,21 +143,30 @@ export default function WorkDetail() {
       showSuccess("차량 출고가 완료되었어요.");
     }
 
+    const data = getMyWorkData(id);
+    setWorkData(data);
+    setWorkStatus(data?.status);
     setCalendarSelectModalOpen(false);
-    router.back();
   };
 
   //청구 금액 이벤트
-  const onClickAccountConfirm = (price: number) => {
+  const onClickAccountConfirm = (
+    price: number,
+    laborPrice: number,
+    partsPrice: number
+  ) => {
     updateMyWorkData(id, {
       status: "청구완료",
       claimDate: dayjs().format("YYYY.MM.DD"),
       price: price,
+      laborPrice: laborPrice,
+      partsPrice: partsPrice,
     });
 
     showSuccess("청구가 처리가 완료되었어요.");
     setAccountModalOpen(false);
-    router.back();
+    setWorkData(getMyWorkData(id));
+    setWorkStatus(getMyWorkData(id)?.status);
   };
 
   return (
@@ -157,9 +175,9 @@ export default function WorkDetail() {
         <div className="flex flex-col items-start self-stretch bg-neutral-100 py-4 gap-4">
           {/* 지역, 상태 배찌 */}
           <div className="flex items-start ml-5 gap-2">
-            <div className="flex flex-col shrink-0 items-start bg-white text-left py-1 px-2 rounded-md border border-solid border-secondary-normal">
+            <div className="flex flex-col shrink-0 items-start bg-bg-normal text-left py-1 px-2 rounded-md border border-solid border-secondary-normal">
               <span className="text-secondary-normal text-xs font-medium">
-                {detailData?.location}
+                {workData?.location}
               </span>
             </div>
             <div
@@ -178,122 +196,69 @@ export default function WorkDetail() {
           {/* 보험사, 차량명 */}
           <div className="flex flex-col items-start self-stretch mx-5">
             <span className="text-secondary-normal text-[15px] font-semibold">
-              {detailData?.company}
+              {workData?.company}
             </span>
             <span className="text-primary-normal text-[22px] font-semibold">
-              {detailData?.carName}
+              {workData?.carName}
             </span>
           </div>
 
-          {/* 상태 바*/}
-          <div
-            className="flex flex-col items-start self-stretch bg-white py-4 mx-5 gap-6 rounded-xl border border-solid border-neutral-100"
-            style={{
-              boxShadow: "0px 4px 20px #0A0C1112",
-            }}
-          >
-            <span className="text-neutral-800 text-lg font-semibold ml-[22px] mr-4">
-              {workDetailStatus[workStatus as keyof typeof workDetailStatus] ||
-                "고객과 입고 일정을 확정해 주세요"}
-            </span>
-
-            <div className="flex items-start self-stretch mx-4 h-11 relative">
-              {Object.keys(workDetailStatus).map((item, idx) => {
-                const isCompleted =
-                  workSteps.indexOf(item) <=
-                  workSteps.indexOf(workStatus as string);
-                const currentStepIndex = workSteps.indexOf(
-                  workStatus as string
-                );
-
-                return (
-                  <div
-                    className="flex flex-1 flex-col items-center relative"
-                    key={idx}
-                  >
-                    {/* 연결선 - 첫 번째가 아닌 경우에만 표시 */}
-                    {idx > 0 && (
-                      <div
-                        className="absolute top-[11px] right-1/2 w-full h-0.5 z-0"
-                        style={{
-                          backgroundColor:
-                            idx <= currentStepIndex ? "#262626" : "#e5e5e5",
-                        }}
-                      ></div>
-                    )}
-
-                    {/* 아이콘 */}
-                    <div className="relative z-10">
-                      {isCompleted ? (
-                        <img
-                          src={"/images/icon/ic_check-circle-fill.svg"}
-                          className="w-[22px] h-[22px] object-fill bg-bg-normal border border-solid border-neutral-800 rounded-full"
-                        />
-                      ) : (
-                        <div className="flex w-[22px] h-[22px] items-center border border-solid border-neutral-300 rounded-full justify-center bg-bg-normal">
-                          <span className="text-neutral-500 text-[13px] font-medium">
-                            {idx + 1}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col items-center mt-2">
-                      <span className="text-neutral-700 text-xs font-semibold text-center">
-                        {item}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          {/*상태바 카드*/}
+          {workStatus === "청구완료" ? (
+            <ComplatedCard data={workData} />
+          ) : (
+            <StatusBarCard data={workData} />
+          )}
         </div>
       </div>
 
       <div className="flex flex-col self-stretch bg-bg-normal py-4 gap-8">
-        <div className="flex flex-col items-start self-stretch bg-neutral-50 py-4 mx-5 gap-4 rounded-xl p-4">
-          <span className="text-primary-normal text-[17px] font-semibold">
-            고객 정보
-          </span>
-          <div className="flex w-full items-center justify-between">
-            <span className="text-neutral-600 text-base font-regular">
-              고객전화번호
+        {/* 고객 정보 */}
+        {workStatus !== "청구완료" && (
+          <div className="flex flex-col items-start self-stretch bg-neutral-50 py-4 mx-5 gap-4 rounded-xl p-4">
+            <span className="text-primary-normal text-[17px] font-semibold">
+              고객 정보
             </span>
-            <div className="flex items-center gap-1">
-              <img
-                src={"/images/img/img_call-orange.png"}
-                className="w-6 h-6 object-fill"
-              />
-              <span className="text-primary-normal text-base font-medium">
-                {detailData?.customerPhone}
+            <div className="flex w-full items-center justify-between">
+              <span className="text-neutral-600 text-base font-regular">
+                고객전화번호
               </span>
+              <div className="flex items-center gap-1">
+                <img
+                  src={"/images/img/img_call-orange.png"}
+                  className="w-6 h-6 object-fill"
+                />
+                <span className="text-primary-normal text-base font-medium">
+                  {workData?.customerPhone}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
         <div className="flex flex-col items-start self-stretch mx-5 gap-4">
-          <span className="text-[#131211] text-lg font-bold ml-1">
+          <span className="text-primary-normal text-lg font-semibold ml-1">
             예약 정보
           </span>
           <div className="flex flex-col self-stretch mx-1 gap-2">
             <div className="flex flex-col items-start self-stretch">
-              <span className="text-[#131211] text-base font-bold mb-[9px]">
+              <span className="text-primary-normal text-base font-medium mb-[9px]">
                 보험 정보
               </span>
               <div className="flex justify-between items-center self-stretch mb-2">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   사고접수번호
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {detailData?.accidentNumber}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {workData?.accidentNumber}
                 </span>
               </div>
               <div className="flex justify-between items-center self-stretch">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   보험사
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {detailData?.company}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {workData?.company}
                 </span>
               </div>
             </div>
@@ -303,19 +268,19 @@ export default function WorkDetail() {
                 예약 기본 정보
               </span>
               <div className="flex justify-between items-center self-stretch mb-2">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   예약지역
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {detailData?.location}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {workData?.location}
                 </span>
               </div>
               <div className="flex justify-between items-center self-stretch">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   입고 예약일
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {detailData?.reservationDate}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {workData?.reservationDate}
                 </span>
               </div>
             </div>
@@ -325,46 +290,46 @@ export default function WorkDetail() {
                 차량 정보
               </span>
               <div className="flex justify-between items-center self-stretch mb-2">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   차량번호
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {detailData?.carNumber}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {workData?.carNumber}
                 </span>
               </div>
               <div className="flex justify-between items-center self-stretch mb-2">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   차종
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {detailData?.carType}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {workData?.carType}
                 </span>
               </div>
               <div className="flex justify-between items-center self-stretch mb-2">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   배기량
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {detailData?.carDisplacement}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {workData?.carDisplacement}
                 </span>
               </div>
               <div className="flex justify-between items-center self-stretch">
-                <span className="flex-1 text-[#616161] text-base mr-1">
+                <span className="flex-1 text-neutral-700 text-base mr-1 font-regular">
                   {"연식"}
                 </span>
-                <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                  {`${detailData?.carYear}년`}
+                <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                  {`${workData?.carYear}년`}
                 </span>
               </div>
             </div>
           </div>
         </div>
         <div className="flex flex-col items-start self-stretch mx-5 gap-4">
-          <span className="text-[#131211] text-lg font-bold ml-1">
+          <span className="text-primary-normal text-lg font-semibold ml-1">
             히스토리
           </span>
           <div className="flex flex-col self-stretch mx-1 gap-2">
-            {detailData?.reservationDate && (
+            {workData?.reservationDate && (
               <div className="flex items-center self-stretch gap-2.5">
                 <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
                 <div className="flex flex-1 justify-between items-center">
@@ -372,13 +337,13 @@ export default function WorkDetail() {
                     예약확정
                   </span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {detailData?.reservationDate}
+                    {workData?.reservationDate}
                   </span>
                 </div>
               </div>
             )}
 
-            {detailData?.inDate && (
+            {workData?.inDate && (
               <div className="flex items-center self-stretch gap-2.5">
                 <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
                 <div className="flex flex-1 justify-between items-center">
@@ -386,13 +351,13 @@ export default function WorkDetail() {
                     차량입고
                   </span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-1">
-                    {detailData?.inDate}
+                    {workData?.inDate.replaceAll("-", ".")} {workData?.inTime}
                   </span>
                 </div>
               </div>
             )}
 
-            {detailData?.startDate && (
+            {workData?.startDate && (
               <div className="flex items-center self-stretch gap-2.5">
                 <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
                 <div className="flex flex-1 justify-between items-center">
@@ -400,13 +365,14 @@ export default function WorkDetail() {
                     수리시작
                   </span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-0.5">
-                    {detailData?.startDate}
+                    {workData?.startDate.replaceAll("-", ".")}{" "}
+                    {workData?.startTime}
                   </span>
                 </div>
               </div>
             )}
 
-            {detailData?.endDate && (
+            {workData?.endDate && (
               <div className="flex items-center self-stretch gap-2.5">
                 <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
                 <div className="flex flex-1 justify-between items-center">
@@ -414,13 +380,13 @@ export default function WorkDetail() {
                     수리완료
                   </span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {detailData?.endDate}
+                    {workData?.endDate.replaceAll("-", ".")} {workData?.endTime}
                   </span>
                 </div>
               </div>
             )}
 
-            {detailData?.outDate && (
+            {workData?.outDate && (
               <div className="flex items-center self-stretch gap-2.5">
                 <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
                 <div className="flex flex-1 justify-between items-center">
@@ -428,7 +394,22 @@ export default function WorkDetail() {
                     차량출고
                   </span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {detailData?.outDate}
+                    {workData?.outDate.replaceAll("-", ".")} {workData?.outTime}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {workData?.claimDate && (
+              <div className="flex items-center self-stretch gap-2.5">
+                <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
+                <div className="flex flex-1 justify-between items-center">
+                  <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">
+                    청구완료
+                  </span>
+                  <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
+                    {workData?.claimDate.replaceAll("-", ".")}{" "}
+                    {workData?.outTime}
                   </span>
                 </div>
               </div>
@@ -438,7 +419,7 @@ export default function WorkDetail() {
       </div>
 
       {/* 청구 완료 버튼 */}
-      <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch py-4 mx-5 gap-1 rounded-xl bg-bg-normal">
+      <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch mx-5 gap-1 rounded-xl bg-bg-normal pb-8 pt-4 ">
         <MainButton
           text={mainButtonText}
           onClick={onClickMainButton}
@@ -469,7 +450,9 @@ export default function WorkDetail() {
         title="청구 금액을 입력해 주세요."
         isOpen={accountModalOpen}
         onClose={() => setAccountModalOpen(false)}
-        onClickConfirm={(price) => onClickAccountConfirm(price)}
+        onClickConfirm={(price, laborPrice, partsPrice) =>
+          onClickAccountConfirm(price, laborPrice, partsPrice)
+        }
       />
     </>
   );

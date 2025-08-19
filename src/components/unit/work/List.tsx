@@ -17,6 +17,14 @@ export default function WorkList({ currentStatus }: { currentStatus: string }) {
       setIsLoading(false);
     };
     loading();
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth",
+      });
+    }, 100);
   }, []);
 
   return (
@@ -37,8 +45,9 @@ export default function WorkList({ currentStatus }: { currentStatus: string }) {
 
 const WorkCard = ({ data }: { data: any }) => {
   const router = useRouter();
+
   const onClickDetail = (id: number) => {
-    router.push(`/work/${id}`);
+    router.push(`/work/${id}?status=${data.status}`);
   };
 
   return (

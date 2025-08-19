@@ -63,6 +63,8 @@ export const workData = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 100000, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 2,
@@ -87,6 +89,8 @@ export const workData = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 3,
@@ -111,6 +115,8 @@ export const workData = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 4,
@@ -135,6 +141,8 @@ export const workData = [
     endTime: "10:00", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 5,
@@ -159,6 +167,8 @@ export const workData = [
     endTime: "10:00", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 6,
@@ -182,7 +192,9 @@ export const workData = [
     endDate: "2025.10.07", //수리 완료일
     endTime: "10:00", //수리 완료 시간
     claimDate: "2025.10.08", //청구완료일
-    price: 100000, //청구금액
+    price: 165000, //청구금액
+    partsPrice: 50000, //부품비
+    laborPrice: 100000, //공임비
   },
 ];
 
@@ -211,6 +223,8 @@ export const workData2 = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 100000, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 2,
@@ -235,6 +249,8 @@ export const workData2 = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 3,
@@ -259,6 +275,8 @@ export const workData2 = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 4,
@@ -283,6 +301,8 @@ export const workData2 = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 5,
@@ -307,6 +327,8 @@ export const workData2 = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
   {
     id: 6,
@@ -331,6 +353,8 @@ export const workData2 = [
     endTime: "", //수리 완료 시간
     claimDate: "", //청구완료일
     price: 0, //청구금액
+    partsPrice: 0, //부품비
+    laborPrice: 0, //공임비
   },
 ];
 

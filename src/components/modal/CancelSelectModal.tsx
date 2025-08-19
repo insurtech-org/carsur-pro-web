@@ -68,6 +68,7 @@ const CancelSelectModal = ({
                     </div>
                     <div className="inline-flex justify-start items-center gap-2">
                       <input
+                        id="cancel-select-1"
                         type="radio"
                         name="cancel-select"
                         className="customRadio"
@@ -77,12 +78,16 @@ const CancelSelectModal = ({
                           onChangeChecked(event.target.value)
                         }
                       />
-                      <div className="justify-start text-primary-normal text-base font-regular">
+                      <label
+                        htmlFor="cancel-select-1"
+                        className="justify-start text-primary-normal text-base font-regular"
+                      >
                         다른 공업사로 수리 예약
-                      </div>
+                      </label>
                     </div>
                     <div className="inline-flex justify-start items-center gap-2">
                       <input
+                        id="cancel-select-2"
                         type="radio"
                         name="cancel-select"
                         className="customRadio"
@@ -92,12 +97,16 @@ const CancelSelectModal = ({
                           onChangeChecked(event.target.value)
                         }
                       />
-                      <div className="justify-start text-primary-normal text-base font-regular">
+                      <label
+                        htmlFor="cancel-select-2"
+                        className="justify-start text-primary-normal text-base font-regular"
+                      >
                         미수선처리
-                      </div>
+                      </label>
                     </div>
                     <div className="inline-flex justify-start items-center gap-2">
                       <input
+                        id="cancel-select-3"
                         type="radio"
                         name="cancel-select"
                         className="customRadio"
@@ -107,15 +116,19 @@ const CancelSelectModal = ({
                           onChangeChecked(event.target.value)
                         }
                       />
-                      <div className="justify-start text-primary-normal text-base font-regular">
+                      <label
+                        htmlFor="cancel-select-3"
+                        className="justify-start text-primary-normal text-base font-regular"
+                      >
                         고객변심
-                      </div>
+                      </label>
                     </div>
                     <div className="justify-start text-primary-alternative text-sm font-medium">
                       공업사 사정에 의한 취소
                     </div>
                     <div className="inline-flex justify-start items-center gap-2">
                       <input
+                        id="cancel-select-4"
                         type="radio"
                         name="cancel-select"
                         className="customRadio"
@@ -125,15 +138,18 @@ const CancelSelectModal = ({
                           onChangeChecked(event.target.value)
                         }
                       />
-                      <div className="justify-start text-primary-normal text-base font-regular">
+                      <label
+                        htmlFor="cancel-select-4"
+                        className="justify-start text-primary-normal text-base font-regular"
+                      >
                         입고 일자를 맞추지 못함
-                      </div>
+                      </label>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="self-stretch bg-bg-normal flex flex-col justify-start items-start pb-4">
-                <div className="self-stretch px-5 py-6 flex flex-col justify-start items-start">
+              <div className="self-stretch bg-bg-normal flex flex-col justify-start items-start">
+                <div className="self-stretch px-5 pb-8 pt-4 flex flex-col justify-start items-start">
                   <div className="self-stretch inline-flex justify-start items-start gap-2">
                     <SubButton text="닫기" onClick={onClickClose} />
 

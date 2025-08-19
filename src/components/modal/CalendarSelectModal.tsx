@@ -411,16 +411,17 @@ export default function CalendarSelectModal({
             </div>
 
             {/* 버튼 섹션 */}
-            <div className="py-4 sticky bottom-0 bg-bg-normal w-full">
+            <div className="pb-8 pt-4 sticky bottom-0 bg-bg-normal w-full">
               <div className="flex justify-center">
                 <MainButton
                   text="완료"
-                  onClick={() =>
+                  onClick={() => {
                     onClickConfirm(
                       selectedDate?.format("YYYY-MM-DD") || "",
                       selectedTimes[0] || ""
-                    )
-                  }
+                    );
+                    onClickClose();
+                  }}
                   disabled={!selectedDate || !selectedTimes[0]}
                 />
               </div>

@@ -4,15 +4,23 @@ import List from "@/components/unit/work/List";
 import { useEffect, useState } from "react";
 import { workStatus, workStatusCount } from "@/mock/data";
 import { useMyWorkStore } from "@/store/mywork";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function WorkPage() {
   const { myWorkData } = useMyWorkStore();
-  const [activeTab, setActiveTab] = useState("입고확정");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialStatus = searchParams.get("status") || "입고확정";
+
+  const [activeTab, setActiveTab] = useState(initialStatus);
   const [workTab, setWorkTab] = useState(workStatusCount(myWorkData));
 
   useEffect(() => {
     const workStatusData = workStatusCount(myWorkData);
     setWorkTab(workStatusData);
+
+    //params 초기화
+    router.replace(`/work?status=${activeTab}`);
   }, [activeTab]);
 
   const onClickTab = (tab: string) => {

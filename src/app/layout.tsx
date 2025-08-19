@@ -1,5 +1,4 @@
 "use client";
-import localFont from "next/font/local";
 import "./globals.css";
 import { useEffect, useState } from "react";
 import BottomNavigator from "@/components/common/BottomNavigator";
@@ -7,29 +6,6 @@ import { useToastStore } from "@/store/toast";
 import Toast from "@/components/common/Toast";
 import LoadingPage from "@/components/common/LoadingPage";
 import { useLoadingStore } from "@/store/loading";
-
-const geistSans = localFont({
-  src: "../../public/fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../../public/fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
-const pretendard = localFont({
-  src: [
-    {
-      path: "../../public/fonts/PretendardVariable.woff2",
-      weight: "100 900",
-      style: "normal",
-    },
-  ],
-  variable: "--font-pretendard",
-  display: "swap",
-});
 
 export default function RootLayout({
   children,
@@ -40,9 +16,16 @@ export default function RootLayout({
 
   return (
     <html lang="ko">
-      <body
-        className={`${pretendard.variable} ${geistSans.variable} ${geistMono.variable} font-pretendard antialiased`}
-      >
+      <head>
+        {/* 프리텐다드 웹폰트 CDN */}
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin=""
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+        />
+      </head>
+      <body className="font-pretendard antialiased">
         <div className="min-h-screen bg-gray-50">
           <div className="hybrid-container">
             <div className="flex-1 w-full">{children}</div>

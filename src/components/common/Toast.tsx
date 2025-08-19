@@ -149,11 +149,12 @@ const Toast: React.FC<ToastProps> = ({
       }`}
     >
       <div
-        className={`w-80 px-4 py-2.5 ${bgColor} rounded-lg inline-flex justify-start items-center gap-4 shadow-lg`}
+        className={`px-4 w-80 max-w-[480px] py-2.5 ${bgColor} rounded-lg inline-flex justify-start items-center gap-4 shadow-lg`}
+        onClick={handleClose}
       >
         <div className="flex-1 flex justify-start items-center gap-2">
           {icon}
-          <div className="flex-1 justify-start text-Bg-Normal text-sm font-medium font-['Pretendard'] leading-tight tracking-tight">
+          <div className="flex-1 justify-start text-bg-normal text-sm font-medium">
             {message}
             {subMessage && <br />}
             {subMessage}

@@ -55,7 +55,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
 
   return (
     <>
-      <div className="flex flex-col bg-white py-4">
+      <div className="flex flex-col bg-white pt-4">
         <div className="self-stretch bg-white ">
           <div className="flex flex-col self-stretch mb-20 px-5 gap-8">
             <div className="flex flex-col items-start self-stretch gap-4">
@@ -186,8 +186,8 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
             </div>
           </div>
 
-          <div className="flex flex-col self-stretch mb-10">
-            <div className="flex items-start self-stretch py-4 px-5 gap-2">
+          <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch pb-8 pt-4 gap-1 rounded-xl bg-bg-normal">
+            <div className="flex items-start self-stretch px-5 gap-2">
               {isProposal ? (
                 <button
                   className="flex flex-1 flex-col items-center bg-neutral-100 text-left py-3 rounded-lg border-0"

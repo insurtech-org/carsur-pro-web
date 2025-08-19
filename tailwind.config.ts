@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        pretendard: ["var(--font-pretendard)", "Pretendard", "sans-serif"],
+        pretendard: ["Pretendard", "sans-serif"],
       },
       colors: {
         // 기존 설정 유지

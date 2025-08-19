@@ -123,7 +123,7 @@ const ProposeModal = ({
               </div>
 
               {/* 버튼 영역 */}
-              <div className="flex flex-row bg-white py-4 gap-2">
+              <div className="flex flex-row bg-white pb-8 pt-4 gap-2">
                 <SubButton
                   text="닫기"
                   onClick={onClickClose}

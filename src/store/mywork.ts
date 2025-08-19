@@ -25,6 +25,8 @@ interface IMyWorkData {
   endTime: string; //수리 완료 시간
   claimDate: string; //청구완료일
   price: number; //청구금액
+  partsPrice: number; //부품비
+  laborPrice: number; //공임비
 }
 
 interface IMyWorkStore {
@@ -34,11 +36,12 @@ interface IMyWorkStore {
   addMyWorkData: (data: IMyWorkData) => void;
   updateMyWorkData: (id: number, data: Partial<IMyWorkData>) => void;
   deleteMyWorkData: (id: number) => void;
+  getMyWorkData: (id: number) => IMyWorkData | undefined;
 }
 
 // Zustand 스토어 생성
 export const useMyWorkStore = create<IMyWorkStore>((set, get) => ({
-  myWorkData: workData2,
+  myWorkData: workData,
   setMyWorkData: (data) => set({ myWorkData: data }),
   addMyWorkData: (data) => set({ myWorkData: [...get().myWorkData, data] }),
   updateMyWorkData: (id, data) =>
@@ -49,4 +52,5 @@ export const useMyWorkStore = create<IMyWorkStore>((set, get) => ({
     }),
   deleteMyWorkData: (id) =>
     set({ myWorkData: get().myWorkData.filter((item) => item.id !== id) }),
+  getMyWorkData: (id) => get().myWorkData.find((item) => item.id === id),
 }));
