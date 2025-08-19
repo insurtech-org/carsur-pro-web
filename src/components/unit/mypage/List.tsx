@@ -23,44 +23,42 @@ export default function MyPageList() {
               </div>
             </div>
           </div>
-          <div className="self-stretch flex flex-col justify-start items-start">
-            <div className="self-stretch h-24 py-5 bg-neutral-100 rounded-[10px] inline-flex justify-center items-center relative">
-              <div className="flex-1 inline-flex flex-col justify-center items-center gap-2.5">
-                <div className="justify-center text-black/20 text-xs font-medium leading-none ">
-                  캐시
-                </div>
-                <div className="self-stretch inline-flex justify-center items-center gap-2">
-                  <div className="text-center justify-start text-black/20 text-base font-semibold">
-                    0
-                  </div>
-                  <div className="text-center justify-start text-black/20 text-base font-semibold">
-                    C
-                  </div>
-                </div>
+          <div className="self-stretch h-24 py-5 bg-neutral-100 rounded-[10px] inline-flex justify-center items-center relative">
+            {/* 캐시/포인트 박스 */}
+            <div className="flex-1 inline-flex flex-col justify-center items-center gap-2.5">
+              <div className="justify-center text-black/20 text-xs font-medium leading-none ">
+                캐시
               </div>
-
-              <div className="w-px h-full bg-neutral-200" />
-
-              <div className="flex-1 inline-flex flex-col justify-center items-center gap-2.5">
-                <div className="justify-center text-black/20 text-xs font-medium leading-none ">
-                  포인트
+              <div className="self-stretch inline-flex justify-center items-center gap-2">
+                <div className="text-center justify-start text-black/20 text-base font-semibold">
+                  0
                 </div>
-                <div className="self-stretch inline-flex justify-center items-center gap-2">
-                  <div className="text-center justify-center text-black/20 text-base font-semibold">
-                    0
-                  </div>
-                  <div className="text-center justify-center text-black/20 text-base font-semibold">
-                    P
-                  </div>
+                <div className="text-center justify-start text-black/20 text-base font-semibold">
+                  C
                 </div>
               </div>
             </div>
 
-            <div className="absolute left-0 right-0 px-4">
-              <div className="self-stretch h-24 bg-[#212121]/40 rounded-[10px] inline-flex justify-center items-center w-full">
-                <div className="text-center justify-start text-white text-base font-semibold">
-                  개발 예정입니다.
+            <div className="w-px h-full bg-neutral-200" />
+
+            <div className="flex-1 inline-flex flex-col justify-center items-center gap-2.5">
+              <div className="justify-center text-black/20 text-xs font-medium leading-none ">
+                포인트
+              </div>
+              <div className="self-stretch inline-flex justify-center items-center gap-2">
+                <div className="text-center justify-center text-black/20 text-base font-semibold">
+                  0
                 </div>
+                <div className="text-center justify-center text-black/20 text-base font-semibold">
+                  P
+                </div>
+              </div>
+            </div>
+
+            {/* 오버레이 */}
+            <div className="absolute inset-0 bg-[#212121]/40 rounded-[10px] flex justify-center items-center">
+              <div className="text-center text-white text-base font-semibold">
+                개발 예정입니다.
               </div>
             </div>
           </div>
@@ -79,7 +77,7 @@ export default function MyPageList() {
               <div
                 data-name="Chevron Right"
                 data-size="sm"
-                className="w-6 h-6 relative overflow-hidden"
+                className="w-6 h-6 overflow-hidden"
               >
                 <img src="/images/icon/ic_arrow-right-2.svg" />
               </div>
