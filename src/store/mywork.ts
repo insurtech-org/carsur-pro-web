@@ -1,4 +1,4 @@
-import { workData } from "@/mock/data";
+import { workData, workData2 } from "@/mock/data";
 import { create } from "zustand";
 
 // 스토어 상태 타입
@@ -38,7 +38,7 @@ interface IMyWorkStore {
 
 // Zustand 스토어 생성
 export const useMyWorkStore = create<IMyWorkStore>((set, get) => ({
-  myWorkData: workData,
+  myWorkData: workData2,
   setMyWorkData: (data) => set({ myWorkData: data }),
   addMyWorkData: (data) => set({ myWorkData: [...get().myWorkData, data] }),
   updateMyWorkData: (id, data) =>

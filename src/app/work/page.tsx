@@ -2,21 +2,22 @@
 
 import List from "@/components/unit/work/List";
 import { useEffect, useState } from "react";
-import { workStatus } from "@/mock/data";
+import { workStatus, workStatusCount } from "@/mock/data";
 import { useMyWorkStore } from "@/store/mywork";
 
 export default function WorkPage() {
-  const [activeTab, setActiveTab] = useState("전체");
-  const [workTab, setWorkTab] = useState(workStatus);
   const { myWorkData } = useMyWorkStore();
+  const [activeTab, setActiveTab] = useState("입고확정");
+  const [workTab, setWorkTab] = useState(workStatusCount(myWorkData));
 
   useEffect(() => {
-    setWorkTab(workStatus);
+    const workStatusData = workStatusCount(myWorkData);
+    setWorkTab(workStatusData);
   }, [activeTab]);
 
   const onClickTab = (tab: string) => {
     setActiveTab(tab);
-    setWorkTab(workStatus);
+    setWorkTab(workStatusCount(myWorkData));
   };
 
   return (
@@ -31,8 +32,39 @@ export default function WorkPage() {
 
         {/* 필터 */}
         <div className="flex w-full items-start gap-1.5 overflow-x-auto scrollbar-hide py-4 px-5">
+          {Object.keys(workTab).map((item, idx) => (
+            <button
+              key={idx}
+              className={`flex shrink-0 items-center justify-center min-w-[70px]  text-left py-2 px-2.5 gap-1 rounded-full  ${
+                activeTab === item
+                  ? "bg-primary-normal border-0"
+                  : "bg-bg-normal border border-solid border-line-neutral"
+              }`}
+              onClick={() => onClickTab(item)}
+            >
+              <span
+                className={`text-sm font-medium  ${
+                  activeTab === item
+                    ? "text-neutral-50"
+                    : "text-primary-neutral"
+                }`}
+              >
+                {item}
+              </span>
+              <span
+                className={`text-sm font-medium ${
+                  activeTab === item
+                    ? "text-neutral-50"
+                    : "text-secondary-normal"
+                }`}
+              >
+                {workTab[item as keyof typeof workTab]}
+              </span>
+            </button>
+          ))}
+
           <button
-            className={`flex shrink-0 items-start  text-left py-2 px-2.5 gap-1 rounded-full ${
+            className={`flex shrink-0 items-center justify-center min-w-[70px]  py-2 px-2.5 gap-1 rounded-full ${
               activeTab === "전체"
                 ? "bg-primary-normal border-0"
                 : "bg-bg-normal border border-solid border-line-neutral"
@@ -58,37 +90,6 @@ export default function WorkPage() {
               {myWorkData.length}
             </span>
           </button>
-
-          {Object.keys(workTab).map((item, idx) => (
-            <button
-              key={idx}
-              className={`flex shrink-0 items-start  text-left py-2 px-2.5 gap-1 rounded-full  ${
-                activeTab === item
-                  ? "bg-primary-normal border-0"
-                  : "bg-bg-normal border border-solid border-line-neutral"
-              }`}
-              onClick={() => onClickTab(item)}
-            >
-              <span
-                className={`text-sm font-medium  ${
-                  activeTab === item
-                    ? "text-neutral-50"
-                    : "text-primary-neutral"
-                }`}
-              >
-                {item}
-              </span>
-              <span
-                className={`text-sm font-medium ${
-                  activeTab === item
-                    ? "text-neutral-50"
-                    : "text-secondary-normal"
-                }`}
-              >
-                {workStatus[item as keyof typeof workStatus]}
-              </span>
-            </button>
-          ))}
         </div>
       </div>
 

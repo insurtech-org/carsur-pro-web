@@ -49,9 +49,6 @@ export const statusColor = (status: string) => {
 
 //현재 상태를 받아서, 현재 상태보다 아래에 있는 상태 리턴
 export const getWorkUnderStatus = (currentStatus: string) => {
-  console.log("workSteps", workSteps);
-  console.log("currentStatus", currentStatus);
   const currentIndex = workSteps.filter((step) => step === currentStatus);
-  console.log("currentIndex", currentIndex);
   return currentIndex;
 };

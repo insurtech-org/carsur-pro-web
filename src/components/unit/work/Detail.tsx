@@ -2,12 +2,14 @@
 
 import MainButton from "@/components/common/MainButton";
 import TextButton from "@/components/common/TextButton";
+import AccountModal from "@/components/modal/AccountModal";
 import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
 import CancelSelectModal from "@/components/modal/CancelSelectModal";
 import { workDetailStatus, workStatus, workSteps } from "@/mock/data";
 import { useMyWorkStore } from "@/store/mywork";
 import { useToastStore } from "@/store/toast";
 import { getWorkUnderStatus, statusColor } from "@/utils/util";
+import dayjs from "dayjs";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -22,11 +24,15 @@ export default function WorkDetail() {
 
   const [cancelSelectModalOpen, setCancelSelectModalOpen] = useState(false);
   const [calendarSelectModalOpen, setCalendarSelectModalOpen] = useState(false);
+  const [accountModalOpen, setAccountModalOpen] = useState(false);
+
   const [mainButtonText, setMainButtonText] = useState("입고 완료");
   const [calendarText, setCalendarText] = useState("입고가 완료된");
 
+  const [workStatus, setWorkStatus] = useState(detailData?.status);
+
   useEffect(() => {
-    switch (detailData?.status) {
+    switch (workStatus) {
       case "입고확정":
         setMainButtonText("입고 완료");
         break;
@@ -46,10 +52,10 @@ export default function WorkDetail() {
         setMainButtonText("청구 완료");
         break;
     }
-  }, [detailData?.status]);
+  }, [workStatus]);
 
   useEffect(() => {
-    switch (detailData?.status) {
+    switch (workStatus) {
       case "입고확정":
         setCalendarText("입고가 완료된");
         break;
@@ -63,12 +69,18 @@ export default function WorkDetail() {
         setCalendarText("출고가 완료된");
         break;
     }
-  }, [detailData?.status]);
+  }, [workStatus]);
 
-  const onClickMainButton = (status: string) => {
-    setCalendarSelectModalOpen(true);
+  //메인 버튼 클릭 이벤트
+  const onClickMainButton = () => {
+    if (workStatus === "차량출고") {
+      setAccountModalOpen(true);
+    } else {
+      setCalendarSelectModalOpen(true);
+    }
   };
 
+  //입고 확정 취소 이벤트
   const onClickCancelConfirm = () => {
     setCancelSelectModalOpen(false);
     deleteMyWorkData(id);
@@ -77,8 +89,9 @@ export default function WorkDetail() {
     router.back();
   };
 
+  //달력 확정 이벤트
   const onClickCalendarConfirm = (date: string, time: string) => {
-    const status = detailData?.status;
+    const status = workStatus;
 
     if (status === "입고확정") {
       updateMyWorkData(id, {
@@ -114,6 +127,19 @@ export default function WorkDetail() {
     router.back();
   };
 
+  //청구 금액 이벤트
+  const onClickAccountConfirm = (price: number) => {
+    updateMyWorkData(id, {
+      status: "청구완료",
+      claimDate: dayjs().format("YYYY.MM.DD"),
+      price: price,
+    });
+
+    showSuccess("청구가 처리가 완료되었어요.");
+    setAccountModalOpen(false);
+    router.back();
+  };
+
   return (
     <>
       <div className="flex flex-col self-stretch bg-bg-main">
@@ -128,12 +154,12 @@ export default function WorkDetail() {
             <div
               className="flex flex-col shrink-0 items-start text-left py-1 px-2 rounded-md border-0"
               style={{
-                backgroundColor: statusColor(detailData?.status as string)?.bg,
-                color: statusColor(detailData?.status as string)?.text,
+                backgroundColor: statusColor(workStatus as string)?.bg,
+                color: statusColor(workStatus as string)?.text,
               }}
             >
               <span className="text-xs font-medium">
-                {detailData?.status as keyof typeof workStatus}
+                {workStatus as keyof typeof workStatus}
               </span>
             </div>
           </div>
@@ -156,18 +182,17 @@ export default function WorkDetail() {
             }}
           >
             <span className="text-neutral-800 text-lg font-semibold ml-[22px] mr-4">
-              {workDetailStatus[
-                detailData?.status as keyof typeof workDetailStatus
-              ] || "고객과 입고 일정을 확정해 주세요"}
+              {workDetailStatus[workStatus as keyof typeof workDetailStatus] ||
+                "고객과 입고 일정을 확정해 주세요"}
             </span>
 
             <div className="flex items-start self-stretch mx-4 h-11 relative">
               {Object.keys(workDetailStatus).map((item, idx) => {
                 const isCompleted =
                   workSteps.indexOf(item) <=
-                  workSteps.indexOf(detailData?.status as string);
+                  workSteps.indexOf(workStatus as string);
                 const currentStepIndex = workSteps.indexOf(
-                  detailData?.status as string
+                  workStatus as string
                 );
 
                 return (
@@ -405,10 +430,10 @@ export default function WorkDetail() {
       <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch py-4 mx-5 gap-1 rounded-xl bg-bg-normal">
         <MainButton
           text={mainButtonText}
-          onClick={() => onClickMainButton(detailData?.status as string)}
-          disabled={detailData?.status === "청구완료"}
+          onClick={onClickMainButton}
+          disabled={workStatus === "청구완료"}
         />
-        {detailData?.status === "입고확정" && (
+        {workStatus === "입고확정" && (
           <TextButton
             text="입고 확정 취소"
             onClick={() => setCancelSelectModalOpen(true)}
@@ -427,6 +452,13 @@ export default function WorkDetail() {
         isOpen={calendarSelectModalOpen}
         onClose={() => setCalendarSelectModalOpen(false)}
         onClickConfirm={(date, time) => onClickCalendarConfirm(date, time)}
+      />
+
+      <AccountModal
+        title="청구 금액을 입력해 주세요."
+        isOpen={accountModalOpen}
+        onClose={() => setAccountModalOpen(false)}
+        onClickConfirm={(price) => onClickAccountConfirm(price)}
       />
     </>
   );
