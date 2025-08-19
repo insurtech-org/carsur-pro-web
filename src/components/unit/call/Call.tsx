@@ -3,7 +3,7 @@
 import MainButton from "@/components/common/MainButton";
 import SubButton from "@/components/common/SubButton";
 import ProposeModal from "@/components/modal/ProposeModal";
-import { callData } from "@/mock/data";
+import { useCallDataStore } from "@/store/callData";
 import { useLoadingStore } from "@/store/loading";
 import { usePropoesStore } from "@/store/propoes";
 import { useToastStore } from "@/store/toast";
@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 
 export default function Call() {
   const { setIsLoading } = useLoadingStore();
+  const { callData } = useCallDataStore();
 
   useEffect(() => {
     const loading = async () => {
@@ -42,6 +43,7 @@ const CallCard = ({ callData }: { callData: any }) => {
   const router = useRouter();
   const [isProposeModalOpen, setIsProposeModalOpen] = useState(false);
   const { addProposeData } = usePropoesStore();
+  const { deleteCallData } = useCallDataStore();
   const { showSuccess } = useToastStore();
 
   const onClickDetail = (id: number) => {
@@ -51,6 +53,7 @@ const CallCard = ({ callData }: { callData: any }) => {
   const onClickDoPropose = async () => {
     setIsProposeModalOpen(false); // 모달닫기
     addProposeData(callData); // 제안 데이터 넣기
+    deleteCallData(callData.id); // 콜 데이터 삭제
     showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요."); // 토스트 알럿
     window.location.hash = "#proposal"; //이동
   };
