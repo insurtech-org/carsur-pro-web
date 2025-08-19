@@ -12,10 +12,9 @@ import { useEffect, useState } from "react";
 
 export default function Detail({ id, hash }: { id: number; hash: string }) {
   const router = useRouter();
-  const { addProposeData, deleteProposeData } = usePropoesStore();
   const { showSuccess } = useToastStore();
   const { setIsLoading } = useLoadingStore();
-  const { callData, deleteCallData } = useCallDataStore();
+  const { callData, updateCallData, deleteCallData } = useCallDataStore();
 
   const isProposal = hash.includes("proposal");
 
@@ -34,16 +33,16 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
 
   const onClickDoPropose = () => {
     setProposeModalOpen(false);
-    addProposeData(detailData as any);
-    deleteCallData(id);
+    updateCallData(id, { status: "제안중" });
     showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
     router.replace("/call/#proposal");
   };
 
   const onClickCancelPropose = () => {
     setCancelModalOpen(false);
-    deleteProposeData(id);
+    deleteCallData(id);
     showSuccess("제안이 취소되었습니다.");
+
     router.replace("/call/#proposal");
   };
 

@@ -13,7 +13,9 @@ import { useEffect, useState } from "react";
 
 export default function Call() {
   const { setIsLoading } = useLoadingStore();
-  const { callData } = useCallDataStore();
+  const { callData: data } = useCallDataStore();
+
+  const callData = data.filter((data) => data.status === "입고예정");
 
   useEffect(() => {
     const loading = async () => {
@@ -42,8 +44,7 @@ export default function Call() {
 const CallCard = ({ callData }: { callData: any }) => {
   const router = useRouter();
   const [isProposeModalOpen, setIsProposeModalOpen] = useState(false);
-  const { addProposeData } = usePropoesStore();
-  const { deleteCallData } = useCallDataStore();
+  const { updateCallData } = useCallDataStore();
   const { showSuccess } = useToastStore();
 
   const onClickDetail = (id: number) => {
@@ -52,8 +53,7 @@ const CallCard = ({ callData }: { callData: any }) => {
 
   const onClickDoPropose = async () => {
     setIsProposeModalOpen(false); // 모달닫기
-    addProposeData(callData); // 제안 데이터 넣기
-    deleteCallData(callData.id); // 콜 데이터 삭제
+    updateCallData(callData.id, { status: "제안중" }); // 콜 데이터 상태 변경
     showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요."); // 토스트 알럿
     window.location.hash = "#proposal"; //이동
   };

@@ -6,9 +6,12 @@ import { useToastStore } from "@/store/toast";
 import { useRouter } from "next/navigation";
 import { sleep } from "@/utils/util";
 import { useLoadingStore } from "@/store/loading";
+import { useCallDataStore } from "@/store/callData";
 
 export default function Proposal() {
-  const { proposeData } = usePropoesStore();
+  const { callData: data } = useCallDataStore();
+  const proposeData = data.filter((data) => data.status === "제안중");
+
   const { setIsLoading } = useLoadingStore();
 
   useEffect(() => {
@@ -37,14 +40,14 @@ export default function Proposal() {
 }
 
 const ProposeCard = ({ proposeData }: { proposeData: any }) => {
-  const { deleteProposeData } = usePropoesStore();
+  const { deleteCallData } = useCallDataStore();
   const { showSuccess } = useToastStore();
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
 
   const onClickProposeCancel = (id: number) => {
-    deleteProposeData(id);
+    deleteCallData(id);
     setIsOpen(false);
     showSuccess("제안이 취소되었습니다.");
   };
