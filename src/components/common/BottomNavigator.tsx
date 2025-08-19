@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useMyWorkStore } from "@/store/mywork";
 
@@ -86,6 +86,11 @@ export default function BottomNavigator() {
   const { myWorkData } = useMyWorkStore();
 
   const [activeTab, setActiveTab] = useState(pathname);
+
+  // pathname이 변경될 때마다 activeTab을 동기화
+  useEffect(() => {
+    setActiveTab(pathname);
+  }, [pathname]);
 
   // 네비게이션 클릭 핸들러
   const handleNavClick = (item: NavItem) => {

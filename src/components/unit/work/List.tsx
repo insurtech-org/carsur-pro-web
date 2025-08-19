@@ -15,7 +15,6 @@ export default function WorkList({ currentStatus }: { currentStatus: string }) {
       setIsLoading(true);
       await sleep(500);
       setIsLoading(false);
-      console.log("loading");
     };
     loading();
   }, []);

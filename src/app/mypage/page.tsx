@@ -3,13 +3,15 @@ import MyPageList from "@/components/unit/mypage/List";
 export default function MyPage() {
   return (
     <>
-      <div className="w-96 px-5 inline-flex justify-between items-center overflow-hidden">
-        <div className="h-11 flex justify-center items-center gap-2">
-          <div className="justify-start text-primary-normal text-xl font-semibold">
+      <div className="sticky top-0 z-10 flex flex-col items-center self-stretch bg-white overflow-hidden">
+        {/* 헤더 */}
+        <div className="h-11 w-full flex flex-row justify-start items-center px-5">
+          <span className="text-primary-normal text-2xl font-semibold">
             마이페이지
-          </div>
+          </span>
         </div>
       </div>
+
       <MyPageList />
     </>
   );
