@@ -33,3 +33,10 @@ export interface ToastActions {
   showInfo: (message: string, subMessage?: string) => void;
   showWarning: (message: string, subMessage?: string) => void;
 }
+
+//페이지 정보
+export interface IPageInfo {
+  currentPage: number;
+  totalItems: number;
+  totalPage: number;
+}
