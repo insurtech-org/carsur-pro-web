@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Call from "@/components/unit/call/Call";
-import Proposal from "@/components/unit/call/Proposal";
+import ProposalList from "@/components/unit/call/ProposalList";
+import CallList from "@/components/unit/call/CallList";
 
 export default function CallPage() {
   const [activeTab, setActiveTab] = useState<"call" | "proposal">("call");
@@ -106,7 +106,7 @@ export default function CallPage() {
       </div>
 
       {/* 탭 컨텐츠 */}
-      {activeTab === "call" ? <Call /> : <Proposal />}
+      {activeTab === "call" ? <CallList /> : <ProposalList />}
     </div>
   );
 }

@@ -6,22 +6,33 @@ import { useState } from "react";
 import SubButton from "@/components/common/SubButton";
 import MainButton from "@/components/common/MainButton";
 import { ICallList } from "@/type/call.type";
+import { postPropose } from "@/api/call.api";
 
 const CallCard = ({ callData }: { callData: ICallList }) => {
   const router = useRouter();
   const [isProposeModalOpen, setIsProposeModalOpen] = useState(false);
   const { updateCallData } = useCallDataStore();
-  const { showSuccess } = useToastStore();
+  const { showSuccess, showError } = useToastStore();
 
   const onClickDetail = (id: number) => {
     router.push(`/call/${id}#mylocal`);
   };
 
   const onClickDoPropose = async () => {
-    setIsProposeModalOpen(false); // 모달닫기
-    updateCallData(callData.id, { status: "제안중" }); // 콜 데이터 상태 변경
-    showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요."); // 토스트 알럿
-    window.location.hash = "#proposal"; //이동
+    try {
+      await postPropose(callData.id);
+
+      showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
+      router.replace("/call/#proposal");
+    } catch (error) {
+      console.log(error);
+      showError("제안에 실패했어요.");
+    }
+
+    // setIsProposeModalOpen(false); // 모달닫기
+    // updateCallData(callData.id, { status: "제안중" }); // 콜 데이터 상태 변경
+    // showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요."); // 토스트 알럿
+    // window.location.hash = "#proposal"; //이동
   };
 
   return (

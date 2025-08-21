@@ -1,12 +1,12 @@
 "use client";
-import { usePropoesStore } from "@/store/propoes";
-import CommonModal from "@/components/modal/CommonModal";
+
 import { useEffect, useState } from "react";
 import { useToastStore } from "@/store/toast";
 import { useRouter } from "next/navigation";
 import { sleep } from "@/utils/util";
 import { useLoadingStore } from "@/store/loading";
 import { useCallDataStore } from "@/store/callData";
+import { useModalStore } from "@/store/modal";
 
 export default function Proposal() {
   const { callData: data } = useCallDataStore();
@@ -23,13 +23,13 @@ export default function Proposal() {
     loading();
   }, []);
   return (
-    <div className="flex flex-col items-center self-stretch bg-neutral-100 h-screen p-4 gap-3">
+    <div className="flex flex-col items-start self-stretch bg-neutral-100 p-4 gap-3 flex-1 pb-24 min-h-screen">
       {proposeData.length > 0 ? (
         proposeData.map((data, idx) => (
           <ProposeCard proposeData={data} key={idx} />
         ))
       ) : (
-        <div className="flex flex-col items-center justify-center  bg-neutral-100 h-1/2">
+        <div className="flex flex-col items-center justify-center  bg-neutral-100 h-72 w-full">
           <span className="text-primary-neutral text-[15px] font-medium">
             제안 중인 내역이 없어요.
           </span>
@@ -43,6 +43,7 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
   const { deleteCallData } = useCallDataStore();
   const { showSuccess } = useToastStore();
   const router = useRouter();
+  const { showModal } = useModalStore();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -53,6 +54,17 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
   };
   const onClickDetail = (id: number) => {
     router.push(`/call/${id}#proposal`);
+  };
+
+  const handleProposeCancel = (id: string) => {
+    showModal({
+      title: "제안을 취소하시겠어요?",
+      description:
+        "제안을 취소하시면 이 예약은 다른 공업사에 배정될 수 있어요.",
+      cancelButtonText: "아니요",
+      confirmButtonText: "제안 취소하기",
+      onConfirm: () => onClickProposeCancel(Number(id)),
+    });
   };
 
   return (
@@ -126,7 +138,7 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
           {/* 제안 취소 버튼 */}
           <button
             className="flex flex-1 flex-col items-center bg-neutral-100 py-3 rounded-lg hover:bg-neutral-200 transition-colors"
-            onClick={() => setIsOpen(true)}
+            onClick={() => handleProposeCancel(proposeData.id)}
           >
             <span className="text-primary-neutral text-base font-medium">
               제안 취소
@@ -144,16 +156,6 @@ const ProposeCard = ({ proposeData }: { proposeData: any }) => {
           </button>
         </div>
       </div>
-
-      <CommonModal
-        title="제안을 취소하시겠어요?"
-        description="제안을 취소하시면 이 예약은 다른 공업사에 배정될 수 있어요."
-        cancelButtonText="아니요"
-        confirmButtonText="제안 취소하기"
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onClickConfirm={() => onClickProposeCancel(proposeData.id)}
-      />
     </>
   );
 };

@@ -103,6 +103,12 @@ export default function BottomNavigator() {
     "/login", // 로그인 페이지
     "/call/[id]", // 콜 상세 페이지 (동적 라우트)
     "/work/[id]", // 작업 상세 페이지 (동적 라우트)
+    "/find-id", // 아이디 찾기 페이지
+    "/find-password", // 비밀번호 찾기 페이지
+    "/mypage/terms", // 이용약관 페이지
+    "/mypage/terms/service", // 서비스 이용약관 페이지
+    "/mypage/terms/personal", // 개인정보 수집 이용 동의 페이지
+    "/mypage/account", // 계정관리 페이지
   ];
 
   // 현재 경로가 숨겨야 할 페이지인지 확인

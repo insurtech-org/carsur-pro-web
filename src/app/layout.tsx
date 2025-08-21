@@ -6,6 +6,7 @@ import { useToastStore } from "@/store/toast";
 import Toast from "@/components/common/Toast";
 import LoadingPage from "@/components/common/LoadingPage";
 import { useLoadingStore } from "@/store/loading";
+import CommonModal from "@/components/modal/CommonModal";
 
 export default function RootLayout({
   children,
@@ -36,6 +37,9 @@ export default function RootLayout({
 
         {/* 전역 Toast 렌더링 */}
         <GlobalToast />
+
+        {/* 전역 모달 렌더링 */}
+        <CommonModal />
       </body>
     </html>
   );

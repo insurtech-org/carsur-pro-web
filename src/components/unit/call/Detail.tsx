@@ -1,10 +1,9 @@
 "use client";
 
-import CommonModal from "@/components/modal/CommonModal";
 import ProposeModal from "@/components/modal/ProposeModal";
 import { useCallDataStore } from "@/store/callData";
 import { useLoadingStore } from "@/store/loading";
-import { usePropoesStore } from "@/store/propoes";
+import { useModalStore } from "@/store/modal";
 import { useToastStore } from "@/store/toast";
 import { sleep } from "@/utils/util";
 import { useRouter } from "next/navigation";
@@ -15,6 +14,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
   const { showSuccess } = useToastStore();
   const { setIsLoading } = useLoadingStore();
   const { callData, updateCallData, deleteCallData } = useCallDataStore();
+  const { showModal } = useModalStore();
 
   const isProposal = hash.includes("proposal");
 
@@ -39,11 +39,20 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
   };
 
   const onClickCancelPropose = () => {
-    setCancelModalOpen(false);
-    deleteCallData(id);
-    showSuccess("제안이 취소되었습니다.");
+    showModal({
+      title: "제안을 취소하시겠어요?",
+      description:
+        "제안을 취소하시면 이 예약은 다른 공업사에 배정될 수 있어요.",
+      cancelButtonText: "아니요",
+      confirmButtonText: "제안 취소하기",
+      onConfirm: () => {
+        setCancelModalOpen(false);
+        deleteCallData(id);
+        showSuccess("제안이 취소되었습니다.");
 
-    router.replace("/call/#proposal");
+        router.replace("/call/#proposal");
+      },
+    });
   };
 
   const onClickGoBack = () => {
@@ -192,7 +201,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
               {isProposal ? (
                 <button
                   className="flex flex-1 flex-col items-center bg-neutral-100 text-left py-3 rounded-lg border-0"
-                  onClick={() => setCancelModalOpen(true)}
+                  onClick={onClickCancelPropose}
                 >
                   <div className="flex flex-col items-center pb-[1px]">
                     <span className="text-primary-neutral text-base font-medium">
@@ -233,16 +242,6 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
         isOpen={proposeModalOpen}
         onClose={() => setProposeModalOpen(false)}
         onClickPropose={onClickDoPropose}
-      />
-
-      <CommonModal
-        title="제안을 취소하시겠어요?"
-        description="제안을 취소하시면 이 예약은 다른 공업사에 배정될 수 있어요."
-        cancelButtonText="아니요"
-        confirmButtonText="제안 취소하기"
-        isOpen={cancelModalOpen}
-        onClose={() => setCancelModalOpen(false)}
-        onClickConfirm={onClickCancelPropose}
       />
     </>
   );

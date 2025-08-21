@@ -40,3 +40,24 @@ export interface IPageInfo {
   totalItems: number;
   totalPage: number;
 }
+
+// 모달 관련 타입 정의
+export interface ModalConfig {
+  title: string;
+  description?: string;
+  cancelButtonText?: string;
+  confirmButtonText?: string;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  type?: "confirm" | "alert";
+}
+
+export interface ModalState {
+  isOpen: boolean;
+  config: ModalConfig | null;
+}
+
+export interface ModalActions {
+  showModal: (config: ModalConfig) => void;
+  hideModal: () => void;
+}

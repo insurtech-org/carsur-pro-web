@@ -1,6 +1,7 @@
 "use client";
 
 import { login } from "@/api/common.api";
+import VailedInput from "@/components/common/VailedInput";
 import { useUserStore } from "@/store/user";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -94,45 +95,26 @@ export default function Login() {
                 </span>
               </span>
 
-              <div
-                className={`relative rounded-lg border border-solid py-3 px-4  ${
-                  isUserFocused
-                    ? "border-primary-normal"
-                    : isUserIdError || isFailedLogin
-                    ? "border-status-destructive"
-                    : "border-line-neutral"
-                }`}
-              >
-                <input
-                  placeholder={"아이디를 입력해주세요."}
-                  value={userId}
-                  onChange={(event) => {
-                    setUserId(event.target.value);
-                    setIsUserIdError(false);
-                    setIsFailedLogin(false);
-                  }}
-                  className="self-stretch text-primary-normal text-base font-regular focus:outline-none w-full pr-8"
-                  onFocus={() => setIsUserFocused(true)}
-                  onBlur={() => setIsUserFocused(false)}
-                />
-
-                <button
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2 hover:opacity-70 transition-opacity"
-                  onClick={() => {
-                    setUserId("");
-                    setIsUserIdError(false);
-                    setIsFailedLogin(false);
-                  }}
-                >
-                  <img src={"/images/icon/ic_x-circle-fill.svg"} alt="지우기" />
-                </button>
-              </div>
-
-              {isUserIdError && (
-                <span className="text-status-destructive text-sm font-regular pt-2">
-                  아이디를 입력해주세요.
-                </span>
-              )}
+              <VailedInput
+                type="text"
+                placeholder="아이디를 입력해주세요."
+                value={userId}
+                isFocused={isUserFocused}
+                isError={isUserIdError || isFailedLogin}
+                onChange={(event) => {
+                  setUserId(event.target.value);
+                  setIsUserIdError(false);
+                  setIsFailedLogin(false);
+                }}
+                onFocus={() => setIsUserFocused(true)}
+                onBlur={() => setIsUserFocused(false)}
+                onClickClear={() => {
+                  setUserId("");
+                  setIsUserIdError(false);
+                  setIsFailedLogin(false);
+                }}
+                errorMessage={isUserIdError ? "아이디를 입력해주세요." : ""}
+              />
             </div>
 
             {/* 비밀번호 입력 영역 */}
@@ -144,55 +126,32 @@ export default function Login() {
                 </span>
               </span>
 
-              <div
-                className={`relative rounded-lg border border-solid py-3 px-4 ${
-                  isPasswordFocused
-                    ? "border-primary-normal"
-                    : isPasswordError || isFailedLogin
-                    ? "border-status-destructive"
-                    : "border-line-neutral"
-                }`}
-              >
-                <input
-                  type="password"
-                  placeholder={"비밀번호를 입력해주세요."}
-                  value={password}
-                  onChange={(event) => {
-                    setPassword(event.target.value);
-                    setIsPasswordError(false);
-                    setIsFailedLogin(false);
-                  }}
-                  className="self-stretch text-primary-normal text-base focus:outline-none w-full pr-8"
-                  onFocus={() => setIsPasswordFocused(true)}
-                  onBlur={() => setIsPasswordFocused(false)}
-                />
-
-                <button
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2 hover:opacity-70 transition-opacity "
-                  onClick={() => {
-                    setPassword("");
-                    setIsPasswordError(false);
-                    setIsFailedLogin(false);
-                  }}
-                >
-                  <img
-                    src={"/images/icon/ic_x-circle-fill.svg"}
-                    alt="비밀번호지우기"
-                  />
-                </button>
-              </div>
-
-              {isPasswordError && (
-                <span className="text-status-destructive text-sm font-regular pt-2">
-                  비밀번호를 입력해주세요.
-                </span>
-              )}
-
-              {isFailedLogin && (
-                <span className="text-status-destructive text-sm font-regular pt-2">
-                  아이디 또는 비밀번호를 확인해주세요.
-                </span>
-              )}
+              <VailedInput
+                type="password"
+                placeholder="비밀번호를 입력해주세요."
+                value={password}
+                isFocused={isPasswordFocused}
+                isError={isPasswordError || isFailedLogin}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  setIsPasswordError(false);
+                  setIsFailedLogin(false);
+                }}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
+                onClickClear={() => {
+                  setPassword("");
+                  setIsPasswordError(false);
+                  setIsFailedLogin(false);
+                }}
+                errorMessage={
+                  isPasswordError
+                    ? "비밀번호를 입력해주세요."
+                    : isFailedLogin
+                    ? "아이디 또는 비밀번호를 확인해주세요."
+                    : ""
+                }
+              />
             </div>
           </div>
 
@@ -209,13 +168,25 @@ export default function Login() {
           {/* 아이디 찾기 비밀번호 찾기 */}
           <div className="flex flex-col items-center self-stretch mt-6">
             <div className="flex items-center">
-              <span className="text-[#212121] opacity-65 text-sm font-medium cursor-pointer">
+              <button
+                className="text-[#212121] opacity-65 text-sm font-medium cursor-pointer"
+                onClick={() => {
+                  router.push("/find-id");
+                }}
+              >
                 아이디 찾기
-              </span>
+              </button>
+
               <div className="bg-line-neutral w-[1px] h-4 mx-3"></div>
-              <span className="text-[#212121] opacity-65 text-sm font-medium cursor-pointer">
+
+              <button
+                className="text-[#212121] opacity-65 text-sm font-medium cursor-pointer"
+                onClick={() => {
+                  router.push("/find-id");
+                }}
+              >
                 비밀번호 찾기
-              </span>
+              </button>
             </div>
           </div>
         </div>
