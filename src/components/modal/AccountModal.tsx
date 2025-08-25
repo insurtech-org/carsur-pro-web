@@ -344,7 +344,7 @@ export default function AccountModal({
             {/* 버튼 섹션 */}
             <div className="pb-8 pt-4 sticky bottom-0 bg-bg-normal w-full">
               <div className="flex justify-center gap-2">
-                <SubButton text="취소" onClick={onClickClose} />
+                <SubButton text="닫기" onClick={onClickClose} />
                 <MainButton
                   text="청구하기"
                   onClick={() =>

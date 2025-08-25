@@ -33,3 +33,39 @@ export interface ToastActions {
   showInfo: (message: string, subMessage?: string) => void;
   showWarning: (message: string, subMessage?: string) => void;
 }
+
+//페이지 정보
+export interface IPageInfo {
+  currentPage: number;
+  totalItems: number;
+  totalPage: number;
+}
+
+// 모달 관련 타입 정의
+export interface ModalConfig {
+  title: string;
+  description?: string;
+  cancelButtonText?: string;
+  confirmButtonText?: string;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  type?: "confirm" | "alert";
+}
+
+export interface ModalState {
+  isOpen: boolean;
+  config: ModalConfig | null;
+}
+
+export interface ModalActions {
+  showModal: (config: ModalConfig) => void;
+  hideModal: () => void;
+}
+
+// * 서버 에러 응답 타입 정의
+export interface ServerErrorResponse {
+  result: boolean;
+  code: string;
+  message: string;
+  data: any;
+}

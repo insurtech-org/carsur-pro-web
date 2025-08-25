@@ -1,33 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useModalStore } from "@/store/modal";
 import SubButton from "../common/SubButton";
 import MainButton from "../common/MainButton";
 
-interface ProposeModalProps {
-  title: string;
-  description: string;
-  isOpen: boolean;
-  cancelButtonText?: string;
-  confirmButtonText?: string;
-  onClose: () => void;
-  onClickConfirm: () => void;
-}
+const CommonModal = () => {
+  const { isOpen, config, hideModal } = useModalStore();
 
-const CommonModal = ({
-  title,
-  description,
-  isOpen = false,
-  cancelButtonText = "닫기",
-  confirmButtonText = "확인",
-  onClose = () => {},
-  onClickConfirm = () => {},
-}: ProposeModalProps) => {
-  // 모달이 열려있지 않으면 렌더링하지 않음
-  if (!isOpen) return null;
+  // 모달이 열려있지 않거나 설정이 없으면 렌더링하지 않음
+  if (!isOpen || !config) return null;
 
-  const onClickClose = () => {
-    onClose();
+  const {
+    title,
+    description = "",
+    type = "confirm", // 기본값은 confirm, alert일 수도 있음
+    cancelButtonText = "닫기",
+    confirmButtonText = "확인",
+    onConfirm,
+    onCancel,
+  } = config;
+
+  const handleConfirm = () => {
+    if (onConfirm) {
+      onConfirm();
+    }
+    hideModal();
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    }
+    hideModal();
+  };
+
+  const handleClose = () => {
+    hideModal();
   };
 
   return (
@@ -51,23 +59,29 @@ const CommonModal = ({
                   {title}
                 </span>
 
-                <button onClick={onClickClose}>
+                <button onClick={handleClose}>
                   <img src={"/images/icon/ic_x-line.svg"} />
                 </button>
               </div>
 
               {/* 설명 텍스트 */}
-              <div className="flex flex-col gap-1 mb-6">
+              <div
+                className={`flex flex-col gap-1 ${
+                  description ? "mb-6" : "mb-0"
+                } `}
+              >
                 <span className="text-neutral-800 text-base font-regular whitespace-pre-line">
                   {description}
                 </span>
               </div>
 
-              {/* 버튼 영역 */}
+              {/* 버튼 영역 - alert 타입일 때는 확인 버튼만 표시 */}
               <div className="flex flex-row bg-white py-4 gap-2">
-                <SubButton text={cancelButtonText} onClick={onClickClose} />
+                {type === "confirm" && (
+                  <SubButton text={cancelButtonText} onClick={handleCancel} />
+                )}
 
-                <MainButton text={confirmButtonText} onClick={onClickConfirm} />
+                <MainButton text={confirmButtonText} onClick={handleConfirm} />
               </div>
             </div>
           </div>
