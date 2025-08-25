@@ -78,7 +78,7 @@ export const validatePassword = (password: string) => {
   // const isValid = lengthValid && hasEnglish && hasNumber && hasSpecialChar;
 
   //테스트 중
-  const isValid = true;
+  const isValid = lengthValid && hasEnglish && hasNumber && hasSpecialChar;
 
   return {
     isValid,
