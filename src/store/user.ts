@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 // 사용자 정보 인터페이스
 interface IUser {
-  id: number;
+  id: number | string;
   username: string;
   userId: string;
   tellNo: string;
@@ -50,19 +50,19 @@ export const useUserStore = create<IUserStore>()(
       user: null,
       tokens: null,
 
-      setUser: (user) => set({ user }),
+      setUser: user => set({ user }),
 
-      setTokens: (tokens) => set({ tokens }),
+      setTokens: tokens => set({ tokens }),
 
       setUserData: (user, tokens) => set({ user, tokens }),
 
-      updateUser: (userData) =>
-        set((state) => ({
+      updateUser: userData =>
+        set(state => ({
           user: state.user ? { ...state.user, ...userData } : null,
         })),
 
-      updateTokens: (tokens) =>
-        set((state) => ({
+      updateTokens: tokens =>
+        set(state => ({
           tokens: state.tokens ? { ...state.tokens, ...tokens } : null,
         })),
 
@@ -75,7 +75,7 @@ export const useUserStore = create<IUserStore>()(
     }),
     {
       name: "user-storage", // localStorage에 저장될 키 이름
-      partialize: (state) => ({
+      partialize: state => ({
         user: state.user,
         tokens: state.tokens,
       }), // localStorage에 저장할 데이터만 선택

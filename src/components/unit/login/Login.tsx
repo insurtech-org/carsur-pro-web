@@ -1,8 +1,9 @@
 "use client";
 
-import { login } from "@/api/common.api";
+import { login } from "@/api/auth.api";
 import VailedInput from "@/components/common/VailedInput";
 import { useUserStore } from "@/store/user";
+import { extractErrorMessage, validatePassword } from "@/utils/util";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -19,6 +20,7 @@ export default function Login() {
 
   const [isUserFocused, setIsUserFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
   const [isFailedLogin, setIsFailedLogin] = useState(false);
 
@@ -47,7 +49,9 @@ export default function Login() {
       router.push("/call");
     } catch (error) {
       console.log(error);
+
       setIsFailedLogin(true);
+      setPasswordErrorMessage("아이디 또는 비밀번호를 확인해주세요.");
     }
   };
 
@@ -55,11 +59,13 @@ export default function Login() {
     if (userId === "" && password === "") {
       setIsUserIdError(true);
       setIsPasswordError(true);
+      setPasswordErrorMessage("비밀번호를 입력해주세요.");
       return false;
     }
 
     if (password === "") {
       setIsPasswordError(true);
+      setPasswordErrorMessage("비밀번호를 입력해주세요.");
       return false;
     }
 
@@ -68,7 +74,30 @@ export default function Login() {
       return false;
     }
 
+    const { isValid, message } = validatePassword(password);
+    if (!isValid) {
+      setIsPasswordError(true);
+      setPasswordErrorMessage(message);
+      return false;
+    }
+
     return true;
+  };
+
+  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const password = e.target.value;
+    setPassword(password);
+
+    //기존 에러 초기화
+    setIsPasswordError(false);
+    setIsFailedLogin(false);
+
+    // //에러 있으면 세팅
+    const { isValid, message } = validatePassword(password);
+    if (!isValid) {
+      setIsPasswordError(true);
+      setPasswordErrorMessage(message);
+    }
   };
 
   return (
@@ -78,10 +107,7 @@ export default function Login() {
         <div className="flex flex-col items-center w-full mt-28">
           {/* 로고 */}
           <div className="flex flex-col mb-[42px]">
-            <img
-              src={"/images/logo_login.png"}
-              className="w-[102px] object-fill"
-            />
+            <img src={"/images/logo_login.png"} className="w-[102px] object-fill" />
           </div>
 
           {/* 아이디, 비밀번호 입력 영역 */}
@@ -90,9 +116,7 @@ export default function Login() {
             <div className="flex flex-col w-full">
               <span className="text-primary-normal text-sm font-semibold mb-2">
                 아이디
-                <span className="text-status-destructive text-sm font-semibold">
-                  *
-                </span>
+                <span className="text-status-destructive text-sm font-semibold">*</span>
               </span>
 
               <VailedInput
@@ -101,7 +125,7 @@ export default function Login() {
                 value={userId}
                 isFocused={isUserFocused}
                 isError={isUserIdError || isFailedLogin}
-                onChange={(event) => {
+                onChange={event => {
                   setUserId(event.target.value);
                   setIsUserIdError(false);
                   setIsFailedLogin(false);
@@ -121,9 +145,7 @@ export default function Login() {
             <div className="flex flex-col w-full">
               <span className="text-primary-normal text-sm font-semibold mb-2">
                 비밀번호
-                <span className="text-status-destructive text-sm font-semibold">
-                  *
-                </span>
+                <span className="text-status-destructive text-sm font-semibold">*</span>
               </span>
 
               <VailedInput
@@ -132,10 +154,8 @@ export default function Login() {
                 value={password}
                 isFocused={isPasswordFocused}
                 isError={isPasswordError || isFailedLogin}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  setIsPasswordError(false);
-                  setIsFailedLogin(false);
+                onChange={event => {
+                  onChangePassword(event);
                 }}
                 onFocus={() => setIsPasswordFocused(true)}
                 onBlur={() => setIsPasswordFocused(false)}
@@ -145,11 +165,7 @@ export default function Login() {
                   setIsFailedLogin(false);
                 }}
                 errorMessage={
-                  isPasswordError
-                    ? "비밀번호를 입력해주세요."
-                    : isFailedLogin
-                    ? "아이디 또는 비밀번호를 확인해주세요."
-                    : ""
+                  isPasswordError ? passwordErrorMessage : isFailedLogin ? "아이디 또는 비밀번호를 확인해주세요." : ""
                 }
               />
             </div>
@@ -160,9 +176,7 @@ export default function Login() {
             className="flex flex-col items-center self-stretch bg-primary-normal text-left py-3 rounded-lg border-0 mt-6"
             onClick={onClickLogin}
           >
-            <span className="text-common-white text-base font-semibold">
-              로그인
-            </span>
+            <span className="text-common-white text-base font-semibold">로그인</span>
           </button>
 
           {/* 아이디 찾기 비밀번호 찾기 */}
@@ -196,9 +210,7 @@ export default function Login() {
           <span className="text-primary-neutral text-[13px] text-center ">
             {"회원가입은 카슈어 운영팀에 문의해주세요."}
           </span>
-          <span className="text-primary-neutral text-[13px] text-center ">
-            {"운영팀: 1555-4473"}
-          </span>
+          <span className="text-primary-neutral text-[13px] text-center ">{"운영팀: 1555-4473"}</span>
         </div>
       </div>
     </div>

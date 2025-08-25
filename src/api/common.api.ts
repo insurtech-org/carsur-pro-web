@@ -9,12 +9,3 @@ export const getHolidays = async (year: number) => {
   const res = await apiInstance.get(`/common/holidays?solYear=${year}`);
   return res;
 };
-
-//로그인 임시
-export const login = async (userId: string, password: string) => {
-  const res = await apiInstance.post("/auth/factory/login", {
-    userId,
-    password,
-  });
-  return res?.data?.data;
-};

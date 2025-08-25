@@ -5,6 +5,7 @@ export default function VailedInput({
   isFocused,
   isError,
   errorMessage,
+  vailedMessage,
   onChange,
   onFocus,
   onBlur,
@@ -16,6 +17,7 @@ export default function VailedInput({
   isFocused: boolean;
   isError: boolean;
   errorMessage?: string;
+  vailedMessage?: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus: () => void;
   onBlur: () => void;
@@ -25,11 +27,7 @@ export default function VailedInput({
     <>
       <div
         className={`relative rounded-lg border border-solid py-3 px-4 ${
-          isFocused
-            ? "border-primary-normal"
-            : isError
-            ? "border-status-destructive"
-            : "border-line-neutral"
+          isError ? "border-status-destructive" : isFocused ? "border-primary-normal" : "border-line-neutral"
         }`}
       >
         <input
@@ -64,10 +62,12 @@ export default function VailedInput({
         )}
       </div>
 
+      {vailedMessage && (
+        <span className="text-primary-alternative text-[13px] font-regular pt-2 tracking-tighter">{vailedMessage}</span>
+      )}
+
       {errorMessage && (
-        <span className="text-status-destructive text-sm font-regular pt-2">
-          {errorMessage}
-        </span>
+        <span className="text-status-destructive text-[13px] font-regular pt-2 tracking-tighter">{errorMessage}</span>
       )}
     </>
   );

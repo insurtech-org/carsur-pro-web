@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import ProposalList from "@/components/unit/call/ProposalList";
 import CallList from "@/components/unit/call/CallList";
+import { useRouter } from "next/navigation";
 
 export default function CallPage() {
   const [activeTab, setActiveTab] = useState<"call" | "proposal">("call");
+  const router = useRouter();
 
   // 페이지 로드 시 URL 해시에 따라 탭 설정
   useEffect(() => {
@@ -56,12 +58,15 @@ export default function CallPage() {
     <div className="flex flex-col items-center self-stretch">
       <div className="sticky top-0 z-10 flex flex-col items-center self-stretch bg-white">
         {/* 헤더 */}
-        <div className="h-11 w-full flex flex-row justify-start items-center px-5">
-          <img
-            className="w-[91] h-[23px]"
-            src="/images/logo_hearder-horizen.png"
-            alt="header"
-          />
+        <div className="h-11 w-full flex flex-row justify-between items-center px-5">
+          <img className="w-[91] h-[23px]" src="/images/logo_hearder-horizen.png" alt="header" />
+
+          <button
+            onClick={() => router.push("/call/proposal-history")}
+            className="text-primary-neutral text-base font-semibold"
+          >
+            제안내역
+          </button>
         </div>
 
         {/* 탭 */}
@@ -76,9 +81,7 @@ export default function CallPage() {
           >
             <span
               className={`text-base font-semibold ${
-                activeTab === "call"
-                  ? "text-primary-normal"
-                  : "text-primary-assistive"
+                activeTab === "call" ? "text-primary-normal" : "text-primary-assistive"
               }`}
             >
               {"내 지역 콜"}
@@ -94,9 +97,7 @@ export default function CallPage() {
           >
             <span
               className={`text-base font-semibold ${
-                activeTab === "proposal"
-                  ? "text-primary-normal"
-                  : "text-primary-assistive"
+                activeTab === "proposal" ? "text-primary-normal" : "text-primary-assistive"
               }`}
             >
               {"제안 중"}

@@ -6,10 +6,12 @@ import BackHeader from "@/components/common/BackHeader";
 import ArrowButton from "@/components/unit/mypage/elements/ArrowButton";
 import { useRouter } from "next/navigation";
 import { useModalStore } from "@/store/modal";
+import { useUserStore } from "@/store/user";
 
 export default function AccountPage() {
   const router = useRouter();
   const { showModal } = useModalStore();
+  const { setTokens, setUser } = useUserStore();
 
   const onClickLogout = () => {
     showModal({
@@ -18,8 +20,19 @@ export default function AccountPage() {
       confirmButtonText: "로그아웃",
       cancelButtonText: "취소",
       onConfirm: () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        setTokens({
+          accessToken: "",
+          refreshToken: "",
+        });
+
+        setUser({
+          id: "",
+          username: "",
+          userId: "",
+          tellNo: "",
+          factoryName: "",
+          roles: "",
+        });
 
         router.replace("/login");
       },
@@ -49,29 +62,15 @@ export default function AccountPage() {
     <div className="flex flex-col h-screen">
       <BackHeader title="계정관리" onBack={() => router.replace("/mypage")} />
       <div className="flex-1 flex flex-col justify-start items-center p-5">
-        <ArrowButton
-          text="기본 정보 수정"
-          onClick={() => onClickModal("default")}
-        />
+        <ArrowButton text="기본 정보 수정" onClick={() => onClickModal("default")} />
 
-        <ArrowButton
-          text="비밀번호 변경"
-          onClick={() => router.replace("/mypage/terms")}
-        />
+        <ArrowButton text="비밀번호 변경" onClick={() => router.replace("/mypage/account/change-password")} />
 
-        <ArrowButton
-          text="사업자 정보 수정"
-          onClick={() => onClickModal("company")}
-          isUnderLine={false}
-        />
+        <ArrowButton text="사업자 정보 수정" onClick={() => onClickModal("company")} isUnderLine={false} />
 
         <ArrowButton text="로그아웃" onClick={onClickLogout} />
 
-        <ArrowButton
-          text="회원탈퇴"
-          onClick={() => onClickModal("withdrawal")}
-          isUnderLine={false}
-        />
+        <ArrowButton text="회원탈퇴" onClick={() => onClickModal("withdrawal")} isUnderLine={false} />
       </div>
     </div>
   );

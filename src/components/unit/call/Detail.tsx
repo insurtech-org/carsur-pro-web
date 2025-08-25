@@ -1,57 +1,71 @@
 "use client";
 
+import { deletePropose, getCallDetail, postPropose } from "@/api/call.api";
 import ProposeModal from "@/components/modal/ProposeModal";
-import { useCallDataStore } from "@/store/callData";
-import { useLoadingStore } from "@/store/loading";
 import { useModalStore } from "@/store/modal";
 import { useToastStore } from "@/store/toast";
-import { sleep } from "@/utils/util";
-import { useRouter } from "next/navigation";
+import { ICallDetail } from "@/type/call.type";
+import { formatDate } from "@/utils/util";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Detail({ id, hash }: { id: number; hash: string }) {
   const router = useRouter();
-  const { showSuccess } = useToastStore();
-  const { setIsLoading } = useLoadingStore();
-  const { callData, updateCallData, deleteCallData } = useCallDataStore();
+
+  const { showSuccess, showError } = useToastStore();
   const { showModal } = useModalStore();
 
   const isProposal = hash.includes("proposal");
 
   const [proposeModalOpen, setProposeModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
-  const detailData = callData.find((data) => data.id === id);
+  const [detailData, setDetailData] = useState<ICallDetail | null>(null);
 
   useEffect(() => {
-    const loading = async () => {
-      setIsLoading(true);
-      await sleep(300);
-      setIsLoading(false);
-    };
-    loading();
+    fetchCallDetail();
   }, []);
 
-  const onClickDoPropose = () => {
-    setProposeModalOpen(false);
-    updateCallData(id, { status: "제안중" });
-    showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
-    router.replace("/call/#proposal");
+  const fetchCallDetail = async () => {
+    try {
+      const res = await getCallDetail(Number(id));
+      setDetailData(res);
+    } catch (error) {
+      console.log(error);
+      showError("콜 상세 정보를 불러오는데 실패했어요.");
+      router.push("/call");
+    }
+  };
+
+  const onClickDoPropose = async () => {
+    try {
+      await postPropose(id);
+
+      setProposeModalOpen(false);
+      showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
+      router.replace("/call/#proposal");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const cancelPropose = async () => {
+    try {
+      await deletePropose(id);
+      setCancelModalOpen(false);
+      showSuccess("제안이 취소되었습니다.");
+      router.replace("/call/#proposal");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onClickCancelPropose = () => {
     showModal({
       title: "제안을 취소하시겠어요?",
-      description:
-        "제안을 취소하시면 이 예약은 다른 공업사에 배정될 수 있어요.",
+      description: "제안을 취소하시면 이 예약은 다른 공업사에 배정될 수 있어요.",
       cancelButtonText: "아니요",
       confirmButtonText: "제안 취소하기",
-      onConfirm: () => {
-        setCancelModalOpen(false);
-        deleteCallData(id);
-        showSuccess("제안이 취소되었습니다.");
-
-        router.replace("/call/#proposal");
-      },
+      onConfirm: () => cancelPropose(),
     });
   };
 
@@ -65,111 +79,84 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
 
   return (
     <>
-      <div className="flex flex-col bg-white pt-4">
-        <div className="self-stretch bg-white ">
+      <div className="flex flex-col bg-bg-normal pt-4">
+        <div className="self-stretch bg-bg-normal ">
           <div className="flex flex-col self-stretch mb-20 px-5 gap-8">
             <div className="flex flex-col items-start self-stretch gap-4">
               <div className="flex items-center pr-[3px] gap-2">
-                <button
-                  className="flex flex-col shrink-0 items-start bg-white text-left py-1 px-2 rounded-md border border-solid border-[#FF934D]"
-                  onClick={() => alert("Pressed!")}
-                >
-                  <span className="text-[#ED6C00] text-sm font-bold">
-                    {detailData?.location}
+                <div className="flex flex-col shrink-0 items-start bg-bg-normal text-left py-1 px-2 rounded-md border border-solid border-secondary-normal">
+                  <span className="text-secondary-normal text-sm font-semibold">
+                    {detailData?.sido} {detailData?.sigungu}
                   </span>
-                </button>
-                <span className="text-[#ED6C00] text-[15px] font-bold">
-                  {detailData?.company}
+                </div>
+                <span className="text-secondary-normal text-[15px] font-semibold">
+                  {detailData?.insuranceCompanyName}
                 </span>
               </div>
-              <span className="text-[#131211] text-[22px] font-bold">
-                {detailData?.carName}
-              </span>
+              <span className="text-primary-normal text-[22px] font-semibold">{detailData?.carModel}</span>
             </div>
             <div className="flex flex-col self-stretch gap-2">
               <div className="flex flex-col items-start self-stretch">
-                <span className="text-[#131211] text-base font-bold mb-[9px]">
-                  보험 정보
-                </span>
+                <span className="text-primary-normal text-base font-medium mb-[9px]">보험 정보</span>
                 <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    사고접수번호
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    123-123456
+                  <span className="flex-1 text-neutral-700 text-base font-regular  mr-1">사고접수번호</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {detailData?.insuranceClaimNo || "-"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center self-stretch">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    보험사
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    {detailData?.company}
+                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">보험사</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {detailData?.insuranceCompanyName}
                   </span>
                 </div>
               </div>
               <div className="self-stretch bg-neutral-100 h-0.5"></div>
               <div className="flex flex-col items-start self-stretch">
-                <span className="text-[#131211] text-base font-bold mb-[9px]">
-                  {"예약 기본 정보"}
-                </span>
+                <span className="text-primary-normal text-base font-medium mb-[9px]">{"예약 기본 정보"}</span>
                 <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    {"예약지역"}
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    {detailData?.location}
+                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"예약지역"}</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {detailData?.sido} {detailData?.sigungu}
                   </span>
                 </div>
                 <div className="flex justify-between items-center self-stretch">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    {"입고 예약일"}
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    {detailData?.reservationDate}
+                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"입고 예약일"}</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {formatDate(detailData?.reservationDate)}
                   </span>
                 </div>
               </div>
               <div className="self-stretch bg-neutral-100 h-0.5"></div>
               <div className="flex flex-col items-start self-stretch">
-                <span className="text-[#131211] text-base font-bold mb-[9px]">
-                  {"차량 정보"}
-                </span>
+                <span className="text-primary-normal text-base font-medium mb-[9px]">{"차량 정보"}</span>
                 <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    {"차량번호"}
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    {detailData?.carNumber}
+                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"차량번호"}</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {detailData?.carModel}
                   </span>
                 </div>
                 <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    {"차종"}
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    {detailData?.carName}
+                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"차종"}</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {detailData?.carModel}
                   </span>
                 </div>
                 <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    {"배기량"}
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    {detailData?.carDisplacement}
+                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"배기량"}</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {detailData?.engineDisplacement}
                   </span>
                 </div>
                 <div className="flex justify-between items-center self-stretch">
-                  <span className="flex-1 text-[#616161] text-base mr-1">
-                    {"연식"}
-                  </span>
-                  <span className="flex-1 text-[#131211] text-base font-bold text-right">
-                    {`${detailData?.carYear}년`}
+                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"연식"}</span>
+                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
+                    {`${detailData?.carModelYear}`}
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-start self-stretch bg-white py-5 gap-4 rounded-xl border border-solid border-[#EDEDED]">
+            <div className="flex flex-col items-start self-stretch bg-bg-normal py-5 gap-4 rounded-xl border border-solid border-neutral-200">
               <div className="flex items-center pr-0.5 ml-5 gap-2">
                 <svg
                   className="w-6 h-6 text-secondary-normal fill-current"
@@ -184,14 +171,10 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
                     fill="currentColor"
                   />
                 </svg>
-                <span className="text-secondary-normal text-sm font-bold">
-                  {"잠깐, 중요한 정보가 있어요."}
-                </span>
+                <span className="text-secondary-normal text-sm font-semibold">잠깐, 중요한 정보가 있어요.</span>
               </div>
-              <span className="text-[#616161] text-sm font-medium px-5">
-                {
-                  "제안(제가 할게요)은 여러 공업사가 제안할 수 있으며, 해당 제안 중 한 곳이 최종 배정됩니다."
-                }
+              <span className="text-neutral-700 text-sm font-medium px-5">
+                제안(제가 할게요)은 여러 공업사가 제안할 수 있으며, 해당 제안 중 한 곳이 최종 배정됩니다.
               </span>
             </div>
           </div>
@@ -204,9 +187,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
                   onClick={onClickCancelPropose}
                 >
                   <div className="flex flex-col items-center pb-[1px]">
-                    <span className="text-primary-neutral text-base font-medium">
-                      제안 취소
-                    </span>
+                    <span className="text-primary-neutral text-base font-medium">제안 취소</span>
                   </div>
                 </button>
               ) : (
@@ -215,9 +196,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
                     className="flex flex-col shrink-0 items-center bg-neutral-100 py-3 px-8 rounded-lg"
                     onClick={onClickGoBack}
                   >
-                    <span className="text-[#212121] text-base font-bold">
-                      나가기
-                    </span>
+                    <span className="text-[#212121] text-base font-bold">나가기</span>
                   </button>
 
                   <button
@@ -225,9 +204,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
                     onClick={() => setProposeModalOpen(true)}
                   >
                     <div className="flex flex-col items-center pb-[1px]">
-                      <span className="text-white text-base font-bold">
-                        제안하기
-                      </span>
+                      <span className="text-white text-base font-bold">제안하기</span>
                     </div>
                   </button>
                 </>

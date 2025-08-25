@@ -61,3 +61,11 @@ export interface ModalActions {
   showModal: (config: ModalConfig) => void;
   hideModal: () => void;
 }
+
+// * 서버 에러 응답 타입 정의
+export interface ServerErrorResponse {
+  result: boolean;
+  code: string;
+  message: string;
+  data: any;
+}

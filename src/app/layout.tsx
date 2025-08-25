@@ -7,6 +7,7 @@ import Toast from "@/components/common/Toast";
 import LoadingPage from "@/components/common/LoadingPage";
 import { useLoadingStore } from "@/store/loading";
 import CommonModal from "@/components/modal/CommonModal";
+import AuthGuard from "@/components/common/AuthGuard";
 
 export default function RootLayout({
   children,
@@ -28,11 +29,13 @@ export default function RootLayout({
       </head>
       <body className="font-pretendard antialiased">
         <div className="min-h-screen bg-gray-50">
-          <div className="hybrid-container">
-            <div className="flex-1 w-full">{children}</div>
-            {isLoading && <LoadingPage />}
-            <BottomNavigator />
-          </div>
+          <AuthGuard>
+            <div className="hybrid-container">
+              <div className="flex-1 w-full">{children}</div>
+              {isLoading && <LoadingPage />}
+              <BottomNavigator />
+            </div>
+          </AuthGuard>
         </div>
 
         {/* 전역 Toast 렌더링 */}

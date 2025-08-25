@@ -13,9 +13,10 @@ export default function CallList() {
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null); // 30초마다 실행할 인터벌을 위한 ref
 
   const { callData: data } = useCallDataStore();
-  const callData = data.filter((data) => data.status === "입고예정");
+  const callData = data.filter(data => data.status === "입고예정");
 
   const [callList, setCallList] = useState<ICallList[]>([]);
   const [pageInfo, setPageInfo] = useState<IPageInfo>({
@@ -24,9 +25,45 @@ export default function CallList() {
     totalPage: 0,
   });
 
+  // 30초마다 첫 페이지 데이터를 새로 가져오는 함수
+  const refreshData = useCallback(async () => {
+    try {
+      const res = await getCallList({
+        page: 1,
+        size: 5,
+      });
+
+      setCallList(res.items);
+      setPageInfo({
+        currentPage: res.currentPage,
+        totalItems: res.totalItems,
+        totalPage: res.totalPage,
+      });
+
+      // 페이지를 1로 리셋하고 hasMore를 다시 true로 설정
+      setPage(1);
+      setHasMore(true);
+    } catch (error) {
+      console.log("데이터 새로고침 중 오류:", error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCallList();
   }, [page]);
+
+  // 컴포넌트가 마운트될 때 30초마다 데이터를 새로고침하는 인터벌 설정
+  useEffect(() => {
+    // 30초마다 첫 페이지 데이터를 새로 가져오기
+    intervalRef.current = setInterval(refreshData, 30000);
+
+    // 컴포넌트가 언마운트될 때 인터벌 정리
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [refreshData]);
 
   const fetchCallList = async () => {
     if (isLoading) return;
@@ -42,7 +79,7 @@ export default function CallList() {
       if (page === 1) {
         setCallList(res.items);
       } else {
-        setCallList((prev) => [...prev, ...res.items]);
+        setCallList(prev => [...prev, ...res.items]);
       }
 
       setPageInfo({
@@ -69,9 +106,9 @@ export default function CallList() {
 
       if (observerRef.current) observerRef.current.disconnect();
 
-      observerRef.current = new IntersectionObserver((entries) => {
+      observerRef.current = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1);
+          setPage(prevPage => prevPage + 1);
         }
       });
 
@@ -85,11 +122,7 @@ export default function CallList() {
       {callList.length > 0 ? (
         <>
           {callList.map((data, index) => (
-            <div
-              key={data.id}
-              ref={index === callList.length - 1 ? lastElementRef : undefined}
-              className="w-full"
-            >
+            <div key={data.id} ref={index === callList.length - 1 ? lastElementRef : undefined} className="w-full">
               <CallCard callData={data} />
             </div>
           ))}
@@ -97,17 +130,13 @@ export default function CallList() {
           {/* 로딩 인디케이터 */}
           {isLoading && (
             <div className="flex justify-center py-4 w-full">
-              <span className="text-primary-neutral text-[15px] font-medium">
-                로딩 중...
-              </span>
+              <span className="text-primary-neutral text-[15px] font-medium">로딩 중...</span>
             </div>
           )}
         </>
       ) : (
         <div className="flex flex-col items-center justify-center  bg-neutral-100 h-72 w-full">
-          <span className="text-primary-neutral text-[15px] font-medium">
-            내 지역 콜 요청 내역이 없어요.
-          </span>
+          <span className="text-primary-neutral text-[15px] font-medium">내 지역 콜 요청 내역이 없어요.</span>
         </div>
       )}
     </div>
