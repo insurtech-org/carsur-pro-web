@@ -12,8 +12,8 @@ env:
   AWS_REGION: ap-northeast-2
   CLUSTER_NAME: insurtech-eks
   NAMESPACE: dev
-  DEPLOYMENT_NAME: insurtech-factory-front-dev
-  CONTAINER_NAME: insurtech-factory-front-dev
+  DEPLOYMENT_NAME: insurtech-factory-front
+  CONTAINER_NAME: insurtech-factory-front
   REPOSITORY: 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev
   IMAGE_TAG: dev-${{ github.sha }}-${{ github.run_number }}
   DOCKER_FILE: Dockerfile
