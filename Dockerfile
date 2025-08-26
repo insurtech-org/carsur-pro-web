@@ -3,6 +3,9 @@
     
     WORKDIR /app
     
+    # base 이미지의 node_modules 복사
+    COPY --from=699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-front-dev-base:latest /app/node_modules ./node_modules
+    
     # 환경 선택 (예: --build-arg BUILD_ENV=dev)
     ARG BUILD_ENV
     ENV BUILD_ENV=$BUILD_ENV
