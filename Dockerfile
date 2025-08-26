@@ -2,13 +2,14 @@
     FROM 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-front-dev-base:latest AS builder
     
     WORKDIR /app
-    
-    # base 이미지의 node_modules 복사
-    COPY --from=699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-front-dev-base:latest /app/node_modules ./node_modules
-    
+        
     # 환경 선택 (예: --build-arg BUILD_ENV=dev)
     ARG BUILD_ENV
     ENV BUILD_ENV=$BUILD_ENV
+
+    # base 이미지의 node_modules 복사
+    COPY package*.json ./
+    RUN npm install
     
     # 빌드 타임에 필요한 환경파일 주입
     # ⚠️ 여기에 들어가는 값은 "NEXT_PUBLIC_*" 처럼 클라이언트에 노출 가능한 값만 두세요.
