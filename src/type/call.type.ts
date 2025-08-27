@@ -23,6 +23,7 @@ export interface IProposeList {
 export interface ICallDetail {
   id: number;
   carModel: string;
+  carNumber: string;
   carScale: string;
   engineDisplacement: string;
   carModelYear: string;

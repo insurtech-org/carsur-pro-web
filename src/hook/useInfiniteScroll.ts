@@ -1,167 +1,122 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { IPageInfo } from "@/type/etc.type";
 
-// 페이지 정보 인터페이스
-export interface PageInfo {
-  currentPage: number;
-  totalItems: number;
-  totalPage: number;
+interface UseInfiniteScrollProps<T> {
+  fetchData: (
+    page: number,
+    size: number
+  ) => Promise<{
+    items: T[];
+    currentPage: number;
+    totalItems: number;
+    totalPage: number;
+  }>;
+  pageSize?: number;
+  refreshInterval?: number;
 }
 
-// API 응답 인터페이스 (items 배열을 포함하는 모든 응답에 대응)
-export interface ApiResponse<T> {
-  items: T[];
-  currentPage: number;
-  totalItems: number;
-  totalPage: number;
-}
-
-// 무한스크롤 hook의 반환 타입
-export interface UseInfiniteScrollReturn<T> {
-  // 데이터 관련
+interface UseInfiniteScrollReturn<T> {
   data: T[];
-  pageInfo: PageInfo;
-
-  // 상태 관련
   isLoading: boolean;
   hasMore: boolean;
-
-  // 함수들
-  fetchData: () => Promise<void>;
-  resetData: () => void;
-  lastElementRef: (node: HTMLDivElement | null) => void;
-
-  // 페이지 관련
-  page: number;
-  setPage: (page: number) => void;
+  pageInfo: IPageInfo;
+  lastElementRef: (node: HTMLDivElement) => void;
 }
 
-// 무한스크롤 hook 설정 옵션
-export interface UseInfiniteScrollOptions<T> {
-  // API 호출 함수
-  fetchFunction: (page: number, size: number) => Promise<ApiResponse<T>>;
-
-  // 페이지 크기 (기본값: 10)
-  pageSize?: number;
-
-  // 초기 페이지 (기본값: 1)
-  initialPage?: number;
-
-  // 데이터 초기화 여부 (기본값: true)
-  autoFetch?: boolean;
-
-  // 에러 처리 함수 (선택사항)
-  onError?: (error: any) => void;
-}
-
-/**
- * 무한스크롤 기능을 제공하는 커스텀 hook
- *
- * @param options - hook 설정 옵션
- * @returns 무한스크롤 관련 상태와 함수들
- *
- * @example
- * ```tsx
- * const {
- *   data: callList,
- *   isLoading,
- *   hasMore,
- *   lastElementRef,
- *   fetchData
- * } = useInfiniteScroll({
- *   fetchFunction: getCallList,
- *   pageSize: 10
- * });
- *
- * // JSX에서 사용
- * {callList.map((item, index) => (
- *   <div key={item.id} ref={index === callList.length - 1 ? lastElementRef : undefined}>
- *     <ItemCard item={item} />
- *   </div>
- * ))}
- * ```
- */
 export function useInfiniteScroll<T>({
-  fetchFunction,
-  pageSize = 10,
-  initialPage = 1,
-  autoFetch = true,
-  onError,
-}: UseInfiniteScrollOptions<T>): UseInfiniteScrollReturn<T> {
-  // 상태 관리
-  const [data, setData] = useState<T[]>([]);
-  const [page, setPage] = useState(initialPage);
+  fetchData,
+  pageSize = 5,
+  refreshInterval = 30000,
+}: UseInfiniteScrollProps<T>): UseInfiniteScrollReturn<T> {
+  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [pageInfo, setPageInfo] = useState<PageInfo>({
-    currentPage: initialPage,
+  const [data, setData] = useState<T[]>([]);
+  const [pageInfo, setPageInfo] = useState<IPageInfo>({
+    currentPage: page,
     totalItems: 0,
     totalPage: 0,
   });
 
-  // Intersection Observer 참조
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 데이터 새로고침 함수
+  const refreshData = useCallback(async () => {
+    try {
+      const res = await fetchData(1, pageSize);
+
+      setData(res.items);
+      setPageInfo({
+        currentPage: res.currentPage,
+        totalItems: res.totalItems,
+        totalPage: res.totalPage,
+      });
+
+      // 페이지를 1로 리셋하고 hasMore를 다시 true로 설정
+      setPage(1);
+      setHasMore(true);
+    } catch (error) {
+      console.log("데이터 새로고침 중 오류:", error);
+    }
+  }, [fetchData, pageSize]);
 
   // 데이터 가져오기 함수
-  const fetchData = useCallback(async () => {
+  const loadData = async () => {
     if (isLoading) return;
 
     try {
       setIsLoading(true);
-      const response = await fetchFunction(page, pageSize);
+      const res = await fetchData(page, pageSize);
 
       // 첫 페이지가 아닌 경우 기존 데이터에 추가
-      if (page === initialPage) {
-        setData(response.items);
+      if (page === 1) {
+        setData(res.items);
       } else {
-        setData(prev => [...prev, ...response.items]);
+        setData(prev => [...prev, ...res.items]);
       }
 
-      // 페이지 정보 업데이트
       setPageInfo({
-        currentPage: response.currentPage,
-        totalItems: response.totalItems,
-        totalPage: response.totalPage,
+        currentPage: res.currentPage,
+        totalItems: res.totalItems,
+        totalPage: res.totalPage,
       });
 
       // 더 이상 데이터가 없으면 hasMore를 false로 설정
-      if (response.items.length < pageSize || response.currentPage >= response.totalPage) {
+      if (res.items.length < pageSize || res.currentPage >= res.totalPage) {
         setHasMore(false);
       }
     } catch (error) {
-      console.error("무한스크롤 데이터 가져오기 실패:", error);
-      onError?.(error);
+      console.log("데이터 로딩 중 오류:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [fetchFunction, page, pageSize, initialPage, isLoading, onError]);
+  };
 
-  // 데이터 초기화 함수
-  const resetData = useCallback(() => {
-    setData([]);
-    setPage(initialPage);
-    setHasMore(true);
-    setPageInfo({
-      currentPage: initialPage,
-      totalItems: 0,
-      totalPage: 0,
-    });
-  }, [initialPage]);
-
-  // 페이지 변경 시 데이터 가져오기
+  // 페이지 변경시 데이터 로드
   useEffect(() => {
-    if (autoFetch) {
-      fetchData();
-    }
-  }, [page, autoFetch, fetchData]);
+    loadData();
+  }, [page]);
 
-  // 마지막 요소 참조 함수 (Intersection Observer 설정)
+  // 주기적 데이터 새로고침 설정
+  useEffect(() => {
+    if (refreshInterval > 0) {
+      intervalRef.current = setInterval(refreshData, refreshInterval);
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }
+  }, [refreshData, refreshInterval]);
+
+  // Intersection Observer 설정
   const lastElementRef = useCallback(
-    (node: HTMLDivElement | null) => {
+    (node: HTMLDivElement) => {
       if (isLoading) return;
 
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      if (observerRef.current) observerRef.current.disconnect();
 
       observerRef.current = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting && hasMore) {
@@ -169,31 +124,10 @@ export function useInfiniteScroll<T>({
         }
       });
 
-      if (node) {
-        observerRef.current.observe(node);
-      }
+      if (node) observerRef.current.observe(node);
     },
     [isLoading, hasMore]
   );
 
-  // 컴포넌트 언마운트 시 Observer 정리
-  useEffect(() => {
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, []);
-
-  return {
-    data,
-    pageInfo,
-    isLoading,
-    hasMore,
-    fetchData,
-    resetData,
-    lastElementRef,
-    page,
-    setPage,
-  };
+  return { data, isLoading, hasMore, pageInfo, lastElementRef };
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallDataStore } from "@/store/callData";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CallCard from "./elements/CallCard";
 import { getCallList } from "@/api/call.api";
@@ -15,9 +14,6 @@ export default function CallList() {
   const loadingRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null); // 30초마다 실행할 인터벌을 위한 ref
 
-  const { callData: data } = useCallDataStore();
-  const callData = data.filter(data => data.status === "입고예정");
-
   const [callList, setCallList] = useState<ICallList[]>([]);
   const [pageInfo, setPageInfo] = useState<IPageInfo>({
     currentPage: page,
@@ -30,7 +26,7 @@ export default function CallList() {
     try {
       const res = await getCallList({
         page: 1,
-        size: 5,
+        size: 10,
       });
 
       setCallList(res.items);
@@ -72,7 +68,7 @@ export default function CallList() {
       setIsLoading(true);
       const res = await getCallList({
         page: page,
-        size: 5,
+        size: 10,
       });
 
       // 첫 페이지가 아닌 경우 기존 데이터에 추가
@@ -89,7 +85,7 @@ export default function CallList() {
       });
 
       // 더 이상 데이터가 없으면 hasMore를 false로 설정
-      if (res.items.length < 5 || res.currentPage >= res.totalPage) {
+      if (res.items.length < 10 || res.currentPage >= res.totalPage) {
         setHasMore(false);
       }
     } catch (error) {

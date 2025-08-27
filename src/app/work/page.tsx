@@ -1,37 +1,47 @@
 "use client";
 
 import List from "@/components/unit/work/List";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { workStatus, workStatusCount } from "@/mock/data";
-import { useMyWorkStore } from "@/store/mywork";
+import { useEffect, useRef, useState } from "react";
+import { getWorkScheduleTabCount } from "@/api/work.api";
+import { FILTER_STATUS } from "@/utils/enum";
+import { IWorkStatusCount } from "@/type/work.type";
+import { convertSnakeToCamel } from "@/utils/util";
 import { useRouter, useSearchParams } from "next/navigation";
 
 // useSearchParams를 사용하는 컴포넌트를 별도로 분리
-function WorkPageContent() {
-  const { myWorkData } = useMyWorkStore();
-  const searchParams = useSearchParams();
+export default function WorkPage() {
   const router = useRouter();
-  const initialStatus = searchParams.get("status") || "입고확정";
 
-  const [activeTab, setActiveTab] = useState(initialStatus);
-  const [workTab, setWorkTab] = useState(workStatusCount(myWorkData));
+  const searchParams = useSearchParams();
+  const status = searchParams.get("status") || "CONFIRMED";
+
   const filterContainerRef = useRef<HTMLDivElement>(null);
+  const initialStatus = !status || status === "undefined" || status === "" ? "CONFIRMED" : status;
+  const [activeTab, setActiveTab] = useState(initialStatus);
+  const [workStatusCount, setWorkStatusCount] = useState<IWorkStatusCount>({
+    billingCompletedCount: 0,
+    cancelledCount: 0,
+    confirmedCount: 0,
+    releasedCount: 0,
+    repairCompletedCount: 0,
+    repairStartedCount: 0,
+    totalCount: 0,
+  });
 
   useEffect(() => {
-    const workStatusData = workStatusCount(myWorkData);
-    setWorkTab(workStatusData);
+    fetchWorkStatus();
 
-    //params 초기화
-    router.replace(`/work?status=${activeTab}`);
-  }, [activeTab, myWorkData, router]);
+    // URL이 기본값과 다른 경우에만 업데이트
+    if (!status || status === "undefined" || status === "") {
+      router.push(`/work?status=CONFIRMED`);
+    }
+  }, []);
 
   // 활성 탭이 변경될 때 해당 필터로 스크롤
   useEffect(() => {
     if (filterContainerRef.current) {
       const container = filterContainerRef.current;
-      const activeButton = container.querySelector(
-        `[data-status="${activeTab}"]`
-      ) as HTMLElement;
+      const activeButton = container.querySelector(`[data-status="${activeTab}"]`) as HTMLElement;
 
       if (activeButton) {
         // 활성 버튼이 컨테이너의 중앙에 오도록 스크롤
@@ -51,7 +61,22 @@ function WorkPageContent() {
 
   const onClickTab = (tab: string) => {
     setActiveTab(tab);
-    setWorkTab(workStatusCount(myWorkData));
+
+    // 현재 URL의 searchParams를 새로 생성
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("status", tab);
+
+    // URL 업데이트
+    router.push(`/work?${String(params)}`);
+  };
+
+  const fetchWorkStatus = async () => {
+    try {
+      const res = await getWorkScheduleTabCount();
+      setWorkStatusCount(res);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -59,9 +84,7 @@ function WorkPageContent() {
       <div className="sticky top-0 z-10 flex flex-col items-center self-stretch bg-white overflow-hidden">
         {/* 헤더 */}
         <div className="h-11 w-full flex flex-row justify-start items-center px-5">
-          <span className="text-primary-normal text-xl font-semibold">
-            내 작업 일정
-          </span>
+          <span className="text-primary-normal text-xl font-semibold">내 작업 일정</span>
         </div>
 
         {/* 필터 */}
@@ -69,7 +92,7 @@ function WorkPageContent() {
           ref={filterContainerRef}
           className="flex w-full items-start gap-1.5 overflow-x-auto scrollbar-hide py-4 px-5"
         >
-          {Object.keys(workTab).map((item, idx) => (
+          {Object.keys(FILTER_STATUS).map((item, idx) => (
             <button
               data-status={item}
               key={idx}
@@ -81,53 +104,17 @@ function WorkPageContent() {
               onClick={() => onClickTab(item)}
             >
               <span
-                className={`text-sm font-medium  ${
-                  activeTab === item
-                    ? "text-neutral-50"
-                    : "text-primary-neutral"
-                }`}
+                className={`text-sm font-medium  ${activeTab === item ? "text-neutral-50" : "text-primary-neutral"}`}
               >
-                {item}
+                {FILTER_STATUS[item as keyof typeof FILTER_STATUS]}
               </span>
               <span
-                className={`text-sm font-medium ${
-                  activeTab === item
-                    ? "text-neutral-50"
-                    : "text-secondary-normal"
-                }`}
+                className={`text-sm font-medium ${activeTab === item ? "text-neutral-50" : "text-secondary-normal"}`}
               >
-                {workTab[item as keyof typeof workTab]}
+                {workStatusCount[`${convertSnakeToCamel(item)}Count` as keyof IWorkStatusCount] || 0}
               </span>
             </button>
           ))}
-
-          <button
-            className={`flex shrink-0 items-center justify-center min-w-[70px]  py-2 px-2.5 gap-1 rounded-full ${
-              activeTab === "전체"
-                ? "bg-primary-normal border-0"
-                : "bg-bg-normal border border-solid border-line-neutral"
-            }`}
-            onClick={() => onClickTab("전체")}
-          >
-            <span
-              className={`text-sm font-medium  ${
-                activeTab === "전체"
-                  ? "text-neutral-50"
-                  : "text-primary-neutral"
-              }`}
-            >
-              전체
-            </span>
-            <span
-              className={`text-sm font-medium ${
-                activeTab === "전체"
-                  ? "text-neutral-50"
-                  : "text-secondary-normal"
-              }`}
-            >
-              {myWorkData.length}
-            </span>
-          </button>
         </div>
       </div>
 
@@ -135,14 +122,5 @@ function WorkPageContent() {
         <List currentStatus={activeTab} />
       </div>
     </>
-  );
-}
-
-// 메인 컴포넌트에서 Suspense로 감싸기
-export default function WorkPage() {
-  return (
-    <Suspense fallback={<div>로딩 중...</div>}>
-      <WorkPageContent />
-    </Suspense>
   );
 }

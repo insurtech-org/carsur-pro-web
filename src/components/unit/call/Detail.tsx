@@ -133,7 +133,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
                 <div className="flex justify-between items-center self-stretch mb-2">
                   <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"차량번호"}</span>
                   <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {detailData?.carModel}
+                    {detailData?.carNumber}
                   </span>
                 </div>
                 <div className="flex justify-between items-center self-stretch mb-2">

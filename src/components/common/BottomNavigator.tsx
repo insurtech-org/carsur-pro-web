@@ -125,7 +125,7 @@ export default function BottomNavigator() {
   });
 
   // body 클래스로 네비게이터 숨김 여부 확인
-  const isHiddenByHook = typeof document !== 'undefined' && document.body.classList.contains('hide-bottom-navigator');
+  const isHiddenByHook = typeof document !== "undefined" && document.body.classList.contains("hide-bottom-navigator");
 
   //숨겨할 페이지에서는 return
   if (shouldHide || isHiddenByHook) return null;
