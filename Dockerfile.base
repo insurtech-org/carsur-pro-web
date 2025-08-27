@@ -1,0 +1,25 @@
+# 1. ECR 로그인
+#aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com
+
+# 2. EC2(Amazon Linux 2)와 호환되는 x86_64 아키텍처로 빌드
+#BUILD_TAG=$(date +%Y%m%d%H%M%S)  # YYYYMMDDHHMMSS 형식의 고유한 태그
+#docker build --build-arg BUILD_ENV=dev --platform linux/amd64 -f Dockerfile -t insurtech-factory-front-dev .
+
+# 3. 태깅 (latest + 고유 버전 태그)
+#docker tag insurtech-factory-front-dev:latest 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:latest
+#docker tag insurtech-factory-front-dev:latest 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:$BUILD_TAG
+
+# 4. Docker 이미지 푸시 (ECR에 최신 버전과 특정 버전 저장)
+#docker push 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:latest
+#docker push 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:$BUILD_TAG
+
+
+# 베이스 이미지: Node.js 20 LTS 사용
+FROM node:20 AS base
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# package.json과 package-lock.json 복사 및 의존성 설치
+COPY package.json package-lock.json ./
+RUN npm install

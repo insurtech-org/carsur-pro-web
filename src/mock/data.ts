@@ -50,7 +50,7 @@ export const workData = [
     inTime: "", // 입고 시간
     outDate: "", // 출고일
     outTime: "", // 출고 시간
-    status: "입고확정", // 예약상태
+    status: "차량입고", // 예약상태
     carName: "제네시스 G80", //차량명
     carNumber: "12가1234", // 차량번호
     carType: "중형차", //차종
@@ -371,19 +371,13 @@ export const workStatus = {
 
 //예약에 따른
 export const workStatusCount = (data: any[]) => {
-  const 입고확정Count =
-    data.filter((item) => item.status === "입고확정").length || 0;
-  const 차량입고Count =
-    data.filter((item) => item.status === "차량입고").length || 0;
-  const 수리중Count = data.filter((item) => item.status === "수리중").length;
-  const 수리완료Count =
-    data.filter((item) => item.status === "수리완료").length || 0;
-  const 차량출고Count =
-    data.filter((item) => item.status === "차량출고").length || 0;
-  const 청구완료Count =
-    data.filter((item) => item.status === "청구완료").length || 0;
-  const 예약취소Count =
-    data.filter((item) => item.status === "예약취소").length || 0;
+  const 입고확정Count = data.filter(item => item.status === "입고확정").length || 0;
+  const 차량입고Count = data.filter(item => item.status === "차량입고").length || 0;
+  const 수리중Count = data.filter(item => item.status === "수리중").length;
+  const 수리완료Count = data.filter(item => item.status === "수리완료").length || 0;
+  const 차량출고Count = data.filter(item => item.status === "차량출고").length || 0;
+  const 청구완료Count = data.filter(item => item.status === "청구완료").length || 0;
+  const 예약취소Count = data.filter(item => item.status === "예약취소").length || 0;
 
   return {
     입고확정: 입고확정Count || 0,
@@ -406,11 +400,4 @@ export const workDetailStatus = {
 };
 
 // 진행 단계별 상태 매핑
-export const workSteps = [
-  "입고확정",
-  "차량입고",
-  "수리중",
-  "수리완료",
-  "차량출고",
-  "청구완료",
-];
+export const workSteps = ["입고확정", "차량입고", "수리중", "수리완료", "차량출고", "청구완료"];

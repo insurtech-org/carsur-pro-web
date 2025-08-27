@@ -10,11 +10,7 @@ interface ProposeModalProps {
   onClickPropose: () => void;
 }
 
-const ProposeModal = ({
-  isOpen = false,
-  onClose = () => {},
-  onClickPropose = () => {},
-}: ProposeModalProps) => {
+const ProposeModal = ({ isOpen = false, onClose = () => {}, onClickPropose = () => {} }: ProposeModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const onChangeChecked = (value: boolean) => {
@@ -57,9 +53,7 @@ const ProposeModal = ({
 
               {/* 설명 텍스트 */}
               <div className="flex flex-col gap-1 mb-6">
-                <span className="text-neutral-800 text-[15px] font-regular whitespace-pre-line">
-                  공임단가 적용기준
-                </span>
+                <span className="text-neutral-800 text-[15px] font-regular whitespace-pre-line">공임단가 적용기준</span>
                 <span
                   className="text-neutral-800 text-[15px] font-medium whitespace-pre-line"
                   style={{
@@ -87,15 +81,12 @@ const ProposeModal = ({
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  onChange={(event) => onChangeChecked(event.target.checked)}
+                  onChange={event => onChangeChecked(event.target.checked)}
                   className="sr-only" // 스크린 리더용으로만 보이도록 숨김
                 />
 
                 {/* 커스텀 체크박스 디자인 */}
-                <div
-                  className="w-6 h-6 relative cursor-pointer"
-                  onClick={() => onChangeChecked(!isChecked)}
-                >
+                <div className="w-6 h-6 relative cursor-pointer" onClick={() => onChangeChecked(!isChecked)}>
                   <div
                     className={`w-6 h-6 left-0 top-0 absolute rounded ${
                       isChecked ? "bg-primary-normal" : "bg-neutral-300"
@@ -117,24 +108,14 @@ const ProposeModal = ({
                 </div>
 
                 {/* 체크박스 라벨 텍스트 */}
-                <span className="text-[#131211] text-base font-bold">
-                  내용을 확인했습니다
-                </span>
+                <span className="text-[#131211] text-base font-bold">내용을 확인했습니다</span>
               </div>
 
               {/* 버튼 영역 */}
               <div className="flex flex-row bg-white pb-8 pt-4 gap-2">
-                <SubButton
-                  text="닫기"
-                  onClick={onClickClose}
-                  disabled={!isChecked}
-                />
+                <SubButton text="닫기" onClick={onClickClose} disabled={!isChecked} />
 
-                <MainButton
-                  text="제안하기"
-                  onClick={onClickPropose}
-                  disabled={!isChecked}
-                />
+                <MainButton text="제안하기" onClick={onClickPropose} disabled={!isChecked} />
               </div>
             </div>
           </div>

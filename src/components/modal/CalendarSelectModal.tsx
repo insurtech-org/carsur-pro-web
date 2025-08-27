@@ -29,12 +29,7 @@ interface HolidayResponse {
   };
 }
 
-export default function CalendarSelectModal({
-  title,
-  isOpen,
-  onClose,
-  onClickConfirm,
-}: CalendarSelectModalProps) {
+export default function CalendarSelectModal({ title, isOpen, onClose, onClickConfirm }: CalendarSelectModalProps) {
   // Hook들을 항상 최상위에서 호출
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
@@ -46,9 +41,7 @@ export default function CalendarSelectModal({
     const fetchHolidays = async () => {
       try {
         const year = currentMonth.year();
-        const response = await fetch(
-          `https://api.insurtech.co.kr/common/holidays?solYear=${year}`
-        );
+        const response = await fetch(`https://api.insurtech.co.kr/common/holidays?solYear=${year}`);
         const data: HolidayResponse = await response.json();
 
         if (data.result && data.data.rawXml) {
@@ -111,8 +104,7 @@ export default function CalendarSelectModal({
     // 다음 달의 첫 번째 날들 (빈 칸으로 표시)
     const nextMonthDays = [];
     const totalCells = 42; // 6주 x 7일
-    const remainingCells =
-      totalCells - (prevMonthDays.length + currentMonthDays.length);
+    const remainingCells = totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push({
         day: i,
@@ -139,9 +131,7 @@ export default function CalendarSelectModal({
 
     // 공휴일인지 확인 (API 데이터 사용)
     const dateString = date.format("YYYYMMDD");
-    const isPublicHoliday = holidays.some(
-      (holiday) => holiday.locdate.toString() === dateString
-    );
+    const isPublicHoliday = holidays.some(holiday => holiday.locdate.toString() === dateString);
 
     return isPastDate || isWeekend || isPublicHoliday;
   };
@@ -157,9 +147,7 @@ export default function CalendarSelectModal({
 
     // API에서 가져온 공휴일인지 확인
     const dateString = date.format("YYYYMMDD");
-    const isPublicHoliday = holidays.some(
-      (holiday) => holiday.locdate.toString() === dateString
-    );
+    const isPublicHoliday = holidays.some(holiday => holiday.locdate.toString() === dateString);
 
     return isWeekend || isPublicHoliday;
   };
@@ -176,7 +164,7 @@ export default function CalendarSelectModal({
 
     // API에서 가져온 공휴일 확인
     const dateString = date.format("YYYYMMDD");
-    const holiday = holidays.find((h) => h.locdate.toString() === dateString);
+    const holiday = holidays.find(h => h.locdate.toString() === dateString);
 
     return holiday ? holiday.dateName : "";
   };
@@ -248,14 +236,9 @@ export default function CalendarSelectModal({
               {/* 헤더 */}
               <div className="self-stretch py-4 inline-flex justify-center items-start">
                 <div className="flex-1 flex justify-between items-start">
-                  <div className="flex-1 justify-center text-neutral-800 text-[17px] font-semibold">
-                    {title}
-                  </div>
+                  <div className="flex-1 justify-center text-neutral-800 text-[17px] font-semibold">{title}</div>
 
-                  <button
-                    className="w-6 h-6 relative overflow-hidden"
-                    onClick={onClickClose}
-                  >
+                  <button className="w-6 h-6 relative overflow-hidden" onClick={onClickClose}>
                     <img src={"/images/icon/ic_x-line.svg"} />
                   </button>
                 </div>
@@ -265,8 +248,7 @@ export default function CalendarSelectModal({
             {/* 안내 섹션 */}
             <div className="self-stretch px-4 py-2 bg-bg-alternative rounded-lg justify-center items-center">
               <div className="flex-1 justify-start text-secondary-normal text-sm font-regular">
-                날짜와 시간은 요청 보험사에 실시간 전달되며, 청구·정산 시
-                참고됩니다. 정확히 입력해 주세요.
+                날짜와 시간은 요청 보험사에 실시간 전달되며, 청구·정산 시 참고됩니다. 정확히 입력해 주세요.
               </div>
             </div>
 
@@ -279,11 +261,7 @@ export default function CalendarSelectModal({
                   <div className="mb-4">
                     <div className="flex flex-row items-center justify-center gap-x-16 mb-4 font-semibold">
                       <button onClick={() => changeMonth(-1)} className="">
-                        <img
-                          src="/images/icon/ic_arrow-left-2.svg"
-                          alt="prev"
-                          className="w-6 h-6"
-                        />
+                        <img src="/images/icon/ic_arrow-left-2.svg" alt="prev" className="w-6 h-6" />
                       </button>
 
                       <div className="flex items-center justify-center">
@@ -293,21 +271,14 @@ export default function CalendarSelectModal({
                       </div>
 
                       <button onClick={() => changeMonth(1)} className="">
-                        <img
-                          src="/images/icon/ic_arrow-right-2.svg"
-                          alt=""
-                          className="w-6 h-6"
-                        />
+                        <img src="/images/icon/ic_arrow-right-2.svg" alt="" className="w-6 h-6" />
                       </button>
                     </div>
 
                     {/* Calendar header */}
                     <div className="grid grid-cols-7 mb-2 text-center">
-                      {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-                        <div
-                          key={day}
-                          className="font-medium text-primary-normal text-base"
-                        >
+                      {["일", "월", "화", "수", "목", "금", "토"].map(day => (
+                        <div key={day} className="font-medium text-primary-normal text-base">
                           {day}
                         </div>
                       ))}
@@ -343,17 +314,9 @@ export default function CalendarSelectModal({
                                 ? "bg-secondary-bg"
                                 : "hover:bg-neutral-100 text-primary-normal"
                             }`}
-                            onClick={() =>
-                              handleDateSelect(day, isCurrentMonth)
-                            }
+                            onClick={() => handleDateSelect(day, isCurrentMonth)}
                             disabled={!isCurrentMonth || isDisabled}
-                            title={
-                              isHolidayDay
-                                ? holidayName
-                                : isDisabled
-                                ? "선택할 수 없는 날짜입니다"
-                                : ""
-                            }
+                            title={isHolidayDay ? holidayName : isDisabled ? "선택할 수 없는 날짜입니다" : ""}
                           >
                             {day}
                           </button>
@@ -363,13 +326,11 @@ export default function CalendarSelectModal({
 
                     {/* 시간 선택 섹션 */}
                     <div>
-                      <div className="mb-2 text-primary-normal font-medium text-base">
-                        오전
-                      </div>
+                      <div className="mb-2 text-primary-normal font-medium text-sm">오전</div>
                       <div className="grid grid-cols-5 gap-2 mb-4">
                         {timeSlots
-                          .filter((time) => parseInt(time) < 12)
-                          .map((time) => (
+                          .filter(time => parseInt(time) < 12)
+                          .map(time => (
                             <button
                               key={time}
                               className={`p-2 rounded-[10px] border ${
@@ -384,13 +345,11 @@ export default function CalendarSelectModal({
                           ))}
                       </div>
 
-                      <div className="mb-2 text-primary-normal font-medium text-base">
-                        오후
-                      </div>
+                      <div className="mb-2 text-primary-normal font-medium text-sm">오후</div>
                       <div className="grid grid-cols-5 gap-2">
                         {timeSlots
-                          .filter((time) => parseInt(time) >= 12)
-                          .map((time) => (
+                          .filter(time => parseInt(time) >= 12)
+                          .map(time => (
                             <button
                               key={time}
                               className={`p-2 rounded-[10px] border ${
@@ -416,10 +375,7 @@ export default function CalendarSelectModal({
                 <MainButton
                   text="완료"
                   onClick={() => {
-                    onClickConfirm(
-                      selectedDate?.format("YYYY-MM-DD") || "",
-                      selectedTimes[0] || ""
-                    );
+                    onClickConfirm(selectedDate?.format("YYYY-MM-DD") || "", selectedTimes[0] || "");
                     onClickClose();
                   }}
                   disabled={!selectedDate || !selectedTimes[0]}

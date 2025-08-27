@@ -1,0 +1,51 @@
+//작업 리스트
+export interface IWorkList {
+  id: number;
+  status: string;
+  carModel: string;
+  carNumber: string;
+  sigungu: string;
+  tellNo: string;
+  insuranceCompanyName: string;
+  reservationDate: string;
+}
+
+//상태 카운트
+export interface IWorkStatusCount {
+  arrivedCount?: number;
+  billingCompletedCount: number;
+  cancelledCount: number;
+  confirmedCount: number;
+  releasedCount: number;
+  repairCompletedCount: number;
+  repairStartedCount: number;
+  totalCount: number;
+}
+
+//작업 상세
+export interface IWorkDetail {
+  id: number;
+  accidentStatus: string;
+  tellNo: string;
+  insuranceClaimNo: string;
+  insuranceCompanyName: string;
+  insuranceCompanyId: number;
+  coverageType: string;
+  orderRank: string;
+  faultRate: string;
+  contactManagerName: string;
+  contactManagerPhone: string;
+  contactManagerFax: string;
+  sigungu: string;
+  reservationDate: string;
+  carNumber: string;
+  carModel: string;
+  engineDisplacement: string;
+  carModelYear: string;
+  confirmedDate: string;
+  arrivedDate: string;
+  repairStartedDate: string;
+  repairCompletedDate: string;
+  releasedDate: string;
+  billingCompletedDate: string;
+}

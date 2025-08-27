@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useMyWorkStore } from "@/store/mywork";
+import { useHideNavigator } from "@/hook/useHideNavigator";
 
 // 네비게이션 아이템 타입 정의
 interface NavItem {
@@ -103,10 +104,17 @@ export default function BottomNavigator() {
     "/login", // 로그인 페이지
     "/call/[id]", // 콜 상세 페이지 (동적 라우트)
     "/work/[id]", // 작업 상세 페이지 (동적 라우트)
+    "/find-id", // 아이디 찾기 페이지
+    "/find-password", // 비밀번호 찾기 페이지
+    "/mypage/terms", // 이용약관 페이지
+    "/mypage/terms/service", // 서비스 이용약관 페이지
+    "/mypage/terms/personal", // 개인정보 수집 이용 동의 페이지
+    "/mypage/account", // 계정관리 페이지
+    "/mypage/account/change-password", // 비밀번호 변경 페이지
   ];
 
   // 현재 경로가 숨겨야 할 페이지인지 확인
-  const shouldHide = hiddenPaths.some((path) => {
+  const shouldHide = hiddenPaths.some(path => {
     if (path.includes("[") && path.includes("]")) {
       // 동적 라우트 패턴 매칭 (예: /call/[id])
       const pathPattern = path.replace(/\[.*?\]/g, "[^/]+");
@@ -116,42 +124,36 @@ export default function BottomNavigator() {
     return pathname === path;
   });
 
-  //숨겨할 페이지에서는 retun
-  if (shouldHide) return null;
+  // body 클래스로 네비게이터 숨김 여부 확인
+  const isHiddenByHook = typeof document !== "undefined" && document.body.classList.contains("hide-bottom-navigator");
+
+  //숨겨할 페이지에서는 return
+  if (shouldHide || isHiddenByHook) return null;
 
   return (
     <div className="responseNavigator fixed bottom-0 left-0 right-0 w-full bg-white rounded-t-lg z-50 ">
       <div className="flex items-center justify-around px-2 pb-6 bg-white shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.04)] rounded-t-lg">
-        {navItems.map((item) => (
+        {navItems.map(item => (
           <button
             key={item.id}
             onClick={() => handleNavClick(item)}
             className={`flex flex-col items-center justify-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-200 ease-in-out ${
-              activeTab === item.path
-                ? "text-primary-normal"
-                : "text-neutral-500"
+              activeTab === item.path ? "text-primary-normal" : "text-neutral-500"
             }`}
           >
             <div className="flex items-center justify-center w-6 h-6 relative">
-              {item.id === "my-work" &&
-                myWorkData.filter((item) => item.status === "입고확정").length >
-                  0 && (
-                  <div className="w-5 h-4 bg-status-destructive rounded-full flex items-center justify-center absolute top-[0px] right-[-15px]">
-                    <span className="text-common-white text-xs font-medium">
-                      {
-                        myWorkData.filter((item) => item.status === "입고확정")
-                          .length
-                      }
-                    </span>
-                  </div>
-                )}
+              {item.id === "my-work" && myWorkData.filter(item => item.status === "입고확정").length > 0 && (
+                <div className="w-5 h-4 bg-status-destructive rounded-full flex items-center justify-center absolute top-[0px] right-[-15px]">
+                  <span className="text-common-white text-xs font-medium">
+                    {myWorkData.filter(item => item.status === "입고확정").length}
+                  </span>
+                </div>
+              )}
               {item.icon}
             </div>
             <span
               className={`text-xs font-medium leading-none tracking-tight ${
-                activeTab === item.path
-                  ? "text-primary-normal"
-                  : "text-neutral-500"
+                activeTab === item.path ? "text-primary-normal" : "text-neutral-500"
               }`}
             >
               {item.label}
