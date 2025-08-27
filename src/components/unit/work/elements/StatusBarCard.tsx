@@ -1,13 +1,14 @@
 "use client";
 
-import { workDetailStatus, workSteps, workStatus } from "@/mock/data";
+import { WORK_STATUS } from "@/utils/enum";
+import { workDetailStatus, workSteps } from "@/utils/workStatus";
 import { useEffect, useState } from "react";
 
 const StatusBarCard = ({ data }: { data: any }) => {
-  const [workStatus, setWorkStatus] = useState(data?.status);
+  const [workStatus, setWorkStatus] = useState(data?.accidentStatus);
 
   useEffect(() => {
-    setWorkStatus(data?.status);
+    setWorkStatus(data?.accidentStatus);
   }, [data]);
 
   return (
@@ -18,28 +19,22 @@ const StatusBarCard = ({ data }: { data: any }) => {
       }}
     >
       <span className="text-neutral-800 text-lg font-semibold ml-[22px] mr-4">
-        {workDetailStatus[workStatus as keyof typeof workDetailStatus] ||
-          "고객과 입고 일정을 확정해 주세요"}
+        {workDetailStatus[workStatus as keyof typeof workDetailStatus] || "고객과 입고 일정을 확정해 주세요"}
       </span>
 
       <div className="flex items-start self-stretch mx-4 h-11 relative">
         {Object.keys(workDetailStatus).map((item, idx) => {
-          const isCompleted =
-            workSteps.indexOf(item) <= workSteps.indexOf(workStatus as string);
+          const isCompleted = workSteps.indexOf(item) <= workSteps.indexOf(workStatus as string);
           const currentStepIndex = workSteps.indexOf(workStatus as string);
 
           return (
-            <div
-              className="flex flex-1 flex-col items-center relative"
-              key={idx}
-            >
+            <div className="flex flex-1 flex-col items-center relative" key={idx}>
               {/* 연결선 - 첫 번째가 아닌 경우에만 표시 */}
               {idx > 0 && (
                 <div
                   className="absolute top-[11px] right-1/2 w-full h-0.5 z-0"
                   style={{
-                    backgroundColor:
-                      idx <= currentStepIndex ? "#262626" : "#e5e5e5",
+                    backgroundColor: idx <= currentStepIndex ? "#262626" : "#e5e5e5",
                   }}
                 ></div>
               )}
@@ -53,16 +48,14 @@ const StatusBarCard = ({ data }: { data: any }) => {
                   />
                 ) : (
                   <div className="flex w-[22px] h-[22px] items-center border border-solid border-neutral-300 rounded-full justify-center bg-bg-normal">
-                    <span className="text-neutral-500 text-[13px] font-medium">
-                      {idx + 1}
-                    </span>
+                    <span className="text-neutral-500 text-[13px] font-medium">{idx + 1}</span>
                   </div>
                 )}
               </div>
 
               <div className="flex flex-col items-center mt-2">
                 <span className="text-neutral-700 text-xs font-semibold text-center">
-                  {item}
+                  {WORK_STATUS[item as keyof typeof WORK_STATUS]}
                 </span>
               </div>
             </div>

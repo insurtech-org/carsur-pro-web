@@ -119,7 +119,7 @@ export default function WorkPage() {
       </div>
 
       <div className="flex flex-col items-center self-stretch bg-bg-main flex-1 overflow-y-auto min-h-screen">
-        <List currentStatus={activeTab} />
+        <List currentStatus={activeTab} onDataFetched={fetchWorkStatus} />
       </div>
     </>
   );

@@ -5,8 +5,6 @@ import TextButton from "@/components/common/TextButton";
 import AccountModal from "@/components/modal/AccountModal";
 import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
 import CancelSelectModal from "@/components/modal/CancelSelectModal";
-import { useLoadingStore } from "@/store/loading";
-import { useMyWorkStore } from "@/store/mywork";
 import { useToastStore } from "@/store/toast";
 import { formatFaxNumber, formatPhoneNumber, getCarTypeText, sleep, statusColor } from "@/utils/util";
 import dayjs from "dayjs";
@@ -14,18 +12,20 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import StatusBarCard from "./elements/StatusBarCard";
 import ComplatedCard from "./elements/ComplatedCard";
-import { getWorkScheduleDetail } from "@/api/work.api";
-import { IWorkDetail } from "@/type/work.type";
+import { cancelWorkSchedule, getWorkScheduleDetail, updateWorkScheduleStatus } from "@/api/work.api";
+import { IWorkDetail, StatusChangeType } from "@/type/work.type";
 import { WORK_STATUS } from "@/utils/enum";
 import DetailInfoRow from "./elements/DetailInfoRow";
+import { convertStatusToType, getStatusToastMessage, workSteps } from "@/utils/workStatus";
 
 export default function WorkDetail() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const detailStatus = searchParams.get("status") || "";
   const detailId = Number(params.id);
   const router = useRouter();
 
-  const { showSuccess } = useToastStore();
+  const { showSuccess, showError } = useToastStore();
 
   const [cancelSelectModalOpen, setCancelSelectModalOpen] = useState(false);
   const [calendarSelectModalOpen, setCalendarSelectModalOpen] = useState(false);
@@ -35,22 +35,42 @@ export default function WorkDetail() {
   const [calendarText, setCalendarText] = useState("입고가 완료된");
 
   const [workData, setWorkData] = useState<IWorkDetail>();
-  const [workStatus, setWorkStatus] = useState<string>(status || "");
+  const [workStatus, setWorkStatus] = useState<string>(detailStatus);
 
   useEffect(() => {
-    fetchWorkData();
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("status", workStatus);
-    router.push(`/work/${detailId}?${String(params)}`);
+    fetchData();
+    //스크롤 가장 위로
+    window.scrollTo(0, 0);
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const newStatus = await fetchWorkData();
+      setWorkStatus(newStatus);
+
+      // URL 업데이트가 필요한 경우에만 수행
+      if (newStatus !== detailStatus) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("status", newStatus);
+        router.replace(`/work/${detailId}?${String(params)}`);
+      }
+    } catch (error) {
+      console.error(error);
+      showError("데이터를 불러오는데 실패했습니다.");
+      router.push(`/work?status=${detailStatus}`);
+    }
+  };
 
   const fetchWorkData = async () => {
     try {
       const res = await getWorkScheduleDetail(detailId);
       setWorkData(res);
-      setWorkStatus(res?.accidentStatus || "");
+      //새로 받은 상태 반환
+      if (!res.accidentStatus) return "";
+      return res.accidentStatus;
     } catch (error) {
       console.log(error);
+      throw error;
     }
   };
 
@@ -104,22 +124,48 @@ export default function WorkDetail() {
   };
 
   //입고 확정 취소 이벤트
-  const onClickCancelConfirm = () => {
-    setCancelSelectModalOpen(false);
-
-    showSuccess("입고 확정이 취소되었어요.");
-    router.back();
+  const onClickCancelConfirm = async (abandonReason: string) => {
+    try {
+      await cancelWorkSchedule(detailId, { abandonReason });
+      goBack();
+    } catch (error) {
+      console.log(error);
+      showError("입고 확정 포기에 실패했습니다.");
+    }
   };
 
   //달력 확정 이벤트
-  const onClickCalendarConfirm = (date: string, time: string) => {
-    const status = workStatus;
+  const onClickCalendarConfirm = async (date: string, time: string) => {
+    const completedDate = `${date} ${time}:00`;
+
+    //다음 상태 계산하기
+    const currentIndex = workSteps.indexOf(workStatus);
+    const nextStatus = workSteps[currentIndex + 1];
+    const convertStatus = convertStatusToType(nextStatus);
+
+    try {
+      await updateWorkScheduleStatus(detailId, convertStatus as StatusChangeType, { completedDate });
+      await fetchData();
+      //상태 변경 후 toast 메세지 표시
+      const toastMessage = getStatusToastMessage(workStatus);
+      if (toastMessage) {
+        showSuccess(toastMessage);
+      }
+    } catch (error) {
+      console.log(error);
+      showError("상태 변경에 실패했습니다.");
+    }
 
     setCalendarSelectModalOpen(false);
   };
 
   //청구 금액 이벤트
   const onClickAccountConfirm = (price: number, laborPrice: number, partsPrice: number) => {};
+
+  //뒤로가기 이벤트
+  const goBack = () => {
+    router.push(`/work?status=${workStatus}`);
+  };
 
   return (
     <>
@@ -160,7 +206,9 @@ export default function WorkDetail() {
         {/* 고객 정보 */}
         {workStatus !== "BILLING_COMPLETED" && (
           <div className="flex flex-col items-start self-stretch bg-neutral-50 py-4 mx-5 gap-4 rounded-xl p-4">
-            <span className="text-primary-normal text-[17px] font-semibold">고객 정보</span>
+            <span className="text-primary-normal text-[17px] font-semibold">
+              {workData?.accidentStatus === "CONFIRMED" ? "고객과 통화해 입고 일정을 확정하세요❗️" : "고객 정보"}
+            </span>
             <div className="flex w-full items-center justify-between">
               <span className="text-neutral-600 text-base font-regular">고객전화번호</span>
               <div className="flex items-center gap-1">
@@ -178,30 +226,30 @@ export default function WorkDetail() {
           <div className="flex flex-col self-stretch mx-1 gap-2">
             <div className="flex flex-col items-start self-stretch">
               <span className="text-primary-normal text-base font-medium mb-[9px]">보험 정보</span>
-              <DetailInfoRow label="사고접수번호" value={workData?.insuranceClaimNo || ""} />
-              <DetailInfoRow label="보험사" value={workData?.insuranceCompanyName || ""} />
-              <DetailInfoRow label="사고구분" value={getCarTypeText(workData?.coverageType || "")} />
-              <DetailInfoRow label="예상과실율" value={`${workData?.faultRate}%` || ""} />
-              <DetailInfoRow label="보험담당자" value={workData?.contactManagerName || ""} />
+              <DetailInfoRow label="사고접수번호" value={workData?.insuranceClaimNo || "-"} />
+              <DetailInfoRow label="보험사" value={workData?.insuranceCompanyName || "-"} />
+              <DetailInfoRow label="사고구분" value={getCarTypeText(workData?.coverageType || "-")} />
+              <DetailInfoRow label="예상과실율" value={`${workData?.faultRate || ""}%`} />
+              <DetailInfoRow label="보험담당자" value={workData?.contactManagerName || "-"} />
               <DetailInfoRow
                 label="보험담당자 연락처"
-                value={formatPhoneNumber(String(workData?.contactManagerPhone)) || ""}
+                value={formatPhoneNumber(String(workData?.contactManagerPhone || "")) || "-"}
               />
               <DetailInfoRow
                 label="보험사 팩스번호"
-                value={formatFaxNumber(String(workData?.contactManagerFax)) || ""}
+                value={formatFaxNumber(String(workData?.contactManagerFax || "")) || "-"}
               />
             </div>
             <div className="self-stretch bg-neutral-100 h-0.5"></div>
             <div className="flex flex-col items-start self-stretch">
-              <span className="text-[#131211] text-base font-bold mb-[9px]">예약 기본 정보</span>
-              <DetailInfoRow label="예약지역" value={workData?.sigungu || ""} />
-              <DetailInfoRow label="입고 예약일" value={workData?.confirmedDate || ""} />
+              <span className="text-primary-normal text-base font-bold mb-[9px]">예약 기본 정보</span>
+              <DetailInfoRow label="예약지역" value={workData?.sigungu || "-"} />
+              <DetailInfoRow label="입고 예약일" value={workData?.confirmedDate || "-"} />
             </div>
             <div className="self-stretch bg-neutral-100 h-0.5"></div>
             <div className="flex flex-col items-start self-stretch">
-              <span className="text-[#131211] text-base font-bold mb-[9px]">차량 정보</span>
-              <DetailInfoRow label="차량번호" value={workData?.carNumber || ""} />
+              <span className="text-primary-normal text-base font-bold mb-[9px]">차량 정보</span>
+              <DetailInfoRow label="차량번호" value={workData?.carNumber || "-"} />
               <DetailInfoRow label="차종" value={workData?.carModel || ""} />
               <DetailInfoRow label="배기량" value={workData?.engineDisplacement || ""} />
               <DetailInfoRow label="연식" value={workData?.carModelYear || ""} />
@@ -297,7 +345,7 @@ export default function WorkDetail() {
       <CancelSelectModal
         isOpen={cancelSelectModalOpen}
         onClose={() => setCancelSelectModalOpen(false)}
-        onClickConfirm={() => onClickCancelConfirm()}
+        onClickConfirm={abandonReason => onClickCancelConfirm(abandonReason)}
       />
 
       <CalendarSelectModal

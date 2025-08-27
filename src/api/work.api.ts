@@ -1,3 +1,4 @@
+import { StatusChangeType } from "@/type/work.type";
 import apiInstance from "./api.config";
 
 const prefix = "/factory/work-schedules";
@@ -23,13 +24,17 @@ export const getWorkScheduleTabCount = async () => {
 };
 
 //작업 상태 업데이트
-export const updateWorkScheduleStatus = async (id: number, status: string) => {
-  const res = await apiInstance.put(`${prefix}/${id}/status/${status}`);
+export const updateWorkScheduleStatus = async (
+  id: number,
+  status: StatusChangeType,
+  body: { completedDate: string }
+) => {
+  const res = await apiInstance.post(`${prefix}/${id}/status/${status}`, body);
   return res;
 };
 
 //입고 확정 취소(제안포기)
-export const cancelWorkSchedule = async (id: number) => {
-  const res = await apiInstance.put(`${prefix}/${id}/abandon`);
+export const cancelWorkSchedule = async (id: number, body: { abandonReason: string }) => {
+  const res = await apiInstance.post(`${prefix}/${id}/abandon`, body);
   return res;
 };

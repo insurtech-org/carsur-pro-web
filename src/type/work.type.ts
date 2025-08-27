@@ -49,3 +49,6 @@ export interface IWorkDetail {
   releasedDate: string;
   billingCompletedDate: string;
 }
+
+//상태 접수 타입
+export type StatusChangeType = "arrived" | "repair-started" | "repair-completed" | "released";

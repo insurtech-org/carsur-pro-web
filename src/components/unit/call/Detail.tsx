@@ -174,7 +174,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
                 <span className="text-secondary-normal text-sm font-semibold">잠깐, 중요한 정보가 있어요.</span>
               </div>
               <span className="text-neutral-700 text-sm font-medium px-5">
-                제안(제가 할게요)은 여러 공업사가 제안할 수 있으며, 해당 제안 중 한 곳이 최종 배정됩니다.
+                제안하기는 여러 공업사가 제안할 수 있으며, 해당 제안 중 한 곳이 최종 배정됩니다.
               </span>
             </div>
           </div>

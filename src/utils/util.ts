@@ -1,5 +1,4 @@
-import { workDetailStatus, workSteps } from "@/mock/data";
-import { ServerErrorResponse } from "@/type/etc.type";
+import { workSteps } from "@/utils/workStatus";
 import { IWorkList } from "@/type/work.type";
 import dayjs from "dayjs";
 
@@ -197,8 +196,18 @@ export const getCarTypeText = (typeNumber: string) => {
   if (typeNumber === "20") {
     return "대물";
   }
-  if (typeNumber === "0") {
+  if (typeNumber === "40") {
     return "자차";
   }
   return "";
+};
+
+//소문자로 변경
+export const convertToLowerCase = (text: string) => {
+  return text.toLowerCase();
+};
+
+//대문자로 변경
+export const convertToUpperCase = (text: string) => {
+  return text.toUpperCase();
 };

@@ -8,7 +8,13 @@ import { IPageInfo } from "@/type/etc.type";
 import { useSearchParams } from "next/navigation";
 import { WORK_STATUS } from "@/utils/enum";
 
-export default function WorkList({ currentStatus }: { currentStatus: string }) {
+export default function WorkList({
+  currentStatus,
+  onDataFetched,
+}: {
+  currentStatus: string;
+  onDataFetched: () => void;
+}) {
   const [workList, setWorkList] = useState<IWorkList[]>([]);
   const [page, setPage] = useState(1);
   const [pageInfo, setPageInfo] = useState<IPageInfo>({
@@ -19,6 +25,8 @@ export default function WorkList({ currentStatus }: { currentStatus: string }) {
 
   useEffect(() => {
     fetchWorkList();
+    //스크롤 가장 위로
+    window.scrollTo(0, 0);
   }, [currentStatus]);
 
   const fetchWorkList = async () => {
@@ -35,6 +43,8 @@ export default function WorkList({ currentStatus }: { currentStatus: string }) {
         totalItems: res.totalItems,
         totalPage: res.totalPage,
       });
+
+      onDataFetched();
     } catch (error) {
       console.log(error);
     }

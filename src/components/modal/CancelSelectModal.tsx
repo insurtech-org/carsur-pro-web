@@ -7,7 +7,7 @@ import SubButton from "../common/SubButton";
 interface CancelSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onClickConfirm: () => void;
+  onClickConfirm: (abandonReason: string) => void;
 }
 
 const CancelSelectModal = ({
@@ -17,10 +17,19 @@ const CancelSelectModal = ({
 }: CancelSelectModalProps) => {
   if (!isOpen) return null;
 
+  const cancelReasons = {
+    "1": "다른 공업사로 수리 예약",
+    "2": "미수선처리",
+    "3": "고객변심",
+    "4": "입고 일자를 맞추지 못함",
+  };
+
   const [selectedValue, setSelectedValue] = useState("1");
+  const [abandonReason, setAbandonReason] = useState(cancelReasons["1"]);
 
   const onChangeChecked = (value: string) => {
     setSelectedValue(value);
+    setAbandonReason(cancelReasons[value as keyof typeof cancelReasons]);
   };
 
   const onClickClose = () => {
@@ -46,14 +55,11 @@ const CancelSelectModal = ({
                   <div className="flex-1 flex justify-between items-start">
                     <div className="flex-1 flex justify-start items-start">
                       <div className="flex-1 justify-center text-neutral-800 text-[17px] font-semibold">
-                        입고 확정 취소 사유를 알려주세요.
+                        입고 확정 포기 사유를 알려주세요.
                       </div>
                     </div>
 
-                    <button
-                      className="w-6 h-6 relative overflow-hidden"
-                      onClick={onClickClose}
-                    >
+                    <button className="w-6 h-6 relative overflow-hidden" onClick={onClickClose}>
                       <img src={"/images/icon/ic_x-line.svg"} />
                     </button>
                   </div>
@@ -63,9 +69,7 @@ const CancelSelectModal = ({
               <div className="self-stretch px-5 flex flex-col justify-start items-start ">
                 <div className="self-stretch flex flex-col justify-start items-start">
                   <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                    <div className="justify-start text-primary-alternative text-sm font-medium">
-                      고객에 의한 취소
-                    </div>
+                    <div className="justify-start text-primary-alternative text-sm font-medium">고객에 의한 사유</div>
                     <div className="inline-flex justify-start items-center gap-2">
                       <input
                         id="cancel-select-1"
@@ -74,15 +78,13 @@ const CancelSelectModal = ({
                         className="customRadio"
                         value="1"
                         checked={selectedValue === "1"}
-                        onChange={(event) =>
-                          onChangeChecked(event.target.value)
-                        }
+                        onChange={event => onChangeChecked(event.target.value)}
                       />
                       <label
                         htmlFor="cancel-select-1"
                         className="justify-start text-primary-normal text-base font-regular"
                       >
-                        다른 공업사로 수리 예약
+                        {cancelReasons["1"]}
                       </label>
                     </div>
                     <div className="inline-flex justify-start items-center gap-2">
@@ -93,15 +95,13 @@ const CancelSelectModal = ({
                         className="customRadio"
                         value="2"
                         checked={selectedValue === "2"}
-                        onChange={(event) =>
-                          onChangeChecked(event.target.value)
-                        }
+                        onChange={event => onChangeChecked(event.target.value)}
                       />
                       <label
                         htmlFor="cancel-select-2"
                         className="justify-start text-primary-normal text-base font-regular"
                       >
-                        미수선처리
+                        {cancelReasons["2"]}
                       </label>
                     </div>
                     <div className="inline-flex justify-start items-center gap-2">
@@ -112,19 +112,17 @@ const CancelSelectModal = ({
                         className="customRadio"
                         value="3"
                         checked={selectedValue === "3"}
-                        onChange={(event) =>
-                          onChangeChecked(event.target.value)
-                        }
+                        onChange={event => onChangeChecked(event.target.value)}
                       />
                       <label
                         htmlFor="cancel-select-3"
                         className="justify-start text-primary-normal text-base font-regular"
                       >
-                        고객변심
+                        {cancelReasons["3"]}
                       </label>
                     </div>
                     <div className="justify-start text-primary-alternative text-sm font-medium">
-                      공업사 사정에 의한 취소
+                      공업사 사정에 의한 사유
                     </div>
                     <div className="inline-flex justify-start items-center gap-2">
                       <input
@@ -134,15 +132,13 @@ const CancelSelectModal = ({
                         className="customRadio"
                         value="4"
                         checked={selectedValue === "4"}
-                        onChange={(event) =>
-                          onChangeChecked(event.target.value)
-                        }
+                        onChange={event => onChangeChecked(event.target.value)}
                       />
                       <label
                         htmlFor="cancel-select-4"
                         className="justify-start text-primary-normal text-base font-regular"
                       >
-                        입고 일자를 맞추지 못함
+                        {cancelReasons["4"]}
                       </label>
                     </div>
                   </div>
@@ -154,8 +150,8 @@ const CancelSelectModal = ({
                     <SubButton text="닫기" onClick={onClickClose} />
 
                     <MainButton
-                      text="입고 확정 취소하기"
-                      onClick={onClickConfirm}
+                      text="입고 확정 포기하기"
+                      onClick={() => onClickConfirm(abandonReason)}
                       disabled={!selectedValue}
                     />
                   </div>
