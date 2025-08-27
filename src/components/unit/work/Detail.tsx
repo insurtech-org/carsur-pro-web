@@ -12,7 +12,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import StatusBarCard from "./elements/StatusBarCard";
 import ComplatedCard from "./elements/ComplatedCard";
-import { cancelWorkSchedule, getWorkScheduleDetail, updateWorkScheduleStatus } from "@/api/work.api";
+import { cancelWorkSchedule, completeBilling, getWorkScheduleDetail, updateWorkScheduleStatus } from "@/api/work.api";
 import { IWorkDetail, StatusChangeType } from "@/type/work.type";
 import { WORK_STATUS } from "@/utils/enum";
 import DetailInfoRow from "./elements/DetailInfoRow";
@@ -160,7 +160,18 @@ export default function WorkDetail() {
   };
 
   //청구 금액 이벤트
-  const onClickAccountConfirm = (price: number, laborPrice: number, partsPrice: number) => {};
+  const onClickAccountConfirm = async (price: number, laborPrice: number, partsPrice: number) => {
+    try {
+      await completeBilling(detailId, { laborPrice, partsPrice });
+      setAccountModalOpen(false);
+      await fetchData();
+
+      showSuccess("청구 완료되었어요");
+    } catch (error) {
+      console.log(error);
+      showError("청구 완료에 실패했습니다.");
+    }
+  };
 
   //뒤로가기 이벤트
   const goBack = () => {

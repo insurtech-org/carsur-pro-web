@@ -38,3 +38,9 @@ export const cancelWorkSchedule = async (id: number, body: { abandonReason: stri
   const res = await apiInstance.post(`${prefix}/${id}/abandon`, body);
   return res;
 };
+
+//청구 완료 처리
+export const completeBilling = async (id: number, body: { laborPrice: number; partsPrice: number }) => {
+  const res = await apiInstance.post(`${prefix}/${id}/billing-complete`, body);
+  return res;
+};
