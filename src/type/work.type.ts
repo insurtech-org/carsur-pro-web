@@ -48,6 +48,8 @@ export interface IWorkDetail {
   repairCompletedDate: string;
   releasedDate: string;
   billingCompletedDate: string;
+  laborPrice?: number;
+  partsPrice?: number;
 }
 
 //상태 접수 타입

@@ -35,14 +35,14 @@ export const convertStatusToType = (status: string) => {
 export const getStatusToastMessage = (status: string) => {
   switch (status) {
     case "ARRIVED":
-      return "차량 입고가 완료되었어요";
+      return "차량 입고가 완료되었어요.";
     case "REPAIR_STARTED":
-      return "차량 수리가 시작되었어요";
+      return "차량 수리가 시작되었어요.";
     case "REPAIR_COMPLETED":
-      return "차량 수리가 완료되었어요";
+      return "차량 수리가 완료되었어요.";
     case "RELEASED":
-      return "차량 출고가 완료되었어요";
+      return "차량 출고가 완료되었어요.";
     case "BILLING_COMPLETED":
-      return "청구 처리가 완료되었어요";
+      return "청구 처리가 완료되었어요.";
   }
 };

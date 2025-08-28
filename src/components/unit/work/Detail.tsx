@@ -54,6 +54,7 @@ export default function WorkDetail() {
         params.set("status", newStatus);
         router.replace(`/work/${detailId}?${String(params)}`);
       }
+      return newStatus;
     } catch (error) {
       console.error(error);
       showError("데이터를 불러오는데 실패했습니다.");
@@ -127,6 +128,8 @@ export default function WorkDetail() {
   const onClickCancelConfirm = async (abandonReason: string) => {
     try {
       await cancelWorkSchedule(detailId, { abandonReason });
+
+      showSuccess("입고 확정이 포기되었어요.");
       goBack();
     } catch (error) {
       console.log(error);
@@ -145,12 +148,12 @@ export default function WorkDetail() {
 
     try {
       await updateWorkScheduleStatus(detailId, convertStatus as StatusChangeType, { completedDate });
-      await fetchData();
+      const newStatus = await fetchData();
+
       //상태 변경 후 toast 메세지 표시
-      const toastMessage = getStatusToastMessage(workStatus);
-      if (toastMessage) {
-        showSuccess(toastMessage);
-      }
+      const toastMessage = getStatusToastMessage(newStatus);
+
+      showSuccess(toastMessage || "상태 변경이 완료되었습니다.");
     } catch (error) {
       console.log(error);
       showError("상태 변경에 실패했습니다.");
@@ -166,7 +169,7 @@ export default function WorkDetail() {
       setAccountModalOpen(false);
       await fetchData();
 
-      showSuccess("청구 완료되었어요");
+      showSuccess("청구 처리가 완료되었어요.");
     } catch (error) {
       console.log(error);
       showError("청구 완료에 실패했습니다.");
@@ -267,16 +270,17 @@ export default function WorkDetail() {
             </div>
           </div>
         </div>
+
         <div className="flex flex-col items-start self-stretch mx-5 gap-4">
           <span className="text-primary-normal text-lg font-semibold ml-1">히스토리</span>
           <div className="flex flex-col self-stretch mx-1 gap-2">
-            {workData?.reservationDate && (
+            {workData?.confirmedDate && (
               <div className="flex items-center self-stretch gap-2.5">
                 <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
                 <div className="flex flex-1 justify-between items-center">
                   <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">예약확정</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {workData?.confirmedDate.replaceAll("-", ".")}
+                    {workData.confirmedDate.replaceAll("-", ".")}
                   </span>
                 </div>
               </div>
