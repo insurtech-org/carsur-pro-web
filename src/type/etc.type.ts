@@ -42,7 +42,7 @@ export interface IPageInfo {
 }
 
 // 모달 관련 타입 정의
-export interface ModalConfig {
+export interface CommonModalConfig {
   title: string;
   description?: string;
   cancelButtonText?: string;
@@ -51,6 +51,14 @@ export interface ModalConfig {
   onCancel?: () => void;
   type?: "confirm" | "alert";
 }
+
+export interface AppWebSelectModalConfig {
+  type: "app-web-select";
+  onSelectApp?: () => void;
+  onSelectWeb?: () => void;
+}
+
+export type ModalConfig = CommonModalConfig | AppWebSelectModalConfig;
 
 export interface ModalState {
   isOpen: boolean;

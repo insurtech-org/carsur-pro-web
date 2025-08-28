@@ -111,6 +111,7 @@ export default function BottomNavigator() {
     "/mypage/terms/personal", // 개인정보 수집 이용 동의 페이지
     "/mypage/account", // 계정관리 페이지
     "/mypage/account/change-password", // 비밀번호 변경 페이지
+    "/r", // 앱 열기 페이지
   ];
 
   // 현재 경로가 숨겨야 할 페이지인지 확인

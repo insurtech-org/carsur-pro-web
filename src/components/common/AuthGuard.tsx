@@ -7,7 +7,7 @@ import LoadingPage from "./LoadingPage";
 import { useToastStore } from "@/store/toast";
 
 // 인증이 필요하지 않은 공개 라우트들
-const publicRoutes = ["/login", "/find-id"];
+const publicRoutes = ["/login", "/find-id", "/r"];
 
 interface AuthGuardProps {
   children: React.ReactNode;
