@@ -39,7 +39,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     // accessToken이 없으면 로그인 페이지로 리다이렉트
     if (!tokens?.accessToken) {
       router.replace("/login");
-      showSuccess("토큰이 만료되었습니다. 다시 로그인해 주세요.");
       return;
     }
   }, [pathname, tokens?.accessToken, router, isHydrated]);
