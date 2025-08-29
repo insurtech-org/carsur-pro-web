@@ -6,9 +6,7 @@ export default function MyPage() {
       <div className="flex flex-col h-screen">
         {/* 헤더 */}
         <div className="sticky top-0 z-10 h-11 w-full flex flex-row justify-start items-center px-5">
-          <span className="text-primary-normal text-2xl font-semibold">
-            마이페이지
-          </span>
+          <span className="text-primary-normal text-[22px] font-semibold">마이페이지</span>
         </div>
 
         <MyPageList />
