@@ -76,17 +76,20 @@ const ProposeModal = ({ isOpen = false, onClose = () => {}, onClickPropose = () 
 
               {/* 확인 체크박스 */}
 
-              <div className="flex items-center self-stretch bg-neutral-100 py-4 px-3 gap-2 rounded-lg mb-5">
+              <div
+                className="flex items-center self-stretch bg-neutral-100 py-4 px-3 gap-2 rounded-lg mb-5 cursor-pointer"
+                onClick={() => onChangeChecked(!isChecked)}
+              >
                 {/* 기본 체크박스는 숨김 처리 */}
                 <input
                   type="checkbox"
                   checked={isChecked}
                   onChange={event => onChangeChecked(event.target.checked)}
-                  className="sr-only" // 스크린 리더용으로만 보이도록 숨김
+                  className="sr-only"
                 />
 
                 {/* 커스텀 체크박스 디자인 */}
-                <div className="w-6 h-6 relative cursor-pointer" onClick={() => onChangeChecked(!isChecked)}>
+                <div className="w-6 h-6 relative">
                   <div
                     className={`w-6 h-6 left-0 top-0 absolute rounded ${
                       isChecked ? "bg-primary-normal" : "bg-neutral-300"
@@ -113,7 +116,7 @@ const ProposeModal = ({ isOpen = false, onClose = () => {}, onClickPropose = () 
 
               {/* 버튼 영역 */}
               <div className="flex flex-row bg-white pb-8 pt-4 gap-2">
-                <SubButton text="닫기" onClick={onClickClose} disabled={!isChecked} />
+                <SubButton text="닫기" onClick={onClickClose} />
 
                 <MainButton text="제안하기" onClick={onClickPropose} disabled={!isChecked} />
               </div>

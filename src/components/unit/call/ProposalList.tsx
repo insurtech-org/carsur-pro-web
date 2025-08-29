@@ -40,7 +40,7 @@ export default function Proposal() {
         proposeList.map((data, idx) => <ProposeCard proposeData={data} refetch={fetchProposalList} key={idx} />)
       ) : (
         <div className="flex flex-col items-center justify-center  bg-neutral-100 h-72 w-full">
-          <span className="text-primary-neutral text-[15px] font-medium">제안 중인 내역이 없어요.</span>
+          <span className="text-primary-assistive text-[15px] font-medium">제안 중인 내역이 없어요.</span>
         </div>
       )}
     </div>

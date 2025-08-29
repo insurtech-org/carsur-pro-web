@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import MainButton from "../common/MainButton";
+import SubButton from "../common/SubButton";
 
 interface CalendarSelectModalProps {
   title: string;
@@ -63,6 +64,21 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     fetchHolidays();
   }, [currentMonth.year()]);
 
+  useEffect(() => {
+    if (isOpen) {
+      // 모달이 열릴 때 body 스크롤 막기
+      document.body.style.overflow = "hidden";
+    } else {
+      // 모달이 닫힐 때 body 스크롤 복구
+      document.body.style.overflow = "unset";
+    }
+
+    // 컴포넌트가 언마운트될 때 스크롤 복구
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   // 월 변경 함수 - dayjs 사용
   const changeMonth = (direction: number) => {
     const newMonth = currentMonth.add(direction, "month");
@@ -74,24 +90,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     const firstDayOfMonth = currentMonth.startOf("month");
     const lastDayOfMonth = currentMonth.endOf("month");
 
-    // 해당 월의 첫 번째 날의 요일 (0: 일요일, 1: 월요일, ...)
-    const firstDayWeekday = firstDayOfMonth.day();
-
-    // 이전 달의 마지막 날들 (빈 칸으로 표시)
-    const prevMonthDays = [];
-    if (firstDayWeekday > 0) {
-      const prevMonth = currentMonth.subtract(1, "month");
-      const daysInPrevMonth = prevMonth.daysInMonth();
-      for (let i = firstDayWeekday - 1; i >= 0; i--) {
-        prevMonthDays.push({
-          day: daysInPrevMonth - i,
-          isCurrentMonth: false,
-          isPrevMonth: true,
-        });
-      }
-    }
-
-    // 현재 월의 날들
+    // 현재 월의 날들만 생성
     const currentMonthDays = [];
     for (let i = 1; i <= lastDayOfMonth.date(); i++) {
       currentMonthDays.push({
@@ -101,19 +100,11 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
       });
     }
 
-    // 다음 달의 첫 번째 날들 (빈 칸으로 표시)
-    const nextMonthDays = [];
-    const totalCells = 42; // 6주 x 7일
-    const remainingCells = totalCells - (prevMonthDays.length + currentMonthDays.length);
-    for (let i = 1; i <= remainingCells; i++) {
-      nextMonthDays.push({
-        day: i,
-        isCurrentMonth: false,
-        isPrevMonth: false,
-      });
-    }
+    // 첫 주의 시작 부분에 빈 셀 추가
+    const firstDayWeekday = firstDayOfMonth.day();
+    const emptyStartCells = Array(firstDayWeekday).fill(null);
 
-    return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
+    return [...emptyStartCells, ...currentMonthDays];
   };
 
   // 날짜 비활성화 여부 확인 - dayjs 사용 (수정됨)
@@ -124,7 +115,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     const today = dayjs();
 
     // 오늘 이전 날짜인지 확인
-    const isPastDate = date.isBefore(today, "day");
+    const isPastDate = date.isBefore(today, "day") || date.isSame(today, "day");
 
     // 주말인지 확인 (토요일: 6, 일요일: 0)
     const isWeekend = date.day() === 0 || date.day() === 6;
@@ -287,7 +278,12 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
                     {/* Calendar days */}
                     <div className="grid grid-cols-7 mb-2">
                       {generateCalendarDays().map((dateInfo, index) => {
-                        const { day, isCurrentMonth, isPrevMonth } = dateInfo;
+                        if (dateInfo === null) {
+                          // 빈 셀 렌더링
+                          return <div key={index} className="h-11" />;
+                        }
+
+                        const { day, isCurrentMonth } = dateInfo;
 
                         const isSelectedDay =
                           selectedDate &&
@@ -306,8 +302,6 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
                             className={`h-11 flex items-center justify-center rounded-[10px] text-base font-medium ${
                               isSelectedDay
                                 ? "bg-secondary-bg text-line-primary border border-line-primary font-semibold"
-                                : !isCurrentMonth
-                                ? "text-neutral-300 cursor-default"
                                 : isDisabled
                                 ? "text-neutral-300 cursor-not-allowed"
                                 : isHolidayDay
@@ -315,7 +309,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
                                 : "hover:bg-neutral-100 text-primary-normal"
                             }`}
                             onClick={() => handleDateSelect(day, isCurrentMonth)}
-                            disabled={!isCurrentMonth || isDisabled}
+                            disabled={isDisabled}
                             title={isHolidayDay ? holidayName : isDisabled ? "선택할 수 없는 날짜입니다" : ""}
                           >
                             {day}
@@ -326,7 +320,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
 
                     {/* 시간 선택 섹션 */}
                     <div>
-                      <div className="mb-2 text-primary-normal font-medium text-sm">오전</div>
+                      <div className="mb-2 text-primary-neutral font-medium text-sm">오전</div>
                       <div className="grid grid-cols-5 gap-2 mb-4">
                         {timeSlots
                           .filter(time => parseInt(time) < 12)
@@ -345,16 +339,16 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
                           ))}
                       </div>
 
-                      <div className="mb-2 text-primary-normal font-medium text-sm">오후</div>
+                      <div className="mb-2 text-primary-neutral font-medium text-sm">오후</div>
                       <div className="grid grid-cols-5 gap-2">
                         {timeSlots
                           .filter(time => parseInt(time) >= 12)
                           .map(time => (
                             <button
                               key={time}
-                              className={`p-2 rounded-[10px] border ${
+                              className={`p-2 rounded-[10px] border text-center self-center justify-center ${
                                 selectedTimes[0] === time
-                                  ? "bg-secondary-bg text-line-primary border border-line-primary font-semibold"
+                                  ? "bg-secondary-bg text-line-primary border border-line-primary font-semibold "
                                   : "border-line-normal text-primary-neutral"
                               }`}
                               onClick={() => handleTimeSelect(time, 0)}
@@ -371,7 +365,9 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
 
             {/* 버튼 섹션 */}
             <div className="pb-8 pt-4 sticky bottom-0 bg-bg-normal w-full">
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-2">
+                <SubButton text="닫기" onClick={onClickClose} />
+
                 <MainButton
                   text="완료"
                   onClick={() => {

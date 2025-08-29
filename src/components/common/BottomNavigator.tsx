@@ -57,7 +57,7 @@ const navItems: NavItem[] = [
   },
   {
     id: "my-profile",
-    label: "마이",
+    label: "마이페이지",
     path: "/mypage",
     icon: (
       <svg
@@ -111,6 +111,7 @@ export default function BottomNavigator() {
     "/mypage/terms/personal", // 개인정보 수집 이용 동의 페이지
     "/mypage/account", // 계정관리 페이지
     "/mypage/account/change-password", // 비밀번호 변경 페이지
+    "/r", // 앱 열기 페이지
   ];
 
   // 현재 경로가 숨겨야 할 페이지인지 확인
@@ -132,12 +133,12 @@ export default function BottomNavigator() {
 
   return (
     <div className="responseNavigator fixed bottom-0 left-0 right-0 w-full bg-white rounded-t-lg z-50 ">
-      <div className="flex items-center justify-around px-2 pb-6 bg-white shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.04)] rounded-t-lg">
-        {navItems.map(item => (
+      <div className="flex items-center justify-around pb-6 bg-white shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.04)] rounded-t-lg">
+        {navItems.map((item, index) => (
           <button
             key={item.id}
             onClick={() => handleNavClick(item)}
-            className={`flex flex-col items-center justify-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-200 ease-in-out ${
+            className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl transition-all duration-200 ease-in-out w-[100px] ${
               activeTab === item.path ? "text-primary-normal" : "text-neutral-500"
             }`}
           >

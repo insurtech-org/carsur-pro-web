@@ -11,16 +11,16 @@ const instance = axios.create({
 
 // 응답 인터셉터 - 로딩 종료
 instance.interceptors.response.use(
-  (response) => {
-    const { setIsLoading } = useLoadingStore.getState();
-    setIsLoading(false);
+  response => {
+    const { endLoading } = useLoadingStore.getState();
+    endLoading();
     return response;
   },
-  (error) => {
-    const { setIsLoading } = useLoadingStore.getState();
-    setIsLoading(false);
-    // 401 에러 시 로그인 페이지로 리다이렉트
-    if (error.response?.status === 401) {
+  error => {
+    const { endLoading } = useLoadingStore.getState();
+    endLoading();
+    // 401 에러 시 로그인 페이지로 리다이렉트 ,예외 : 비밀번호 변경 로직은 401 에러 처리 X
+    if (error.response?.status === 401 && !error.config.url.includes("/auth/factory/change-password")) {
       localStorage.removeItem("authToken");
       window.location.href = "/login";
     }
@@ -30,9 +30,9 @@ instance.interceptors.response.use(
 );
 
 // 요청 인터셉터 - 로딩 시작
-instance.interceptors.request.use((config) => {
-  const { setIsLoading } = useLoadingStore.getState();
-  setIsLoading(true);
+instance.interceptors.request.use(config => {
+  const { startLoading } = useLoadingStore.getState();
+  startLoading();
 
   const { tokens } = useUserStore.getState();
   if (tokens && tokens.accessToken) {

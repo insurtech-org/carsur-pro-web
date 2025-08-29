@@ -138,6 +138,13 @@ export default function Login() {
                   setIsFailedLogin(false);
                 }}
                 errorMessage={isUserIdError ? "아이디를 입력해주세요." : ""}
+                onKeyDown={event => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+
+                    onClickLogin();
+                  }
+                }}
               />
             </div>
 
@@ -167,6 +174,13 @@ export default function Login() {
                 errorMessage={
                   isPasswordError ? passwordErrorMessage : isFailedLogin ? "아이디 또는 비밀번호를 확인해주세요." : ""
                 }
+                onKeyDown={event => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+
+                    onClickLogin();
+                  }
+                }}
               />
             </div>
           </div>

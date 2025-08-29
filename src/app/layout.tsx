@@ -16,6 +16,32 @@ export default function RootLayout({
 }>) {
   const { isLoading } = useLoadingStore();
 
+  // 안드로이드 뒤로가기 버튼 처리
+  useEffect(() => {
+    const handleBackButton = (e: PopStateEvent) => {
+      e.preventDefault();
+
+      // window.ReactNativeWebView가 존재하는 경우에만 메시지 전송
+      if (window.ReactNativeWebView) {
+        // React Native에 메시지 전송
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "HANDLE_BACK_PRESS",
+            data: {
+              canGoBack: window.history.length > 1,
+            },
+          })
+        );
+      }
+    };
+
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, []);
+
   return (
     <html lang="ko">
       <head>
@@ -46,6 +72,15 @@ export default function RootLayout({
       </body>
     </html>
   );
+}
+
+// TypeScript 타입 선언 추가 (파일 최상단에 추가)
+declare global {
+  interface Window {
+    ReactNativeWebView: {
+      postMessage: (message: string) => void;
+    };
+  }
 }
 
 // 전역 Toast 컴포넌트

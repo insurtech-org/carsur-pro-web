@@ -10,6 +10,7 @@ export default function VailedInput({
   onFocus,
   onBlur,
   onClickClear,
+  onKeyDown,
 }: {
   type: string;
   placeholder: string;
@@ -22,6 +23,7 @@ export default function VailedInput({
   onFocus: () => void;
   onBlur: () => void;
   onClickClear: () => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }) {
   return (
     <>
@@ -38,6 +40,7 @@ export default function VailedInput({
           className="self-stretch text-primary-normal text-base focus:outline-none w-full pr-8"
           onFocus={onFocus}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}
         />
 
         {value && (

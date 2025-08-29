@@ -1,8 +1,16 @@
 "use client";
 
 import { IWorkDetail } from "@/type/work.type";
+import { useMemo } from "react";
 
 const ComplatedCard = ({ data }: { data: IWorkDetail }) => {
+  const totalPrice = useMemo(() => {
+    const laborPrice = data.laborPrice || 0;
+    const partsPrice = data.partsPrice || 0;
+
+    return (laborPrice + partsPrice).toLocaleString();
+  }, [data.laborPrice, data.partsPrice]);
+
   return (
     <div
       className="flex flex-col items-start self-stretch bg-bg-normal p-4 mx-5 gap-6 rounded-xl border border-solid border-neutral-100"
@@ -17,14 +25,18 @@ const ComplatedCard = ({ data }: { data: IWorkDetail }) => {
           <div className="self-stretch inline-flex justify-between items-center">
             <div className="justify-start text-neutral-700 text-base font-regular">공임비</div>
             <div className="flex justify-start items-center gap-0.5">
-              <div className="text-right justify-start text-primary-normal text-base font-medium">{"-"}</div>
+              <div className="text-right justify-start text-primary-normal text-base font-medium">
+                {data.laborPrice ? data.laborPrice.toLocaleString() : "-"}
+              </div>
               <div className="text-right justify-center text-neutral-500 text-sm font-normal">원</div>
             </div>
           </div>
           <div className="self-stretch inline-flex justify-between items-center">
             <div className="justify-start text-neutral-700 text-base font-regular">부품비</div>
             <div className="flex justify-start items-center gap-0.5">
-              <div className="text-right justify-start text-primary-normal text-base font-medium">{"-"}</div>
+              <div className="text-right justify-start text-primary-normal text-base font-medium">
+                {data.partsPrice ? data.partsPrice.toLocaleString() : "-"}
+              </div>
               <div className="text-right justify-center text-neutral-500 text-sm font-normal">원</div>
             </div>
           </div>
@@ -34,7 +46,9 @@ const ComplatedCard = ({ data }: { data: IWorkDetail }) => {
           <div className="self-stretch inline-flex justify-between items-center">
             <div className="justify-start text-neutral-700 text-base font-regular">총 수리비(VAT포함)</div>
             <div className="flex justify-start items-center gap-0.5">
-              <div className="text-right justify-start text-primary-normal text-base font-medium">{"-"}</div>
+              <div className="text-right justify-start text-primary-normal text-base font-medium">
+                {totalPrice || "-"}
+              </div>
               <div className="text-right justify-center text-neutral-500 text-sm font-normal">원</div>
             </div>
           </div>

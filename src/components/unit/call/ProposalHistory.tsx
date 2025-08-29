@@ -85,7 +85,7 @@ export default function ProposalHistory() {
               ))
             ) : (
               <div className="flex flex-col items-center justify-center h-72 w-full">
-                <span className="text-primary-neutral text-[15px] font-medium">제안 내역이 없어요.</span>
+                <span className="text-primary-assistive text-[15px] font-medium">제안 내역이 없어요.</span>
               </div>
             )}
           </div>

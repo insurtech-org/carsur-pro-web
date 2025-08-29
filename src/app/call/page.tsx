@@ -84,7 +84,7 @@ export default function CallPage() {
                 activeTab === "call" ? "text-primary-normal" : "text-primary-assistive"
               }`}
             >
-              {"내 지역 콜"}
+              내 지역 콜
             </span>
           </button>
           <button
@@ -100,7 +100,7 @@ export default function CallPage() {
                 activeTab === "proposal" ? "text-primary-normal" : "text-primary-assistive"
               }`}
             >
-              {"제안 중"}
+              제안 중
             </span>
           </button>
         </div>
