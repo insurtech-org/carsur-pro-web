@@ -109,7 +109,13 @@ export default function WorkPage() {
                 {FILTER_STATUS[item as keyof typeof FILTER_STATUS]}
               </span>
               <span
-                className={`text-sm font-medium ${activeTab === item ? "text-neutral-50" : "text-secondary-normal"}`}
+                className={`text-sm font-medium ${
+                  activeTab === item
+                    ? "text-neutral-50"
+                    : workStatusCount[`${convertSnakeToCamel(item)}Count` as keyof IWorkStatusCount] === 0
+                    ? "text-primary-asstive"
+                    : "text-secondary-normal"
+                }`}
               >
                 {workStatusCount[`${convertSnakeToCamel(item)}Count` as keyof IWorkStatusCount] || 0}
               </span>

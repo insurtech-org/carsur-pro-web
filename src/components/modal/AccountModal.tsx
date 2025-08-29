@@ -9,19 +9,10 @@ interface AccountModalProps {
   title: string;
   isOpen: boolean;
   onClose: () => void;
-  onClickConfirm: (
-    totalPrice: number,
-    partsPrice: number,
-    laborPrice: number
-  ) => void;
+  onClickConfirm: (totalPrice: number, partsPrice: number, laborPrice: number) => void;
 }
 
-export default function AccountModal({
-  title,
-  isOpen,
-  onClose,
-  onClickConfirm,
-}: AccountModalProps) {
+export default function AccountModal({ title, isOpen, onClose, onClickConfirm }: AccountModalProps) {
   const [inputPrice1, setInputPrice1] = useState("");
   const [inputPrice2, setInputPrice2] = useState("");
   const sumPrice = useMemo(() => {
@@ -38,14 +29,12 @@ export default function AccountModal({
 
   const [isFocused1, setIsFocused1] = useState<boolean>(false);
   const [isFocused2, setIsFocused2] = useState<boolean>(false);
-  const [currentFocusedInput, setCurrentFocusedInput] = useState<
-    "input1" | "input2" | null
-  >(null);
+  const [currentFocusedInput, setCurrentFocusedInput] = useState<"input1" | "input2" | null>(null);
 
   // 숫자 입력 함수
   const handleNumberInput = (number: string) => {
     if (currentFocusedInput === "input1") {
-      setInputPrice1((prev) => {
+      setInputPrice1(prev => {
         // 첫 입력이 0이면 0을 제거하고 새 숫자로 대체
         if (prev === "0" || prev === "00") {
           return number;
@@ -53,7 +42,7 @@ export default function AccountModal({
         return prev + number;
       });
     } else if (currentFocusedInput === "input2") {
-      setInputPrice2((prev) => {
+      setInputPrice2(prev => {
         // 첫 입력이 0이면 0을 제거하고 새 숫자로 대체
         if (prev === "0" || prev === "00") {
           return number;
@@ -66,9 +55,9 @@ export default function AccountModal({
   // 백스페이스 함수
   const handleBackspace = () => {
     if (currentFocusedInput === "input1") {
-      setInputPrice1((prev) => prev.slice(0, -1));
+      setInputPrice1(prev => prev.slice(0, -1));
     } else if (currentFocusedInput === "input2") {
-      setInputPrice2((prev) => prev.slice(0, -1));
+      setInputPrice2(prev => prev.slice(0, -1));
     }
   };
 
@@ -114,14 +103,9 @@ export default function AccountModal({
               {/* 헤더 */}
               <div className="self-stretch py-4 inline-flex justify-center items-start">
                 <div className="flex-1 flex justify-between items-start">
-                  <div className="flex-1 justify-center text-neutral-800 text-[17px] font-semibold">
-                    {title}
-                  </div>
+                  <div className="flex-1 justify-center text-neutral-800 text-[17px] font-semibold">{title}</div>
 
-                  <button
-                    className="w-6 h-6 relative overflow-hidden"
-                    onClick={onClickClose}
-                  >
+                  <button className="w-6 h-6 relative overflow-hidden" onClick={onClickClose}>
                     <img src={"/images/icon/ic_x-line.svg"} />
                   </button>
                 </div>
@@ -137,15 +121,13 @@ export default function AccountModal({
                   </div>
                   <div
                     className={`self-stretch h-12 px-4 py-3 bg-bg-normal rounded-lg outline outline-1 inline-flex justify-start items-center gap-3 ${
-                      isFocused1
-                        ? "outline-primary-normal"
-                        : "outline-line-normal"
+                      isFocused1 ? "outline-primary-normal" : "outline-line-normal"
                     }`}
                   >
                     <input
                       className="flex-1 justify-center text-primary-normal text-base font-regular outline-none"
                       value={inputPrice1.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      onChange={(event) => {
+                      onChange={event => {
                         const value = event.target.value.replace(/,/g, "");
                         setInputPrice1(value);
                       }}
@@ -154,9 +136,7 @@ export default function AccountModal({
                       readOnly
                     />
 
-                    <div className="text-right justify-center text-primary-normal text-base font-medium">
-                      원
-                    </div>
+                    <div className="text-right justify-center text-primary-normal text-base font-medium">원</div>
                   </div>
                 </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -165,15 +145,13 @@ export default function AccountModal({
                   </div>
                   <div
                     className={`self-stretch h-12 px-4 py-3 bg-bg-normal rounded-lg outline outline-1 inline-flex justify-start items-center gap-3 ${
-                      isFocused2
-                        ? "outline-primary-normal"
-                        : "outline-line-normal"
+                      isFocused2 ? "outline-primary-normal" : "outline-line-normal"
                     }`}
                   >
                     <input
                       className="flex-1 justify-center text-primary-normal text-base font-regular outline-none"
                       value={inputPrice2.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      onChange={(event) => {
+                      onChange={event => {
                         const value = event.target.value.replace(/,/g, "");
                         setInputPrice2(value);
                       }}
@@ -182,52 +160,38 @@ export default function AccountModal({
                       readOnly
                     />
 
-                    <div className="text-right justify-center text-primary-normal text-base font-medium">
-                      원
-                    </div>
+                    <div className="text-right justify-center text-primary-normal text-base font-medium">원</div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col justify-start items-end gap-2">
                 <div className="flex flex-col justify-start items-end">
                   <div className="inline-flex justify-start items-center gap-2">
-                    <div className="justify-center text-neutral-500 text-sm font-regular">
-                      총 수리비
-                    </div>
+                    <div className="justify-center text-neutral-500 text-sm font-regular">총 수리비</div>
                     <div className="flex justify-start items-center gap-1">
                       <div className="justify-center text-neutral-500 text-sm font-regular">
                         {sumPrice.toLocaleString()}
                       </div>
-                      <div className="text-right justify-center text-neutral-500 text-sm font-regular">
-                        원
-                      </div>
+                      <div className="text-right justify-center text-neutral-500 text-sm font-regular">원</div>
                     </div>
                   </div>
                   <div className="inline-flex justify-start items-center gap-2">
-                    <div className="justify-center text-neutral-500 text-sm font-regular">
-                      VAT
-                    </div>
+                    <div className="justify-center text-neutral-500 text-sm font-regular">VAT</div>
                     <div className="flex justify-start items-center gap-1">
                       <div className="justify-center text-neutral-500 text-sm font-regular">
                         {vatPrice.toLocaleString()}
                       </div>
-                      <div className="text-right justify-center text-neutral-500 text-sm font-regular">
-                        원
-                      </div>
+                      <div className="text-right justify-center text-neutral-500 text-sm font-regular">원</div>
                     </div>
                   </div>
                 </div>
                 <div className="inline-flex justify-start items-center gap-4">
-                  <div className="justify-center text-primary-normal text-sm font-semibold">
-                    총 수리비(VAT포함)
-                  </div>
+                  <div className="justify-center text-primary-normal text-sm font-semibold">총 수리비(VAT포함)</div>
                   <div className="flex justify-start items-center gap-1">
                     <div className="justify-center text-primary-strong text-base font-semibold">
                       {totalPrice.toLocaleString()}
                     </div>
-                    <div className="text-right justify-center text-primary-neutral text-base font-medium">
-                      원
-                    </div>
+                    <div className="text-right justify-center text-primary-neutral text-base font-medium">원</div>
                   </div>
                 </div>
               </div>
@@ -347,16 +311,8 @@ export default function AccountModal({
                 <SubButton text="닫기" onClick={onClickClose} />
                 <MainButton
                   text="청구하기"
-                  onClick={() =>
-                    onClickConfirm(
-                      totalPrice,
-                      Number(inputPrice1),
-                      Number(inputPrice2)
-                    )
-                  }
-                  disabled={
-                    Number(inputPrice1) === 0 || Number(inputPrice2) === 0
-                  }
+                  onClick={() => onClickConfirm(totalPrice, Number(inputPrice1), Number(inputPrice2))}
+                  disabled={Number(inputPrice1) === 0 || Number(inputPrice2) === 0}
                 />
               </div>
             </div>

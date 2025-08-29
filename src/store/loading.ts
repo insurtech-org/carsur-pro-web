@@ -49,7 +49,7 @@ export const useLoadingStore = create<ILoadingStore>((set, get) => ({
     // 300ms 후에 로딩 상태 해제
     const timer = setTimeout(() => {
       set({ isLoading: false, debounceTimer: null });
-    }, 300);
+    }, 50);
 
     set({ debounceTimer: timer });
   },

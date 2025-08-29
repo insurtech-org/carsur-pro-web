@@ -42,7 +42,7 @@ export default function ChangePasswordPage() {
       await changePassword(currentPassword, newPassword, confirmPassword);
 
       showSuccess("비밀번호가 변경되었어요.");
-      router.push("/mypage/account");
+      router.replace("/mypage/account");
     } catch (error) {
       const errorData = extractErrorMessage(error) as unknown as ServerErrorResponse;
 
@@ -115,6 +115,14 @@ export default function ChangePasswordPage() {
     const { isValid, message } = validatePassword(password);
     setIsNewPasswordError(!isValid);
     setNewPasswordErrorMessage(message);
+
+    if (confirmPassword.length > 0 && confirmPassword !== password) {
+      setIsConfirmPasswordError(true);
+      setConfirmPasswordErrorMessage("새 비밀번호가 일치하지 않습니다.");
+    } else {
+      setIsConfirmPasswordError(false);
+      setConfirmPasswordErrorMessage("");
+    }
   };
 
   const onChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,6 +136,14 @@ export default function ChangePasswordPage() {
     const { isValid, message } = validatePassword(password);
     setIsConfirmPasswordError(!isValid);
     setConfirmPasswordErrorMessage(message);
+
+    if (password.length > 0 && newPassword !== password) {
+      setIsConfirmPasswordError(true);
+      setConfirmPasswordErrorMessage("새 비밀번호가 일치하지 않습니다.");
+    } else {
+      setIsConfirmPasswordError(false);
+      setConfirmPasswordErrorMessage("");
+    }
   };
 
   return (

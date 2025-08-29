@@ -8,7 +8,7 @@ const ComplatedCard = ({ data }: { data: IWorkDetail }) => {
     const laborPrice = data.laborPrice || 0;
     const partsPrice = data.partsPrice || 0;
 
-    return (laborPrice + partsPrice).toLocaleString() + "원";
+    return (laborPrice + partsPrice).toLocaleString();
   }, [data.laborPrice, data.partsPrice]);
 
   return (

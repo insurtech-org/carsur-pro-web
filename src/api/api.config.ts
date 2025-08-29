@@ -19,8 +19,8 @@ instance.interceptors.response.use(
   error => {
     const { endLoading } = useLoadingStore.getState();
     endLoading();
-    // 401 에러 시 로그인 페이지로 리다이렉트
-    if (error.response?.status === 401) {
+    // 401 에러 시 로그인 페이지로 리다이렉트 ,예외 : 비밀번호 변경 로직은 401 에러 처리 X
+    if (error.response?.status === 401 && !error.config.url.includes("/auth/factory/change-password")) {
       localStorage.removeItem("authToken");
       window.location.href = "/login";
     }

@@ -79,7 +79,7 @@ export default function WorkList({
 const EmptyWork = ({ status }: { status: string }) => {
   return (
     <div className="flex flex-col items-center justify-center  bg-neutral-100 h-72 w-full">
-      <span className="text-primary-neutral text-[15px] font-medium">{`아직 ${
+      <span className="text-primary-assistive text-[15px] font-medium">{`아직 ${
         WORK_STATUS[status as keyof typeof WORK_STATUS]
       } 작업이 없어요.`}</span>
     </div>

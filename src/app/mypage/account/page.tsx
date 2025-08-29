@@ -66,7 +66,7 @@ export default function AccountPage() {
 
         <ArrowButton text="비밀번호 변경" onClick={() => router.replace("/mypage/account/change-password")} />
 
-        <ArrowButton text="사업자 정보 수정" onClick={() => onClickModal("company")} isUnderLine={false} />
+        <ArrowButton text="사업자 정보 수정" onClick={() => onClickModal("company")} />
 
         <ArrowButton text="로그아웃" onClick={onClickLogout} />
 

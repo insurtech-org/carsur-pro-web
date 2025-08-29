@@ -239,7 +239,7 @@ export default function WorkDetail() {
           <span className="text-primary-normal text-lg font-semibold ml-1">예약 정보</span>
           <div className="flex flex-col self-stretch mx-1 gap-2">
             <div className="flex flex-col items-start self-stretch">
-              <span className="text-primary-normal text-base font-medium mb-[9px]">보험 정보</span>
+              <span className="text-primary-normal text-base font-medium mb-2">보험 정보</span>
               <DetailInfoRow label="사고접수번호" value={workData?.insuranceClaimNo || "-"} />
               <DetailInfoRow label="보험사" value={workData?.insuranceCompanyName || "-"} />
               <DetailInfoRow label="사고구분" value={getCarTypeText(workData?.coverageType || "-")} />
@@ -254,15 +254,15 @@ export default function WorkDetail() {
                 value={formatFaxNumber(String(workData?.contactManagerFax || "")) || "-"}
               />
             </div>
-            <div className="self-stretch bg-neutral-100 h-0.5"></div>
+            <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
             <div className="flex flex-col items-start self-stretch">
-              <span className="text-primary-normal text-base font-bold mb-[9px]">예약 기본 정보</span>
+              <span className="text-primary-normal text-base font-medium mb-2">예약 기본 정보</span>
               <DetailInfoRow label="예약지역" value={workData?.sigungu || "-"} />
               <DetailInfoRow label="입고 예약일" value={workData?.confirmedDate || "-"} />
             </div>
-            <div className="self-stretch bg-neutral-100 h-0.5"></div>
+            <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
             <div className="flex flex-col items-start self-stretch">
-              <span className="text-primary-normal text-base font-bold mb-[9px]">차량 정보</span>
+              <span className="text-primary-normal text-base font-medium mb-2">차량 정보</span>
               <DetailInfoRow label="차량번호" value={workData?.carNumber || "-"} />
               <DetailInfoRow label="차종" value={workData?.carModel || ""} />
               <DetailInfoRow label="배기량" value={workData?.engineDisplacement || ""} />
