@@ -31,8 +31,21 @@ export default function WorkList({
 
   const fetchWorkList = async () => {
     try {
+      let searchStatus = "";
+
+      switch (currentStatus) {
+        case "CANCELLED":
+          searchStatus = "FACTORY_CANCELLED";
+          break;
+        case "TOTAL":
+          searchStatus = "";
+          break;
+        default:
+          searchStatus = currentStatus;
+      }
+
       const res = await getWorkScheduleList({
-        status: currentStatus === "TOTAL" ? "" : currentStatus,
+        status: searchStatus,
         page: page,
         size: 10,
       });
@@ -62,11 +75,10 @@ export default function WorkList({
           )
         ) : (
           (() => {
-            const filteredList = workList.filter(item => item.status === currentStatus);
-            return filteredList.length === 0 ? (
+            return workList.length === 0 ? (
               <EmptyWork status={currentStatus} />
             ) : (
-              filteredList.map((data, idx) => <WorkCard data={data} key={idx} />)
+              workList.map((data, idx) => <WorkCard data={data} key={idx} />)
             );
           })()
         )}
@@ -79,9 +91,11 @@ export default function WorkList({
 const EmptyWork = ({ status }: { status: string }) => {
   return (
     <div className="flex flex-col items-center justify-center  bg-neutral-100 h-72 w-full">
-      <span className="text-primary-assistive text-[15px] font-medium">{`아직 ${
-        WORK_STATUS[status as keyof typeof WORK_STATUS]
-      } 작업이 없어요.`}</span>
+      <span className="text-primary-assistive text-[15px] font-medium">
+        {status === "CANCELLED"
+          ? `아직 취소가 없어요.`
+          : `아직 ${WORK_STATUS[status as keyof typeof WORK_STATUS]} 작업이 없어요.`}
+      </span>
     </div>
   );
 };
