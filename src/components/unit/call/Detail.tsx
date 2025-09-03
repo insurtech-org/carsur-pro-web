@@ -44,7 +44,8 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
       showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
       router.replace("/call/#proposal");
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showError("시스템 오류로 제안에 실패했어요", "운영팀에 문의주세요.");
     }
   };
 
@@ -55,7 +56,8 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
       showSuccess("제안이 취소되었습니다.");
       router.replace("/call/#proposal");
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showError("시스템 오류로 제안 취소에 실패했어요.", "운영팀에 문의주세요.");
     }
   };
 
