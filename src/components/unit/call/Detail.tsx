@@ -1,8 +1,8 @@
 "use client";
 
 import { deletePropose, getCallDetail, postPropose } from "@/api/call.api";
-import ProposeModal from "@/components/modal/ProposeModal";
 import { useModalStore } from "@/store/modal";
+import { useProposeModalStore } from "@/store/proposeModal";
 import { useToastStore } from "@/store/toast";
 import { ICallDetail } from "@/type/call.type";
 import { formatDate } from "@/utils/util";
@@ -14,11 +14,10 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
 
   const { showSuccess, showError } = useToastStore();
   const { showModal } = useModalStore();
+  const { showProposeModal, hideProposeModal } = useProposeModalStore();
 
   const isProposal = hash.includes("proposal");
 
-  const [proposeModalOpen, setProposeModalOpen] = useState(false);
-  const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [detailData, setDetailData] = useState<ICallDetail | null>(null);
 
   useEffect(() => {
@@ -36,23 +35,23 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
     }
   };
 
-  const onClickDoPropose = async () => {
-    try {
-      await postPropose(id);
-
-      setProposeModalOpen(false);
-      showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
-      router.replace("/call/#proposal");
-    } catch (error) {
-      console.error(error);
-      showError("시스템 오류로 제안에 실패했어요", "운영팀에 문의주세요.");
-    }
+  const handlePropose = () => {
+    showProposeModal(id, async () => {
+      try {
+        await postPropose(id);
+        showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
+        hideProposeModal();
+        router.replace("/call/#proposal");
+      } catch (error) {
+        console.error(error);
+        showError("시스템 오류로 제안에 실패했어요", "운영팀에 문의주세요.");
+      }
+    });
   };
 
   const cancelPropose = async () => {
     try {
       await deletePropose(id);
-      setCancelModalOpen(false);
       showSuccess("제안이 취소되었습니다.");
       router.replace("/call/#proposal");
     } catch (error) {
@@ -203,7 +202,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
 
                   <button
                     className="flex flex-1 flex-col items-center bg-[#131211] text-left py-3 rounded-lg border-0"
-                    onClick={() => setProposeModalOpen(true)}
+                    onClick={handlePropose}
                   >
                     <div className="flex flex-col items-center pb-[1px]">
                       <span className="text-white text-base font-bold">제안하기</span>
@@ -215,13 +214,6 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
           </div>
         </div>
       </div>
-
-      {/* 제안 모달 */}
-      <ProposeModal
-        isOpen={proposeModalOpen}
-        onClose={() => setProposeModalOpen(false)}
-        onClickPropose={onClickDoPropose}
-      />
     </>
   );
 }
