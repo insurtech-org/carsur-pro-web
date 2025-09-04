@@ -13,7 +13,10 @@ export default function WorkPage() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const status = searchParams.get("status") || "CONFIRMED";
+  const rawStatus = searchParams.get("status") || "CONFIRMED";
+
+  // CANCELLED 관련 상태들을 CANCELLED로 통일
+  const status = rawStatus.includes("CANCELLED") ? "CANCELLED" : rawStatus;
 
   const filterContainerRef = useRef<HTMLDivElement>(null);
   const initialStatus = !status || status === "undefined" || status === "" ? "CONFIRMED" : status;

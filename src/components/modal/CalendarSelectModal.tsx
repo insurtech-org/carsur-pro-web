@@ -114,8 +114,8 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     const date = currentMonth.date(day);
     const today = dayjs();
 
-    // 오늘 이전 날짜인지 확인
-    const isPastDate = date.isBefore(today, "day") || date.isSame(today, "day");
+    // 오늘 이후 날짜인지 확인 (오늘 제외)
+    const isFutureDate = date.isAfter(today, "day");
 
     // 주말인지 확인 (토요일: 6, 일요일: 0)
     const isWeekend = date.day() === 0 || date.day() === 6;
@@ -124,7 +124,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     const dateString = date.format("YYYYMMDD");
     const isPublicHoliday = holidays.some(holiday => holiday.locdate.toString() === dateString);
 
-    return isPastDate || isWeekend || isPublicHoliday;
+    return isFutureDate || isWeekend || isPublicHoliday;
   };
 
   // 휴일 여부 확인 - API 데이터 사용 (수정됨)

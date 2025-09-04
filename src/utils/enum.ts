@@ -6,8 +6,8 @@ export const WORK_STATUS = {
   REPAIR_COMPLETED: "수리완료",
   RELEASED: "차량출고",
   BILLING_COMPLETED: "청구완료",
-  FACTORY_CANCELLED: "공업사취소",
-  CUSTOMER_CANCELLED: "고객취소",
+  FACTORY_CANCELLED: "공업사포기",
+  CUSTOMER_CANCELLED: "고객포기",
   ADMIN_CANCELLED: "어드민취소",
 };
 
@@ -19,6 +19,6 @@ export const FILTER_STATUS = {
   REPAIR_COMPLETED: "수리완료",
   RELEASED: "차량출고",
   BILLING_COMPLETED: "청구완료",
-  CANCELLED: "취소",
+  CANCELLED: "입고포기",
   TOTAL: "전체",
 };

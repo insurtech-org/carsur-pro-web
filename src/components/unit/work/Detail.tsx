@@ -7,9 +7,8 @@ import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
 import CancelSelectModal from "@/components/modal/CancelSelectModal";
 import { useToastStore } from "@/store/toast";
 import { formatFaxNumber, formatPhoneNumber, getCarTypeText, sleep, statusColor } from "@/utils/util";
-import dayjs from "dayjs";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import StatusBarCard from "./elements/StatusBarCard";
 import ComplatedCard from "./elements/ComplatedCard";
 import { cancelWorkSchedule, completeBilling, getWorkScheduleDetail, updateWorkScheduleStatus } from "@/api/work.api";
@@ -17,6 +16,7 @@ import { IWorkDetail, StatusChangeType } from "@/type/work.type";
 import { WORK_STATUS } from "@/utils/enum";
 import DetailInfoRow from "./elements/DetailInfoRow";
 import { convertStatusToType, getStatusToastMessage, workSteps } from "@/utils/workStatus";
+import CancelCard from "./elements/CancelCard";
 
 export default function WorkDetail() {
   const params = useParams();
@@ -36,6 +36,8 @@ export default function WorkDetail() {
 
   const [workData, setWorkData] = useState<IWorkDetail>();
   const [workStatus, setWorkStatus] = useState<string>(detailStatus);
+
+  const isCancelled = useMemo(() => workStatus?.includes("CANCELLED"), [workStatus]);
 
   useEffect(() => {
     fetchData();
@@ -57,7 +59,7 @@ export default function WorkDetail() {
       return newStatus;
     } catch (error) {
       console.error(error);
-      showError("데이터를 불러오는데 실패했습니다.");
+      showError("데이터를 불러오는데 실패했어요.");
       router.push(`/work?status=${detailStatus}`);
     }
   };
@@ -133,7 +135,7 @@ export default function WorkDetail() {
       goBack();
     } catch (error) {
       console.log(error);
-      showError("입고 확정 포기에 실패했습니다.");
+      showError("입고 확정 포기에 실패했어요.");
     }
   };
 
@@ -153,10 +155,10 @@ export default function WorkDetail() {
       //상태 변경 후 toast 메세지 표시
       const toastMessage = getStatusToastMessage(newStatus);
 
-      showSuccess(toastMessage || "상태 변경이 완료되었습니다.");
+      showSuccess(toastMessage || "상태 변경이 완료되었어요.");
     } catch (error) {
       console.log(error);
-      showError("상태 변경에 실패했습니다.");
+      showError("상태 변경에 실패했어요.");
     }
 
     setCalendarSelectModalOpen(false);
@@ -172,7 +174,7 @@ export default function WorkDetail() {
       showSuccess("청구 처리가 완료되었어요.");
     } catch (error) {
       console.log(error);
-      showError("청구 완료에 실패했습니다.");
+      showError("청구 완료에 실패했어요.");
     }
   };
 
@@ -210,6 +212,8 @@ export default function WorkDetail() {
           {/*상태바 카드*/}
           {workStatus === "BILLING_COMPLETED" ? (
             <ComplatedCard data={workData || ({} as IWorkDetail)} />
+          ) : isCancelled ? (
+            <CancelCard reason={workData?.accidentStatus || ""} />
           ) : (
             <StatusBarCard data={workData || ({} as IWorkDetail)} />
           )}
@@ -218,7 +222,7 @@ export default function WorkDetail() {
 
       <div className="flex flex-col self-stretch bg-bg-normal py-4 gap-8">
         {/* 고객 정보 */}
-        {workStatus !== "BILLING_COMPLETED" && (
+        {workStatus !== "BILLING_COMPLETED" && !isCancelled && (
           <div className="flex flex-col items-start self-stretch bg-neutral-50 py-4 mx-5 gap-4 rounded-xl p-4">
             <span className="text-primary-normal text-[17px] font-semibold">
               {workData?.accidentStatus === "CONFIRMED" ? "고객과 통화해 입고 일정을 확정하세요❗️" : "고객 정보"}
@@ -244,21 +248,25 @@ export default function WorkDetail() {
               <DetailInfoRow label="보험사" value={workData?.insuranceCompanyName || "-"} />
               <DetailInfoRow label="사고구분" value={getCarTypeText(workData?.coverageType || "-")} />
               <DetailInfoRow label="예상과실율" value={`${workData?.faultRate || ""}%`} />
-              <DetailInfoRow label="보험담당자" value={workData?.contactManagerName || "-"} />
-              <DetailInfoRow
-                label="보험담당자 연락처"
-                value={formatPhoneNumber(String(workData?.contactManagerPhone || "")) || "-"}
-              />
-              <DetailInfoRow
-                label="보험사 팩스번호"
-                value={formatFaxNumber(String(workData?.contactManagerFax || "")) || "-"}
-              />
+              {!isCancelled && <DetailInfoRow label="보험담당자" value={workData?.contactManagerName || "-"} />}
+              {!isCancelled && (
+                <DetailInfoRow
+                  label="보험담당자 연락처"
+                  value={formatPhoneNumber(String(workData?.contactManagerPhone || "")) || "-"}
+                />
+              )}
+              {!isCancelled && (
+                <DetailInfoRow
+                  label="보험사 팩스번호"
+                  value={formatFaxNumber(String(workData?.contactManagerFax || "")) || "-"}
+                />
+              )}
             </div>
             <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
             <div className="flex flex-col items-start self-stretch">
               <span className="text-primary-normal text-base font-medium mb-2">예약 기본 정보</span>
               <DetailInfoRow label="예약지역" value={workData?.sigungu || "-"} />
-              <DetailInfoRow label="입고 예약일" value={workData?.confirmedDate || "-"} />
+              <DetailInfoRow label="입고 예약일" value={workData?.reservationDate || "-"} />
             </div>
             <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
             <div className="flex flex-col items-start self-stretch">
@@ -351,7 +359,9 @@ export default function WorkDetail() {
 
       {/* 청구 완료 버튼 */}
       <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch mx-5 gap-1 rounded-xl bg-bg-normal pb-8 pt-4 ">
-        <MainButton text={mainButtonText} onClick={onClickMainButton} disabled={workStatus === "BILLING_COMPLETED"} />
+        {!isCancelled && (
+          <MainButton text={mainButtonText} onClick={onClickMainButton} disabled={workStatus === "BILLING_COMPLETED"} />
+        )}
         {workStatus === "CONFIRMED" && (
           <TextButton text="입고 확정 취소" onClick={() => setCancelSelectModalOpen(true)} />
         )}
