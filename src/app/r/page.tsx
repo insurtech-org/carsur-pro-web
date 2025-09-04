@@ -35,19 +35,20 @@ export default function R() {
           "end;";
         window.location.href = intentUrl;
       }
+
       // iOS 유니버설 링크 방식
       else if (isIOS) {
         // 웹 URL 설정
-        const webBaseUrl = "https://carsur-pro-dev.insurtech.co.kr";
-        const webUrl = action ? `${webBaseUrl}/${action}` : webBaseUrl;
+        const webBaseUrl = "https://carsur-pro-dev.insurtech.co.kr/";
+        const webUrl = action ? `${webBaseUrl}${action}` : webBaseUrl;
 
         // iOS의 경우 바로 웹으로 리다이렉트
         window.location.href = webUrl;
       }
     } else {
       // PC인 경우 웹으로 리다이렉트 (action이 있으면 해당 경로로)
-      const webBaseUrl = "https://carsur-pro-dev.insurtech.co.kr";
-      const webUrl = action ? `${webBaseUrl}/${action}` : webBaseUrl;
+      const webBaseUrl = "https://carsur-pro-dev.insurtech.co.kr/";
+      const webUrl = action ? `${webBaseUrl}${action}` : webBaseUrl;
       window.location.href = webUrl;
     }
   };
@@ -60,7 +61,7 @@ export default function R() {
   // 로딩 중 표시를 위한 최소한의 UI 반환
   return (
     <div className="h-screen bg-white flex items-center justify-center">
-      <div className="text-gray-500">리다이렉트 중...</div>
+      <div className="text-gray-500">이동 중...</div>
     </div>
   );
 }

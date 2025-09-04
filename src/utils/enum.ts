@@ -19,5 +19,6 @@ export const FILTER_STATUS = {
   REPAIR_COMPLETED: "수리완료",
   RELEASED: "차량출고",
   BILLING_COMPLETED: "청구완료",
+  CANCELLED: "취소",
   TOTAL: "전체",
 };

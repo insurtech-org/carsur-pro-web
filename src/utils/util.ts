@@ -40,6 +40,12 @@ export const statusColor = (status: string) => {
         text: "#1D1B17",
       };
     }
+    default: {
+      return {
+        bg: "#E5E4E199",
+        text: "#9E9E9E",
+      };
+    }
   }
 };
 

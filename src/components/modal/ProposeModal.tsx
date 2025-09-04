@@ -1,28 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SubButton from "../common/SubButton";
 import MainButton from "../common/MainButton";
+import { useProposeModalStore } from "@/store/proposeModal";
 
-interface ProposeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onClickPropose: () => void;
-}
-
-const ProposeModal = ({ isOpen = false, onClose = () => {}, onClickPropose = () => {} }: ProposeModalProps) => {
+const ProposeModal = () => {
+  const { isOpen, onConfirm, hideProposeModal } = useProposeModalStore();
   const [isChecked, setIsChecked] = useState(false);
 
   const onChangeChecked = (value: boolean) => {
     setIsChecked(value);
   };
 
+  // 모달이 닫힐 때 체크박스 상태 초기화
+  useEffect(() => {
+    if (!isOpen) {
+      setIsChecked(false);
+    }
+  }, [isOpen]);
+
   // 모달이 열려있지 않으면 렌더링하지 않음
   if (!isOpen) return null;
 
   const onClickClose = () => {
     setIsChecked(false);
-    onClose();
+    hideProposeModal();
   };
 
   return (
@@ -118,7 +121,15 @@ const ProposeModal = ({ isOpen = false, onClose = () => {}, onClickPropose = () 
               <div className="flex flex-row bg-white pb-8 pt-4 gap-2">
                 <SubButton text="닫기" onClick={onClickClose} />
 
-                <MainButton text="제안하기" onClick={onClickPropose} disabled={!isChecked} />
+                <MainButton
+                  text="제안하기"
+                  onClick={() => {
+                    if (onConfirm) {
+                      onConfirm();
+                    }
+                  }}
+                  disabled={!isChecked}
+                />
               </div>
             </div>
           </div>

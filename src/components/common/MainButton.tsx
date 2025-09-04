@@ -16,11 +16,7 @@ export default function MainButton({
       disabled={disabled}
     >
       <div className="flex flex-col items-center">
-        <span
-          className={`text-base font-semibold ${
-            disabled ? "text-primary-disabled" : "text-bg-normal"
-          }`}
-        >
+        <span className={`text-base font-semibold ${disabled ? "text-primary-disabled" : "text-bg-normal"}`}>
           {text}
         </span>
       </div>

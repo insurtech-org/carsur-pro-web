@@ -7,6 +7,7 @@ import Toast from "@/components/common/Toast";
 import LoadingPage from "@/components/common/LoadingPage";
 import { useLoadingStore } from "@/store/loading";
 import CommonModal from "@/components/modal/CommonModal";
+import ProposeModal from "@/components/modal/ProposeModal";
 import AuthGuard from "@/components/common/AuthGuard";
 
 export default function RootLayout({
@@ -69,6 +70,7 @@ export default function RootLayout({
 
         {/* 전역 모달 렌더링 */}
         <CommonModal />
+        <ProposeModal />
       </body>
     </html>
   );
