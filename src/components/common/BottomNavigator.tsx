@@ -133,7 +133,7 @@ export default function BottomNavigator() {
 
   return (
     <div className="responseNavigator fixed bottom-0 left-0 right-0 w-full bg-white rounded-t-lg z-50 ">
-      <div className="flex items-center justify-around pb-6 bg-white shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.04)] rounded-t-lg">
+      <div className="flex items-center justify-around pb-2 bg-white shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.04)] rounded-t-lg">
         {navItems.map((item, index) => (
           <button
             key={item.id}
