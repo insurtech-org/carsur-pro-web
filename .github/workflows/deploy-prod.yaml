@@ -1,8 +1,8 @@
-name: CI/CD - Deploy self-claim-front-prod to EKS
+name: CI/CD - Deploy insurtech-factory-front-prod to EKS
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -12,13 +12,13 @@ env:
   AWS_REGION: ap-northeast-2
   CLUSTER_NAME: insurtech-eks
   NAMESPACE: prod
-  DEPLOYMENT_NAME: self-claim-front
-  CONTAINER_NAME: self-claim-front
+  DEPLOYMENT_NAME: insurtech-factory-front
+  CONTAINER_NAME: insurtech-factory-front
   REPOSITORY: 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-front-prod
   IMAGE_TAG: prod-${{ github.sha }}-${{ github.run_number }}
   DOCKER_FILE: Dockerfile
   BUILD_ENV: prod
-  PROJECT_NAME: insurtech-front-prod
+  PROJECT_NAME: insurtech-factory-front-prod
 
 jobs:
   deploy:
