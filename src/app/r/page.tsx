@@ -16,7 +16,7 @@ export default function R() {
       const appUrl = action ? `${appScheme}${action}` : appScheme;
 
       const androidStoreUrl = "https://play.google.com/store/apps/details?id=com.suretech.carsurpromobile";
-      const iosStoreUrl = "https://carsur-pro-dev.insurtech.co.kr"; // iOS 앱스토어 ID 필요
+      const iosStoreUrl = "https://apps.apple.com/us/app/%EC%B9%B4%EC%8A%88%EC%96%B4%ED%94%84%EB%A1%9C/id6751558142"; // iOS 앱스토어 링크 업데이트
 
       const isAndroid = /Android/i.test(navigator.userAgent);
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -38,16 +38,25 @@ export default function R() {
 
       // iOS 유니버설 링크 방식
       else if (isIOS) {
-        // 웹 URL 설정
-        const webBaseUrl = "https://carsur-pro-dev.insurtech.co.kr/";
-        const webUrl = action ? `${webBaseUrl}${action}` : webBaseUrl;
+        // 앱이 설치되어 있는지 확인하기 위해 딥링크 시도
+        const appUrl = action ? `suretech://${action}` : "suretech://";
 
-        // iOS의 경우 바로 웹으로 리다이렉트
-        window.location.href = webUrl;
+        // 앱이 설치되어 있지 않으면 앱스토어로 이동
+        const fallbackTimer = setTimeout(() => {
+          window.location.href = iosStoreUrl;
+        }, 1000);
+
+        // 앱이 설치되어 있으면 앱으로 이동
+        window.location.href = appUrl;
+
+        // 앱이 열리면 타이머 클리어
+        window.addEventListener("pagehide", () => {
+          clearTimeout(fallbackTimer);
+        });
       }
     } else {
       // PC인 경우 웹으로 리다이렉트 (action이 있으면 해당 경로로)
-      const webBaseUrl = "https://carsur-pro-dev.insurtech.co.kr/";
+      const webBaseUrl = "https://carsur-pro.insurtech.co.kr/";
       const webUrl = action ? `${webBaseUrl}${action}` : webBaseUrl;
       window.location.href = webUrl;
     }

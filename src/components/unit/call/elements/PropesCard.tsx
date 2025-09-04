@@ -26,7 +26,7 @@ export const ProposeCard = ({ proposeData, refetch }: { proposeData: IProposeLis
   const onClickProposeCancel = async (id: number) => {
     try {
       await deletePropose(id);
-      showSuccess("제안이 취소되었습니다.");
+      showSuccess("제안이 취소되었어요.");
       refetch();
     } catch (error) {
       console.log(error);

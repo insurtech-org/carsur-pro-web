@@ -52,7 +52,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
   const cancelPropose = async () => {
     try {
       await deletePropose(id);
-      showSuccess("제안이 취소되었습니다.");
+      showSuccess("제안이 취소되었어요.");
       router.replace("/call/#proposal");
     } catch (error) {
       console.error(error);
