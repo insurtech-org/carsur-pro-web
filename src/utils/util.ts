@@ -205,7 +205,7 @@ export const getCarTypeText = (typeNumber: string) => {
   if (typeNumber === "40") {
     return "자차";
   }
-  return "";
+  return "-";
 };
 
 //소문자로 변경
@@ -216,4 +216,10 @@ export const convertToLowerCase = (text: string) => {
 //대문자로 변경
 export const convertToUpperCase = (text: string) => {
   return text.toUpperCase();
+};
+
+// 2025-08-26 15:21:06 => 2025.08.26 15:21 시간이 없으면 - 반환
+export const formatDateTime = (dateTime: string) => {
+  if (!dateTime) return "-";
+  return dayjs(dateTime).format("YYYY.MM.DD HH:mm");
 };

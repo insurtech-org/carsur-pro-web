@@ -30,7 +30,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
       setDetailData(res);
     } catch (error) {
       console.log(error);
-      showError("콜 상세 정보를 불러오는데 실패했어요.");
+      showError("이미 완료된 콜입니다.", "상태를 확인해 주세요.");
       router.push("/call");
     }
   };
@@ -44,7 +44,9 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
         router.replace("/call/#proposal");
       } catch (error) {
         console.error(error);
-        showError("시스템 오류로 제안에 실패했어요", "운영팀에 문의주세요.");
+        showError("이미 완료된 콜입니다.", "상태를 확인해 주세요.");
+        hideProposeModal();
+        router.push("/call");
       }
     });
   };
@@ -56,7 +58,8 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
       router.replace("/call/#proposal");
     } catch (error) {
       console.error(error);
-      showError("시스템 오류로 제안 취소에 실패했어요.", "운영팀에 문의주세요.");
+      showError("이미 완료된 콜입니다.", "상태를 확인해 주세요.");
+      fetchCallDetail();
     }
   };
 
