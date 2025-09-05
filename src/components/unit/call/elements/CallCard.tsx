@@ -9,7 +9,7 @@ import { ICallList } from "@/type/call.type";
 import { postPropose } from "@/api/call.api";
 import { formatDate } from "@/utils/util";
 
-const CallCard = ({ callData }: { callData: ICallList }) => {
+const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => void }) => {
   const router = useRouter();
   const { showSuccess, showError } = useToastStore();
   const { showProposeModal, hideProposeModal } = useProposeModalStore();
@@ -28,7 +28,9 @@ const CallCard = ({ callData }: { callData: ICallList }) => {
         window.location.hash = "#proposal";
       } catch (error) {
         console.log(error);
-        showError("제안에 실패했어요.");
+        showError("이미 완료된 콜입니다.", "상태를 확인해 주세요");
+        refetch();
+        hideProposeModal();
       }
     });
   };

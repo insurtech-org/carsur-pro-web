@@ -128,7 +128,7 @@ export default function CallList() {
           <>
             {callList.map((data, index) => (
               <div key={data.id} ref={index === callList.length - 1 ? lastElementRef : undefined} className="w-full">
-                <CallCard callData={data} />
+                <CallCard callData={data} refetch={fetchCallList} />
               </div>
             ))}
 

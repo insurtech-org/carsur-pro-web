@@ -6,7 +6,7 @@ import AccountModal from "@/components/modal/AccountModal";
 import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
 import CancelSelectModal from "@/components/modal/CancelSelectModal";
 import { useToastStore } from "@/store/toast";
-import { formatFaxNumber, formatPhoneNumber, getCarTypeText, sleep, statusColor } from "@/utils/util";
+import { formatDateTime, formatFaxNumber, formatPhoneNumber, getCarTypeText, sleep, statusColor } from "@/utils/util";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import StatusBarCard from "./elements/StatusBarCard";
@@ -135,7 +135,8 @@ export default function WorkDetail() {
       goBack();
     } catch (error) {
       console.log(error);
-      showError("입고 확정 포기에 실패했어요.");
+      showError("이미 처리된 상태입니다.", "상태를 확인해 주세요.");
+      await fetchData();
     }
   };
 
@@ -158,7 +159,8 @@ export default function WorkDetail() {
       showSuccess(toastMessage || "상태 변경이 완료되었어요.");
     } catch (error) {
       console.log(error);
-      showError("상태 변경에 실패했어요.");
+      showError("이미 처리된 상태입니다.", "상태를 확인해 주세요.");
+      await fetchData();
     }
 
     setCalendarSelectModalOpen(false);
@@ -174,7 +176,9 @@ export default function WorkDetail() {
       showSuccess("청구 처리가 완료되었어요.");
     } catch (error) {
       console.log(error);
-      showError("청구 완료에 실패했어요.");
+      showError("이미 처리된 상태입니다.", "상태를 확인해 주세요.");
+      await fetchData();
+      setAccountModalOpen(false);
     }
   };
 
@@ -288,7 +292,7 @@ export default function WorkDetail() {
                 <div className="flex flex-1 justify-between items-center">
                   <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">예약확정</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {workData.confirmedDate.replaceAll("-", ".")}
+                    {formatDateTime(workData.confirmedDate)}
                   </span>
                 </div>
               </div>
@@ -300,7 +304,7 @@ export default function WorkDetail() {
                 <div className="flex flex-1 justify-between items-center">
                   <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">차량입고</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-1">
-                    {workData?.arrivedDate.replaceAll("-", ".")}
+                    {formatDateTime(workData.arrivedDate)}
                   </span>
                 </div>
               </div>
@@ -312,7 +316,7 @@ export default function WorkDetail() {
                 <div className="flex flex-1 justify-between items-center">
                   <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">수리시작</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-0.5">
-                    {workData?.repairStartedDate.replaceAll("-", ".")}
+                    {formatDateTime(workData.repairStartedDate)}
                   </span>
                 </div>
               </div>
@@ -324,7 +328,7 @@ export default function WorkDetail() {
                 <div className="flex flex-1 justify-between items-center">
                   <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">수리완료</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {workData?.repairCompletedDate.replaceAll("-", ".")}
+                    {formatDateTime(workData.repairCompletedDate)}
                   </span>
                 </div>
               </div>
@@ -336,7 +340,7 @@ export default function WorkDetail() {
                 <div className="flex flex-1 justify-between items-center">
                   <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">차량출고</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {workData?.releasedDate.replaceAll("-", ".")}
+                    {formatDateTime(workData.releasedDate)}
                   </span>
                 </div>
               </div>
@@ -348,7 +352,7 @@ export default function WorkDetail() {
                 <div className="flex flex-1 justify-between items-center">
                   <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">청구완료</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
-                    {workData?.billingCompletedDate.replaceAll("-", ".")}
+                    {formatDateTime(workData.billingCompletedDate)}
                   </span>
                 </div>
               </div>
@@ -363,7 +367,7 @@ export default function WorkDetail() {
           <MainButton text={mainButtonText} onClick={onClickMainButton} disabled={workStatus === "BILLING_COMPLETED"} />
         )}
         {workStatus === "CONFIRMED" && (
-          <TextButton text="입고 확정 취소" onClick={() => setCancelSelectModalOpen(true)} />
+          <TextButton text="입고 확정 포기" onClick={() => setCancelSelectModalOpen(true)} />
         )}
       </div>
 
