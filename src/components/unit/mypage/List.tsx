@@ -21,7 +21,7 @@ export default function MyPageList() {
 
   return (
     <>
-      <div className="flex flex-col justify-between items-start self-stretch gap-2 bg-bg-alternative p-6 px-5 flex-1 pb-24">
+      <div className="flex flex-col justify-between items-start self-stretch gap-2 bg-bg-normal p-6 px-5 flex-1 pb-24">
         <div className="w-full inline-flex flex-col justify-start items-start gap-5">
           <div className="flex flex-col justify-center items-start gap-1">
             <div className="inline-flex justify-center items-center gap-2">

@@ -135,7 +135,7 @@ export default function WorkDetail() {
       goBack();
     } catch (error) {
       console.log(error);
-      showError("이미 처리된 상태입니다.", "상태를 확인해 주세요.");
+      showError("이미 처리된 상태입니다.");
       await fetchData();
     }
   };
@@ -159,7 +159,7 @@ export default function WorkDetail() {
       showSuccess(toastMessage || "상태 변경이 완료되었어요.");
     } catch (error) {
       console.log(error);
-      showError("이미 처리된 상태입니다.", "상태를 확인해 주세요.");
+      showError("이미 처리된 상태입니다.");
       await fetchData();
     }
 
@@ -176,7 +176,7 @@ export default function WorkDetail() {
       showSuccess("청구 처리가 완료되었어요.");
     } catch (error) {
       console.log(error);
-      showError("이미 처리된 상태입니다.", "상태를 확인해 주세요.");
+      showError("이미 처리된 상태입니다.");
       await fetchData();
       setAccountModalOpen(false);
     }
@@ -193,8 +193,8 @@ export default function WorkDetail() {
         <div className="flex flex-col items-start self-stretch bg-neutral-100 py-4 gap-4">
           {/* 지역, 상태 배찌 */}
           <div className="flex items-start ml-5 gap-2">
-            <div className="flex flex-col shrink-0 items-start bg-bg-normal text-left py-1 px-2 rounded-md border border-solid border-secondary-normal">
-              <span className="text-secondary-normal text-xs font-medium">{workData?.sigungu}</span>
+            <div className="flex flex-col shrink-0 items-start bg-bg-normal text-left py-1 px-2 rounded-md border border-solid border-line-primary">
+              <span className="text-line-primary text-xs font-medium">{workData?.sigungu}</span>
             </div>
             <div
               className="flex flex-col shrink-0 items-start text-left py-1 px-2 rounded-md border-0"

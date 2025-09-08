@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 export const ProposeCard = ({ proposeData, refetch }: { proposeData: IProposeList; refetch: () => void }) => {
   const router = useRouter();
 
-  const { showSuccess, showWarning } = useToastStore();
+  const { showSuccess, showError } = useToastStore();
   const { showModal } = useModalStore();
 
   const handleProposeCancel = (id: string) => {
@@ -30,7 +30,7 @@ export const ProposeCard = ({ proposeData, refetch }: { proposeData: IProposeLis
       refetch();
     } catch (error) {
       console.log(error);
-      showWarning("이미 완료된 콜입니다.", "상태를 확인해 주세요.");
+      showError("이미 입고확정 또는 취소된 건이에요.", "현재 상태는 제안내역에서 확인할 수 있어요.");
       refetch();
     }
   };
