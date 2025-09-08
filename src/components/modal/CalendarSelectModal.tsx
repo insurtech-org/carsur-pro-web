@@ -8,6 +8,7 @@ import SubButton from "../common/SubButton";
 interface CalendarSelectModalProps {
   title: string;
   isOpen: boolean;
+  minTime?: string;
   onClose: () => void;
   onClickConfirm: (date: string, time: string) => void;
 }
@@ -30,7 +31,13 @@ interface HolidayResponse {
   };
 }
 
-export default function CalendarSelectModal({ title, isOpen, onClose, onClickConfirm }: CalendarSelectModalProps) {
+export default function CalendarSelectModal({
+  title,
+  isOpen,
+  minTime,
+  onClose,
+  onClickConfirm,
+}: CalendarSelectModalProps) {
   // Hook들을 항상 최상위에서 호출
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
@@ -124,7 +131,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     const dateString = date.format("YYYYMMDD");
     const isPublicHoliday = holidays.some(holiday => holiday.locdate.toString() === dateString);
 
-    return isFutureDate || isWeekend || isPublicHoliday;
+    return isFutureDate;
   };
 
   // 휴일 여부 확인 - API 데이터 사용 (수정됨)
@@ -134,7 +141,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     const date = currentMonth.date(day);
 
     // 주말인지 확인
-    const isWeekend = date.day() === 0 || date.day() === 6;
+    const isWeekend = date.day() === 0;
 
     // API에서 가져온 공휴일인지 확인
     const dateString = date.format("YYYYMMDD");
@@ -174,6 +181,10 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
   };
 
   const timeSlots = [
+    "08:00",
+    "08:30",
+    "09:00",
+    "09:30",
     "10:00",
     "10:30",
     "11:00",
@@ -205,6 +216,20 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
     setCurrentMonth(dayjs());
 
     onClose();
+  };
+
+  // minTime이 있을 때 해당 시간 이전인지 체크하는 함수 추가
+  const isTimeDisabled = (time: string) => {
+    if (!minTime) return false;
+
+    // 시간을 24시간 형식으로 변환하여 비교
+    const [hour, minute] = time.split(":").map(Number);
+    const [minHour, minMinute] = minTime.split(":").map(Number);
+
+    const timeValue = hour * 60 + minute;
+    const minTimeValue = minHour * 60 + minMinute;
+
+    return timeValue < minTimeValue;
   };
 
   // 조건부 렌더링을 return 문에서 처리
@@ -305,7 +330,7 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
                                 : isDisabled
                                 ? "text-neutral-300 cursor-not-allowed"
                                 : isHolidayDay
-                                ? "bg-secondary-bg"
+                                ? "text-red-400"
                                 : "hover:bg-neutral-100 text-primary-normal"
                             }`}
                             onClick={() => handleDateSelect(day, isCurrentMonth)}
@@ -330,9 +355,12 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
                               className={`p-2 rounded-[10px] border ${
                                 selectedTimes[0] === time
                                   ? "bg-secondary-bg text-line-primary border border-line-primary font-semibold"
+                                  : isTimeDisabled(time)
+                                  ? "border-line-normal text-neutral-300 cursor-not-allowed" // disabled 스타일 추가
                                   : "border-line-normal text-primary-neutral"
                               }`}
                               onClick={() => handleTimeSelect(time, 0)}
+                              disabled={isTimeDisabled(time)} // disabled 속성 추가
                             >
                               {time}
                             </button>
@@ -349,9 +377,12 @@ export default function CalendarSelectModal({ title, isOpen, onClose, onClickCon
                               className={`p-2 rounded-[10px] border text-center self-center justify-center ${
                                 selectedTimes[0] === time
                                   ? "bg-secondary-bg text-line-primary border border-line-primary font-semibold "
+                                  : isTimeDisabled(time)
+                                  ? "border-line-normal text-neutral-300 cursor-not-allowed" // disabled 스타일 추가
                                   : "border-line-normal text-primary-neutral"
                               }`}
                               onClick={() => handleTimeSelect(time, 0)}
+                              disabled={isTimeDisabled(time)} // disabled 속성 추가
                             >
                               {time}
                             </button>

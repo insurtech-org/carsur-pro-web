@@ -210,7 +210,11 @@ export default function WorkDetail() {
           {/* 보험사, 차량명 */}
           <div className="flex flex-col items-start self-stretch mx-5">
             <span className="text-secondary-normal text-[15px] font-semibold">{workData?.insuranceCompanyName}</span>
-            <span className="text-primary-normal text-[22px] font-semibold">{workData?.carModel}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-primary-normal text-[22px] font-semibold">{workData?.carModel}</span>
+              <span className="border border-solid border-neutral-neutral h-4"></span>
+              <span className="text-primary-normal text-[22px] font-semibold"> {workData?.carNumber}</span>
+            </div>
           </div>
 
           {/*상태바 카드*/}
@@ -382,6 +386,19 @@ export default function WorkDetail() {
         isOpen={calendarSelectModalOpen}
         onClose={() => setCalendarSelectModalOpen(false)}
         onClickConfirm={(date, time) => onClickCalendarConfirm(date, time)}
+        minTime={(() => {
+          // 상태별 참조해야 할 날짜 매핑
+          const statusDateMap = {
+            ARRIVED: workData?.arrivedDate,
+            REPAIR_STARTED: workData?.repairStartedDate,
+            REPAIR_COMPLETED: workData?.repairCompletedDate,
+            RELEASED: workData?.releasedDate,
+          };
+
+          const targetDate = statusDateMap[workStatus as keyof typeof statusDateMap];
+
+          return targetDate ? formatDateTime(targetDate, "HH:mm") : "";
+        })()}
       />
 
       <AccountModal
