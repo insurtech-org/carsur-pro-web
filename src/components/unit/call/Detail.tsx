@@ -8,11 +8,12 @@ import { ICallDetail } from "@/type/call.type";
 import { formatDate } from "@/utils/util";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import DetailInfoRow from "../work/elements/DetailInfoRow";
 
 export default function Detail({ id, hash }: { id: number; hash: string }) {
   const router = useRouter();
 
-  const { showSuccess, showError } = useToastStore();
+  const { showSuccess, showWarning, showError } = useToastStore();
   const { showModal } = useModalStore();
   const { showProposeModal, hideProposeModal } = useProposeModalStore();
 
@@ -30,8 +31,13 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
       setDetailData(res);
     } catch (error) {
       console.log(error);
-      showError("이미 완료된 콜입니다.", "상태를 확인해 주세요.");
-      router.push("/call");
+      if (isProposal) {
+        showWarning("이미 입고확정 또는 취소된 건이에요.", "현재 상태는 제안내역에서 확인할 수 있어요.");
+        router.push("/call#proposal");
+      } else {
+        showWarning(`이미 완료된 콜입니다.`);
+        router.push("/call#mylocal");
+      }
     }
   };
 
@@ -44,7 +50,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
         router.replace("/call/#proposal");
       } catch (error) {
         console.error(error);
-        showError("이미 완료된 콜입니다.", "상태를 확인해 주세요.");
+        showWarning("이미 완료된 콜입니다.");
         hideProposeModal();
         router.push("/call");
       }
@@ -55,11 +61,12 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
     try {
       await deletePropose(id);
       showSuccess("제안이 취소되었어요.");
+
       router.replace("/call/#proposal");
     } catch (error) {
       console.error(error);
-      showError("이미 완료된 콜입니다.", "상태를 확인해 주세요.");
-      fetchCallDetail();
+      showError("이미 입고확정 또는 취소된 건이에요.", "현재 상태는 제안내역에서 확인할 수 있어요.");
+      router.replace("/call/#proposal");
     }
   };
 
@@ -88,7 +95,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
           <div className="flex flex-col self-stretch mb-20 px-5 gap-8">
             <div className="flex flex-col items-start self-stretch gap-4">
               <div className="flex items-center pr-[3px] gap-2">
-                <div className="flex flex-col shrink-0 items-start bg-bg-normal text-left py-1 px-2 rounded-md border border-solid border-secondary-normal">
+                <div className="flex flex-col shrink-0 items-start bg-bg-normal text-left py-1 px-2 rounded-md border border-solid border-line-primary">
                   <span className="text-secondary-normal text-sm font-semibold">
                     {detailData?.sido} {detailData?.sigungu}
                   </span>
@@ -99,67 +106,35 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
               </div>
               <span className="text-primary-normal text-[22px] font-semibold">{detailData?.carModel}</span>
             </div>
+
             <div className="flex flex-col self-stretch gap-2">
               <div className="flex flex-col items-start self-stretch">
-                <span className="text-primary-normal text-base font-medium mb-[9px]">보험 정보</span>
-                <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-neutral-700 text-base font-regular  mr-1">사고접수번호</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {detailData?.insuranceClaimNo || "-"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center self-stretch">
-                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">보험사</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {detailData?.insuranceCompanyName}
-                  </span>
-                </div>
+                <span className="text-primary-normal text-base font-medium mb-2">보험 정보</span>
+
+                <DetailInfoRow label="사고접수번호" value={detailData?.insuranceClaimNo || "-"} />
+                <DetailInfoRow label="보험사" value={detailData?.insuranceCompanyName || "-"} />
               </div>
-              <div className="self-stretch bg-neutral-100 h-0.5"></div>
+
+              <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
+
               <div className="flex flex-col items-start self-stretch">
-                <span className="text-primary-normal text-base font-medium mb-[9px]">{"예약 기본 정보"}</span>
-                <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"예약지역"}</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {detailData?.sido} {detailData?.sigungu}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center self-stretch">
-                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"입고 예약일"}</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {formatDate(detailData?.reservationDate)}
-                  </span>
-                </div>
+                <span className="text-primary-normal text-base font-medium mb-2">예약 기본 정보</span>
+                <DetailInfoRow label="예약지역" value={detailData?.sido + " " + detailData?.sigungu || "-"} />
+                <DetailInfoRow label="입고 예약일" value={formatDate(detailData?.reservationDate) || "-"} />
               </div>
-              <div className="self-stretch bg-neutral-100 h-0.5"></div>
+
+              <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
+
               <div className="flex flex-col items-start self-stretch">
-                <span className="text-primary-normal text-base font-medium mb-[9px]">{"차량 정보"}</span>
-                <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"차량번호"}</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {detailData?.carNumber}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"차종"}</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {detailData?.carModel}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center self-stretch mb-2">
-                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"배기량"}</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {detailData?.engineDisplacement}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center self-stretch">
-                  <span className="flex-1 text-neutral-700 text-base font-regular mr-1">{"연식"}</span>
-                  <span className="flex-1 text-primary-normal text-base font-medium text-right">
-                    {`${detailData?.carModelYear}`}
-                  </span>
-                </div>
+                <span className="text-primary-normal text-base font-medium mb-2">차량 정보</span>
+
+                <DetailInfoRow label="차량번호" value={detailData?.carNumber || "-"} />
+                <DetailInfoRow label="차종" value={detailData?.carModel || "-"} />
+                <DetailInfoRow label="배기량" value={detailData?.engineDisplacement || "-"} />
+                <DetailInfoRow label="연식" value={`${detailData?.carModelYear}` || "-"} />
               </div>
             </div>
+
             <div className="flex flex-col items-start self-stretch bg-bg-normal py-5 gap-4 rounded-xl border border-solid border-neutral-200">
               <div className="flex items-center pr-0.5 ml-5 gap-2">
                 <svg

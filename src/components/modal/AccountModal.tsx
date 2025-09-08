@@ -35,6 +35,7 @@ export default function AccountModal({ title, isOpen, onClose, onClickConfirm }:
   const handleNumberInput = (number: string) => {
     if (currentFocusedInput === "input1") {
       setInputPrice1(prev => {
+        if (prev.length > 8) return prev;
         // 첫 입력이 0이면 0을 제거하고 새 숫자로 대체
         if (prev === "0" || prev === "00") {
           return number;
@@ -43,6 +44,7 @@ export default function AccountModal({ title, isOpen, onClose, onClickConfirm }:
       });
     } else if (currentFocusedInput === "input2") {
       setInputPrice2(prev => {
+        if (prev.length > 8) return prev;
         // 첫 입력이 0이면 0을 제거하고 새 숫자로 대체
         if (prev === "0" || prev === "00") {
           return number;

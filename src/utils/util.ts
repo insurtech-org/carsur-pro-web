@@ -219,7 +219,7 @@ export const convertToUpperCase = (text: string) => {
 };
 
 // 2025-08-26 15:21:06 => 2025.08.26 15:21 시간이 없으면 - 반환
-export const formatDateTime = (dateTime: string) => {
+export const formatDateTime = (dateTime: string, format = "YYYY.MM.DD HH:mm") => {
   if (!dateTime) return "-";
-  return dayjs(dateTime).format("YYYY.MM.DD HH:mm");
+  return dayjs(dateTime).format(format);
 };

@@ -41,7 +41,11 @@ const WorkCard = ({ data }: { data: IWorkList }) => {
               )}
             </div>
           </div>
-          <span className="text-[#131211] text-lg font-bold">{data.carModel}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-primary-normal text-lg font-semibold">{data.carModel}</span>
+            <span className="border border-solid border-neutral-neutral h-4"></span>
+            <span className="text-primary-normal text-lg font-semibold">{data.carNumber}</span>
+          </div>
         </div>
 
         <div className="flex items-start self-stretch mx-4">

@@ -11,7 +11,7 @@ import { formatDate } from "@/utils/util";
 
 const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => void }) => {
   const router = useRouter();
-  const { showSuccess, showError } = useToastStore();
+  const { showSuccess, showWarning } = useToastStore();
   const { showProposeModal, hideProposeModal } = useProposeModalStore();
 
   const onClickDetail = (id: number) => {
@@ -28,7 +28,7 @@ const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => v
         window.location.hash = "#proposal";
       } catch (error) {
         console.log(error);
-        showError("이미 완료된 콜입니다.", "상태를 확인해 주세요");
+        showWarning("이미 완료된 콜입니다.");
         refetch();
         hideProposeModal();
       }
