@@ -7,7 +7,7 @@ import { useToastStore } from "@/store/toast";
 import { ICallDetail } from "@/type/call.type";
 import { formatDate } from "@/utils/util";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DetailInfoRow from "../work/elements/DetailInfoRow";
 
 export default function Detail({ id, hash }: { id: number; hash: string }) {
@@ -20,6 +20,9 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
   const isProposal = hash.includes("proposal");
 
   const [detailData, setDetailData] = useState<ICallDetail | null>(null);
+  const isAxa = useMemo(() => {
+    return detailData?.insuranceCompanyName?.toLowerCase() === "axa";
+  }, [detailData]);
 
   useEffect(() => {
     fetchCallDetail();
@@ -42,19 +45,23 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
   };
 
   const handlePropose = () => {
-    showProposeModal(id, async () => {
-      try {
-        await postPropose(id);
-        showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
-        hideProposeModal();
-        router.replace("/call/#proposal");
-      } catch (error) {
-        console.error(error);
-        showWarning("이미 완료된 콜입니다.");
-        hideProposeModal();
-        router.push("/call");
-      }
-    });
+    showProposeModal(
+      id,
+      async () => {
+        try {
+          await postPropose(id);
+          showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
+          hideProposeModal();
+          router.replace("/call/#proposal");
+        } catch (error) {
+          console.error(error);
+          showWarning("이미 완료된 콜입니다.");
+          hideProposeModal();
+          router.push("/call");
+        }
+      },
+      isAxa ? "• AXA손해보험 DRP계약 상 공임단가 적용" : ""
+    );
   };
 
   const cancelPropose = async () => {
