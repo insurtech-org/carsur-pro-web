@@ -6,7 +6,7 @@ import MainButton from "@/components/common/MainButton";
 import VailedInput from "@/components/common/VailedInput";
 import { useToastStore } from "@/store/toast";
 import { ServerErrorResponse } from "@/type/etc.type";
-import { extractErrorMessage, validatePassword } from "@/utils/util";
+import { extractErrorMessage, validatePassword2 } from "@/utils/util";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -49,7 +49,7 @@ export default function ChangePasswordPage() {
       const errorMessage = errorData?.message;
       const errorCode = errorData?.code;
 
-      if (errorCode === "BE") {
+      if (errorCode === "BE" || errorCode === "VAL") {
         setFailErrorMessage(errorMessage);
         setIsFailError(true);
       } else {
@@ -99,7 +99,7 @@ export default function ChangePasswordPage() {
     setIsFailError(false);
     setFailErrorMessage("");
     //비밀번호 유효성 검사
-    const { isValid, message } = validatePassword(password);
+    const { isValid, message } = validatePassword2(password);
     setIsCurrentPasswordError(!isValid);
     setCurrentPasswordErrorMessage(message);
   };
@@ -111,8 +111,9 @@ export default function ChangePasswordPage() {
     //에러 초기화
     setIsNewPasswordError(false);
     setNewPasswordErrorMessage("");
+
     //비밀번호 유효성 검사
-    const { isValid, message } = validatePassword(password);
+    const { isValid, message } = validatePassword2(password);
     setIsNewPasswordError(!isValid);
     setNewPasswordErrorMessage(message);
 
@@ -132,8 +133,9 @@ export default function ChangePasswordPage() {
     //에러 초기화
     setIsConfirmPasswordError(false);
     setConfirmPasswordErrorMessage("");
+
     //비밀번호 유효성 검사
-    const { isValid, message } = validatePassword(password);
+    const { isValid, message } = validatePassword2(password);
     setIsConfirmPasswordError(!isValid);
     setConfirmPasswordErrorMessage(message);
 

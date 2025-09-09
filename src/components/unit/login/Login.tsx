@@ -3,7 +3,7 @@
 import { login } from "@/api/auth.api";
 import VailedInput from "@/components/common/VailedInput";
 import { useUserStore } from "@/store/user";
-import { extractErrorMessage, validatePassword } from "@/utils/util";
+import { extractErrorMessage, validatePassword2 } from "@/utils/util";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -74,7 +74,7 @@ export default function Login() {
       return false;
     }
 
-    const { isValid, message } = validatePassword(password);
+    const { isValid, message } = validatePassword2(password);
     if (!isValid) {
       setIsPasswordError(true);
       setPasswordErrorMessage(message);
@@ -93,7 +93,7 @@ export default function Login() {
     setIsFailedLogin(false);
 
     // //에러 있으면 세팅
-    const { isValid, message } = validatePassword(password);
+    const { isValid, message } = validatePassword2(password);
     if (!isValid) {
       setIsPasswordError(true);
       setPasswordErrorMessage(message);
