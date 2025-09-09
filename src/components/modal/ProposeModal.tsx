@@ -6,7 +6,7 @@ import MainButton from "../common/MainButton";
 import { useProposeModalStore } from "@/store/proposeModal";
 
 const ProposeModal = () => {
-  const { isOpen, onConfirm, hideProposeModal } = useProposeModalStore();
+  const { isOpen, onConfirm, hideProposeModal, content1, content2 } = useProposeModalStore();
   const [isChecked, setIsChecked] = useState(false);
 
   const onChangeChecked = (value: boolean) => {
@@ -64,7 +64,7 @@ const ProposeModal = () => {
                     paddingLeft: "1rem",
                   }}
                 >
-                  {`• 요청 보험사와 직접 공임 계약(DRP)이 있는 경우:\n → 해당 보험사 공임 단가 적용`}
+                  {content1 || `• 카슈어 프로 공임단가 적용: \n (국산차: 30,000원 / 수입차: 35,000원, VAT 별도)`}
                 </span>
                 <span
                   className="text-neutral-800 text-[15px] font-medium whitespace-pre-line"
@@ -73,7 +73,7 @@ const ProposeModal = () => {
                     paddingLeft: "1rem",
                   }}
                 >
-                  {`• DRP 계약이 없는 경우: \n → 카슈어 프로 공임단가 적용  \n(국산차: 30,000원 / 수입차: 35,000원, VAT 별도)`}
+                  {content2 || ""}
                 </span>
               </div>
 

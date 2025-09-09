@@ -8,31 +8,40 @@ import MainButton from "@/components/common/MainButton";
 import { ICallList } from "@/type/call.type";
 import { postPropose } from "@/api/call.api";
 import { formatDate } from "@/utils/util";
+import { useMemo } from "react";
 
 const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => void }) => {
   const router = useRouter();
   const { showSuccess, showWarning } = useToastStore();
   const { showProposeModal, hideProposeModal } = useProposeModalStore();
 
+  const isAxa = useMemo(() => {
+    return callData.insuranceCompanyName?.toLowerCase() === "axa";
+  }, [callData]);
+
   const onClickDetail = (id: number) => {
     router.push(`/call/${id}#mylocal`);
   };
 
   const handlePropose = () => {
-    showProposeModal(callData.id, async () => {
-      try {
-        await postPropose(callData.id);
-        showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
-        hideProposeModal();
+    showProposeModal(
+      callData.id,
+      async () => {
+        try {
+          await postPropose(callData.id);
+          showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
+          hideProposeModal();
 
-        window.location.hash = "#proposal";
-      } catch (error) {
-        console.log(error);
-        showWarning("이미 완료된 콜입니다.");
-        refetch();
-        hideProposeModal();
-      }
-    });
+          window.location.hash = "#proposal";
+        } catch (error) {
+          console.log(error);
+          showWarning("이미 완료된 콜입니다.");
+          refetch();
+          hideProposeModal();
+        }
+      },
+      isAxa ? "• AXA손해보험 DRP계약 상 공임단가 적용" : ""
+    );
   };
 
   return (
