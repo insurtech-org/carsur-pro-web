@@ -173,7 +173,7 @@ export default function WorkDetail() {
       setAccountModalOpen(false);
       await fetchData();
 
-      showSuccess("청구 처리가 완료되었어요.");
+      showSuccess("청구 금액 입력이 완료되었어요.");
     } catch (error) {
       console.log(error);
       showError("이미 처리된 상태입니다.");
@@ -354,7 +354,7 @@ export default function WorkDetail() {
               <div className="flex items-center self-stretch gap-2.5">
                 <div className="w-1 h-1 object-fill bg-neutral-300 rounded-full" />
                 <div className="flex flex-1 justify-between items-center">
-                  <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">청구완료</span>
+                  <span className="flex-1 text-neutral-800 text-base mr-1 font-regular">종결</span>
                   <span className="flex-1 text-neutral-700 text-[15px] text-right font-regular mr-[3px]">
                     {formatDateTime(workData.billingCompletedDate)}
                   </span>
@@ -382,7 +382,7 @@ export default function WorkDetail() {
       />
 
       <CalendarSelectModal
-        title={`${calendarText} 날짜를 입력해 주세요.`}
+        title={`${calendarText} 날짜를 입력해 주세요`}
         isOpen={calendarSelectModalOpen}
         onClose={() => setCalendarSelectModalOpen(false)}
         onClickConfirm={(date, time) => onClickCalendarConfirm(date, time)}
@@ -402,7 +402,7 @@ export default function WorkDetail() {
       />
 
       <AccountModal
-        title="청구한 금액을 입력해 주세요."
+        title="청구한 금액을 입력해 주세요"
         isOpen={accountModalOpen}
         onClose={() => setAccountModalOpen(false)}
         onClickConfirm={(price, laborPrice, partsPrice) => onClickAccountConfirm(price, laborPrice, partsPrice)}
