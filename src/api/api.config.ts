@@ -18,11 +18,21 @@ instance.interceptors.response.use(
   },
   error => {
     const { endLoading } = useLoadingStore.getState();
+
     endLoading();
-    // 401 에러 시 로그인 페이지로 리다이렉트 ,예외 : 비밀번호 변경 로직은 401 에러 처리 X
-    if (error.response?.status === 401 && !error.config.url.includes("/auth/factory/change-password")) {
-      localStorage.removeItem("authToken");
-      window.location.href = "/login";
+
+    // 401 에러 시 로그인 페이지로 리다이렉트
+    // 예외: 특정 페이지들에서는 401 에러 처리 X
+    if (error.response?.status === 401) {
+      const currentPath = window.location.pathname;
+      const isPasswordChange = error.config.url.includes("/auth/factory/change-password");
+      const isAuthPage = currentPath === "/login" || currentPath === "/find-id";
+
+      // 비밀번호 변경이나 인증 관련 페이지가 아닌 경우에만 리다이렉트
+      if (!isPasswordChange && !isAuthPage) {
+        localStorage.removeItem("authToken");
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(error);

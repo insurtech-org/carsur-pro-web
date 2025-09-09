@@ -312,9 +312,9 @@ export default function AccountModal({ title, isOpen, onClose, onClickConfirm }:
               <div className="flex justify-center gap-2">
                 <SubButton text="닫기" onClick={onClickClose} />
                 <MainButton
-                  text="청구하기"
+                  text="입력하기"
                   onClick={() => onClickConfirm(totalPrice, Number(inputPrice1), Number(inputPrice2))}
-                  disabled={Number(inputPrice1) === 0 || Number(inputPrice2) === 0}
+                  disabled={inputPrice1 === "" || inputPrice2 === ""}
                 />
               </div>
             </div>

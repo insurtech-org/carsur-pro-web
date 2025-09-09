@@ -3,7 +3,7 @@
 import { login } from "@/api/auth.api";
 import VailedInput from "@/components/common/VailedInput";
 import { useUserStore } from "@/store/user";
-import { extractErrorMessage, validatePassword2 } from "@/utils/util";
+import { extractErrorMessage, validateId, validatePassword2 } from "@/utils/util";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -21,6 +21,7 @@ export default function Login() {
   const [isUserFocused, setIsUserFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+  const [userIdErrorMessage, setUserIdErrorMessage] = useState("");
 
   const [isFailedLogin, setIsFailedLogin] = useState(false);
 
@@ -49,7 +50,6 @@ export default function Login() {
       router.push("/call");
     } catch (error) {
       console.log(error);
-
       setIsFailedLogin(true);
       setPasswordErrorMessage("아이디 또는 비밀번호를 확인해주세요.");
     }
@@ -71,6 +71,13 @@ export default function Login() {
 
     if (userId === "") {
       setIsUserIdError(true);
+      return false;
+    }
+
+    const { isValid: isUserIdValid, message: userIdErrorMessage } = validateId(userId);
+    if (!isUserIdValid) {
+      setIsUserIdError(true);
+      setUserIdErrorMessage(userIdErrorMessage);
       return false;
     }
 
@@ -137,7 +144,9 @@ export default function Login() {
                   setIsUserIdError(false);
                   setIsFailedLogin(false);
                 }}
-                errorMessage={isUserIdError ? "아이디를 입력해주세요." : ""}
+                errorMessage={
+                  isUserIdError ? userIdErrorMessage : isFailedLogin ? "아이디 또는 비밀번호를 확인해주세요." : ""
+                }
                 onKeyDown={event => {
                   if (event.key === "Enter") {
                     event.preventDefault();

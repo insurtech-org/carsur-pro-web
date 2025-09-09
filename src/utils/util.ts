@@ -91,7 +91,8 @@ export const validatePassword2 = (password: string) => {
   const lengthValid = password.length >= 8 && password.length <= 16;
 
   // 허용되는 문자만 포함하는지 검사 (길이 조건도 정규식에 포함)
-  const safePassword = /^[a-zA-Z0-9!@#$%^&*()_+\-=/,.?]{8,16}$/.test(password);
+
+  const safePassword = /^[A-Za-z0-9!@#$%^*+\-_.?~]{8,16}$/.test(password);
 
   // 구체적인 에러 메시지 생성
   let message = "";
@@ -99,11 +100,26 @@ export const validatePassword2 = (password: string) => {
   if (!lengthValid) {
     message = "비밀번호는 8자리 이상 16자리 이하여야 합니다.";
   } else if (!safePassword) {
-    message = "비밀번호는 영문, 숫자, 특수문자(!@#$%^&*()_+-=/,.?만)만 사용 가능합니다.";
+    message = "비밀번호는 영문, 숫자, 특수문자(!@#$%^&*+-_.?~만)만 사용 가능합니다.";
   }
 
   const isValid = lengthValid && safePassword;
 
+  return {
+    isValid,
+    message,
+  };
+};
+
+//아이 유효성 검사 ^[A-Za-z0-9_-]{4,20}$
+export const validateId = (id: string) => {
+  //길이 검사
+  const lengthValid = id.length >= 4 && id.length <= 20;
+  //허용되는 문자만 포함하는지 검사
+  const safeId = /^[A-Za-z0-9_-]{4,20}$/.test(id);
+  //모든 조건을 만족하는지 검사
+  const isValid = lengthValid && safeId;
+  const message = isValid ? "" : "아이디는 영문, 숫자, 언더바(_), 하이픈(-)만 사용 가능하며, 4~20자 이내여야 합니다.";
   return {
     isValid,
     message,
