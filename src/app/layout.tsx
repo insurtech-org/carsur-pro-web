@@ -1,5 +1,12 @@
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
+import { Metadata } from "next";
+
+// 메타데이터 설정
+export const metadata: Metadata = {
+  title: "카슈어프로",
+  description: "카슈어프로 웹 애플리케이션",
+};
 
 // layout.tsx는 서버 컴포넌트로 유지
 export default function RootLayout({
