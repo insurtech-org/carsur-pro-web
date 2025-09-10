@@ -37,7 +37,7 @@ export default function MyPageList() {
                 </div>
               </div>
               <div className="justify-center text-primary-alternative text-sm font-medium  leading-tight ">
-                카슈어 카센터
+                {user?.factoryName}
               </div>
             </div>
           </div>
