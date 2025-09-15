@@ -18,3 +18,16 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   });
   return res;
 };
+
+//리프레쉬 토큰 갱신
+export const refreshToken = async (body: { refreshToken: string }) => {
+  const res = await apiInstance.post("/auth/factory/refresh", body);
+  return res;
+};
+
+//로그아웃
+//헤더에 Authorization 토큰 필요
+export const logout = async () => {
+  const res = await apiInstance.post("/auth/logout");
+  return res;
+};

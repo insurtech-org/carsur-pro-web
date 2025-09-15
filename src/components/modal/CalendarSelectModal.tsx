@@ -9,6 +9,7 @@ interface CalendarSelectModalProps {
   title: string;
   isOpen: boolean;
   minTime?: string;
+  minDate?: string;
   onClose: () => void;
   onClickConfirm: (date: string, time: string) => void;
 }
@@ -35,6 +36,7 @@ export default function CalendarSelectModal({
   title,
   isOpen,
   minTime,
+  minDate,
   onClose,
   onClickConfirm,
 }: CalendarSelectModalProps) {
@@ -124,12 +126,12 @@ export default function CalendarSelectModal({
     // 오늘 이후 날짜인지 확인 (오늘 제외)
     const isFutureDate = date.isAfter(today, "day");
 
-    // 주말인지 확인 (토요일: 6, 일요일: 0)
-    const isWeekend = date.day() === 0 || date.day() === 6;
-
-    // 공휴일인지 확인 (API 데이터 사용)
-    const dateString = date.format("YYYYMMDD");
-    const isPublicHoliday = holidays.some(holiday => holiday.locdate.toString() === dateString);
+    // minDate가 있는 경우, 해당 날짜 이전인지 확인
+    if (minDate) {
+      const minDateTime = dayjs(minDate);
+      const isBeforeMinDate = date.isBefore(minDateTime, "day");
+      return isBeforeMinDate || isFutureDate;
+    }
 
     return isFutureDate;
   };
@@ -218,18 +220,39 @@ export default function CalendarSelectModal({
     onClose();
   };
 
-  // minTime이 있을 때 해당 시간 이전인지 체크하는 함수 추가
+  // 시간 비활성화 체크 함수
   const isTimeDisabled = (time: string) => {
-    if (!minTime) return false;
+    // 날짜가 선택되지 않았으면 모든 시간 비활성화
+    if (!selectedDate) return true;
 
-    // 시간을 24시간 형식으로 변환하여 비교
+    const now = dayjs();
     const [hour, minute] = time.split(":").map(Number);
-    const [minHour, minMinute] = minTime.split(":").map(Number);
-
+    const selectedDateTime = selectedDate.hour(hour).minute(minute);
     const timeValue = hour * 60 + minute;
-    const minTimeValue = minHour * 60 + minMinute;
 
-    return timeValue < minTimeValue;
+    // 선택된 날짜가 오늘인 경우, 현재 시간 이후는 비활성화
+    if (selectedDate.isSame(now, "day")) {
+      if (selectedDateTime.isAfter(now)) {
+        return true;
+      }
+    }
+
+    // minTime이 있는 경우, 해당 시간 이전은 비활성화
+    if (minTime) {
+      const [minHour, minMinute] = minTime.split(":").map(Number);
+      const minTimeValue = minHour * 60 + minMinute;
+
+      // minDate가 있고 선택된 날짜가 minDate와 같은 날인 경우에만 minTime 체크
+      if (minDate && selectedDate.isSame(dayjs(minDate), "day")) {
+        return timeValue < minTimeValue;
+      }
+      // minDate가 없는 경우 항상 minTime 체크
+      else if (!minDate) {
+        return timeValue < minTimeValue;
+      }
+    }
+
+    return false;
   };
 
   // 조건부 렌더링을 return 문에서 처리

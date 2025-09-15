@@ -6,7 +6,7 @@ import AccountModal from "@/components/modal/AccountModal";
 import CalendarSelectModal from "@/components/modal/CalendarSelectModal";
 import CancelSelectModal from "@/components/modal/CancelSelectModal";
 import { useToastStore } from "@/store/toast";
-import { formatDateTime, formatFaxNumber, formatPhoneNumber, getCarTypeText, sleep, statusColor } from "@/utils/util";
+import { formatDateTime, formatFaxNumber, formatPhoneNumber, getCarTypeText, statusColor } from "@/utils/util";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import StatusBarCard from "./elements/StatusBarCard";
@@ -388,6 +388,18 @@ export default function WorkDetail() {
         onClickConfirm={(date, time) => onClickCalendarConfirm(date, time)}
         minTime={(() => {
           // 상태별 참조해야 할 날짜 매핑
+          const statusTimeMap = {
+            ARRIVED: workData?.arrivedDate,
+            REPAIR_STARTED: workData?.repairStartedDate,
+            REPAIR_COMPLETED: workData?.repairCompletedDate,
+            RELEASED: workData?.releasedDate,
+          };
+
+          const targetTime = statusTimeMap[workStatus as keyof typeof statusTimeMap];
+
+          return targetTime ? formatDateTime(targetTime, "HH:mm") : "";
+        })()}
+        minDate={(() => {
           const statusDateMap = {
             ARRIVED: workData?.arrivedDate,
             REPAIR_STARTED: workData?.repairStartedDate,
@@ -396,8 +408,7 @@ export default function WorkDetail() {
           };
 
           const targetDate = statusDateMap[workStatus as keyof typeof statusDateMap];
-
-          return targetDate ? formatDateTime(targetDate, "HH:mm") : "";
+          return targetDate ? formatDateTime(targetDate, "YYYYMMDD") : "";
         })()}
       />
 
