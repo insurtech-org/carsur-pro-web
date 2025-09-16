@@ -11,7 +11,7 @@ const WorkCard = ({ data }: { data: IWorkList }) => {
   };
 
   return (
-    <button className="flex flex-col self-stretch mx-5 gap-3" onClick={() => onClickDetail(data.id)}>
+    <button className="flex flex-col self-stretch gap-3 w-full" onClick={() => onClickDetail(data.id)}>
       <div
         className="flex flex-col self-stretch bg-white py-4 gap-2.5 rounded-xl border border-solid border-neutral-100"
         style={{

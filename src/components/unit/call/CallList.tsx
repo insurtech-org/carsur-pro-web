@@ -6,15 +6,12 @@ import CallCard from "./elements/CallCard";
 import { getCallList } from "@/api/call.api";
 import { ICallList } from "@/type/call.type";
 import { IPageInfo } from "@/type/etc.type";
-import SpinnerTailwind from "@/components/common/SpinnerTailwind";
 
 export default function CallList() {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null); // 30초마다 실행할 인터벌을 위한 ref
 
   const [callList, setCallList] = useState<ICallList[]>([]);
   const [pageInfo, setPageInfo] = useState<IPageInfo>({
@@ -48,6 +45,7 @@ export default function CallList() {
 
   useEffect(() => {
     fetchCallList();
+    window.scrollTo(0, 0);
   }, [page]);
 
   const fetchCallList = async () => {
@@ -111,13 +109,11 @@ export default function CallList() {
       resistance={1}
       pullDownThreshold={50}
       maxPullDownDistance={70}
-      refreshingContent={
-        <div className="flex justify-center py-3 text-primary-neutral text-[15px] font-medium">
-          <SpinnerTailwind size="small" />
-        </div>
-      }
+      // refreshingContent={
+      //   <div className="flex justify-center py-3 text-gray-400 text-[12px] font-medium">아래로 당겨서 새로고침</div>
+      // }
       pullingContent={
-        <div className="flex justify-center py-3 text-primary-neutral text-[15px] font-medium">
+        <div className="flex justify-center py-3 text-primary-neutral text-[12px] font-medium">
           아래로 당겨서 새로고침
         </div>
       }
