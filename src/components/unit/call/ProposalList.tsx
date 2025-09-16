@@ -45,6 +45,7 @@ export default function Proposal() {
 
   useEffect(() => {
     fetchProposalList();
+    window.scrollTo(0, 0);
   }, [page]);
 
   const fetchProposalList = async () => {
@@ -106,13 +107,13 @@ export default function Proposal() {
       resistance={1}
       pullDownThreshold={50}
       maxPullDownDistance={70}
-      refreshingContent={
-        <div className="flex justify-center py-3 text-primary-neutral text-[15px] font-medium">
-          <SpinnerTailwind size="small" />
-        </div>
-      }
+      // refreshingContent={
+      //   <div className="flex justify-center py-3 text-primary-neutral text-[15px] font-medium">
+      //     <SpinnerTailwind size="small" />
+      //   </div>
+      // }
       pullingContent={
-        <div className="flex justify-center py-3 text-primary-neutral text-[15px] font-medium">
+        <div className="flex justify-center py-3 text-primary-neutral text-[12px] font-medium">
           아래로 당겨서 새로고침
         </div>
       }
