@@ -67,10 +67,38 @@ export default function R() {
     handleRedirect();
   }, []);
 
-  // 로딩 중 표시를 위한 최소한의 UI 반환
+  const onClickDownButton = (type: "android" | "ios") => {
+    if (type === "android") {
+      window.location.href = "https://play.google.com/store/apps/details?id=com.suretech.carsurpromobile";
+    } else {
+      window.location.href = "https://apps.apple.com/us/app/%EC%B9%B4%EC%8A%88%EC%96%B4%ED%94%84%EB%A1%9C/id6751558142";
+    }
+  };
+
+  // 앱 다운로드 권유 페이지 UI
   return (
-    <div className="h-screen bg-white flex items-center justify-center">
-      <div className="text-gray-500">이동 중...</div>
+    <div className="h-screen bg-gradient-to-br from-blue-50 flex flex-col items-center justify-center px-4">
+      <div className="max-w-[102px] object-fill mb-8">
+        <img src="/images/logo_login.png" alt="카슈어프로 로고" />
+      </div>
+
+      <p className="text-gray-500 text-sm mb-4">앱을 다운로드 후 이용해주세요</p>
+
+      <div className="flex gap-4 justify-center">
+        {/* Android 다운로드 버튼 */}
+        <button onClick={() => onClickDownButton("android")} className="w-32">
+          <img
+            src="/images/img/app_down_button_android.png"
+            alt="Android 다운로드"
+            className="w-full h-full object-contain"
+          />
+        </button>
+
+        {/* iOS 다운로드 버튼 */}
+        <button onClick={() => onClickDownButton("ios")} className="w-32">
+          <img src="/images/img/app_down_button_ios.png" alt="iOS 다운로드" className="w-full h-full object-contain" />
+        </button>
+      </div>
     </div>
   );
 }
