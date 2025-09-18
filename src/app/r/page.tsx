@@ -15,20 +15,20 @@ export default function R() {
       const appScheme = "suretech://";
       const appUrl = action ? `${appScheme}${action}` : appScheme;
 
+      const androidPackage = process.env.NEXT_PUBLIC_ANDROID_PACKAGE || "com.suretech.carsurpromobile";
+
       const androidStoreUrl = "https://play.google.com/store/apps/details?id=com.suretech.carsurpromobile";
       const iosStoreUrl = "https://apps.apple.com/us/app/%EC%B9%B4%EC%8A%88%EC%96%B4%ED%94%84%EB%A1%9C/id6751558142"; // iOS 앱스토어 링크 업데이트
 
       const isAndroid = /Android/i.test(navigator.userAgent);
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      const startTime = new Date().getTime();
-
       // Android 인텐트 방식의 딥링크
       if (isAndroid) {
         const intentUrl =
           `intent://${action || ""}#Intent;` +
           "scheme=suretech;" +
-          "package=com.suretech.carsurpromobile;" +
+          `package=${androidPackage};` + // 개발/운영 환경에 따라 패키지명 변경
           "S.browser_fallback_url=" +
           encodeURIComponent(androidStoreUrl) +
           ";" +
@@ -56,7 +56,7 @@ export default function R() {
       }
     } else {
       // PC인 경우 웹으로 리다이렉트 (action이 있으면 해당 경로로)
-      const webBaseUrl = "https://carsur-pro.insurtech.co.kr/";
+      const webBaseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://carsur-pro.insurtech.co.kr/";
       const webUrl = action ? `${webBaseUrl}${action}` : webBaseUrl;
       window.location.href = webUrl;
     }
@@ -67,10 +67,38 @@ export default function R() {
     handleRedirect();
   }, []);
 
-  // 로딩 중 표시를 위한 최소한의 UI 반환
+  const onClickDownButton = (type: "android" | "ios") => {
+    if (type === "android") {
+      window.location.href = "https://play.google.com/store/apps/details?id=com.suretech.carsurpromobile";
+    } else {
+      window.location.href = "https://apps.apple.com/us/app/%EC%B9%B4%EC%8A%88%EC%96%B4%ED%94%84%EB%A1%9C/id6751558142";
+    }
+  };
+
+  // 앱 다운로드 권유 페이지 UI
   return (
-    <div className="h-screen bg-white flex items-center justify-center">
-      <div className="text-gray-500">이동 중...</div>
+    <div className="h-screen bg-gradient-to-br from-blue-50 flex flex-col items-center justify-center px-4">
+      <div className="max-w-[102px] object-fill mb-8">
+        <img src="/images/logo_login.png" alt="카슈어프로 로고" />
+      </div>
+
+      <p className="text-gray-500 text-sm mb-4">앱을 다운로드 후 이용해주세요</p>
+
+      <div className="flex gap-4 justify-center">
+        {/* Android 다운로드 버튼 */}
+        <button onClick={() => onClickDownButton("android")} className="w-32">
+          <img
+            src="/images/img/app_down_button_android.png"
+            alt="Android 다운로드"
+            className="w-full h-full object-contain"
+          />
+        </button>
+
+        {/* iOS 다운로드 버튼 */}
+        <button onClick={() => onClickDownButton("ios")} className="w-32">
+          <img src="/images/img/app_down_button_ios.png" alt="iOS 다운로드" className="w-full h-full object-contain" />
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,1 +1,3 @@
 NEXT_PUBLIC_API_URL=https://api-dev.insurtech.co.kr
+NEXT_PUBLIC_WEB_URL=https://carsur-pro-dev.insurtech.co.kr/
+NEXT_PUBLIC_ANDROID_PACKAGE=com.suretech.carsurpromobile.dev
