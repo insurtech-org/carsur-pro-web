@@ -44,9 +44,14 @@ instance.interceptors.request.use(config => {
   const { startLoading } = useLoadingStore.getState();
   startLoading();
 
-  const { tokens } = useUserStore.getState();
-  if (tokens && tokens.accessToken) {
-    config.headers.Authorization = `Bearer ${tokens.accessToken}`;
+  // 로그인 API는 토큰을 추가하지 않음
+  const isLoginApi = config.url?.includes("/auth/factory/login");
+
+  if (!isLoginApi) {
+    const { tokens } = useUserStore.getState();
+    if (tokens && tokens.accessToken) {
+      config.headers.Authorization = `Bearer ${tokens.accessToken}`;
+    }
   }
 
   return config;
