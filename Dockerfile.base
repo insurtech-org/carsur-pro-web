@@ -3,15 +3,15 @@
 
 # 2. EC2(Amazon Linux 2)와 호환되는 x86_64 아키텍처로 빌드
 #BUILD_TAG=$(date +%Y%m%d%H%M%S)  # YYYYMMDDHHMMSS 형식의 고유한 태그
-#docker build --build-arg BUILD_ENV=dev --platform linux/amd64 -f Dockerfile -t insurtech-factory-front-dev .
+#docker build --build-arg BUILD_ENV=prod --platform linux/amd64 -f Dockerfile -t insurtech-factory-front-prod .
 
 # 3. 태깅 (latest + 고유 버전 태그)
-#docker tag insurtech-factory-front-dev:latest 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:latest
-#docker tag insurtech-factory-front-dev:latest 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:$BUILD_TAG
+#docker tag insurtech-factory-front-prod:latest 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-prod:latest
+#docker tag insurtech-factory-front-prod:latest 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-prod:$BUILD_TAG
 
 # 4. Docker 이미지 푸시 (ECR에 최신 버전과 특정 버전 저장)
-#docker push 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:latest
-#docker push 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-dev:$BUILD_TAG
+#docker push 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-prod:latest
+#docker push 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-prod:$BUILD_TAG
 
 
 # 베이스 이미지: Node.js 20 LTS 사용

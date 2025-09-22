@@ -1,5 +1,5 @@
 # ---- Builder: 사내 Base 재사용 ----
-    FROM 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-front-dev-base:latest AS builder
+    FROM 699475927546.dkr.ecr.ap-northeast-2.amazonaws.com/insurtech-factory-front-prod-base:latest AS builder
     
     WORKDIR /app
         
