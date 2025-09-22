@@ -17,6 +17,7 @@ import { WORK_STATUS } from "@/utils/enum";
 import DetailInfoRow from "./elements/DetailInfoRow";
 import { convertStatusToType, getStatusToastMessage, workSteps } from "@/utils/workStatus";
 import CancelCard from "./elements/CancelCard";
+import dayjs from "dayjs";
 
 export default function WorkDetail() {
   const params = useParams();
@@ -401,6 +402,9 @@ export default function WorkDetail() {
         })()}
         minDate={(() => {
           const statusDateMap = {
+            CONFIRMED: workData?.reservationDate
+              ? dayjs(workData.reservationDate).subtract(1, "day").format("YYYYMMDD")
+              : "",
             ARRIVED: workData?.arrivedDate,
             REPAIR_STARTED: workData?.repairStartedDate,
             REPAIR_COMPLETED: workData?.repairCompletedDate,
