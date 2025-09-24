@@ -3,20 +3,9 @@
 import React, { useEffect } from "react";
 
 export default function R() {
-  // URL에서 /r 뒤의 경로(/r/call/200 형태) 또는 기존 쿼리(action) 추출
-  const url = new URL(window.location.href);
-  const urlParams = url.searchParams;
+  // URL 쿼리 파라미터에서 action 값 추출
+  const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get("action");
-  const pathAfterR = (() => {
-    try {
-      const match = url.pathname.match(/\/r\/?(.*)$/);
-      return match && match[1] ? decodeURIComponent(match[1]) : "";
-    } catch {
-      return "";
-    }
-  })();
-  // 우선순위: /r/경로 > ?action=값
-  const targetPath = (pathAfterR || action || "").replace(/^\//, "");
 
   // 모바일 기기 체크
   const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -24,7 +13,7 @@ export default function R() {
   const handleRedirect = () => {
     if (isMobile) {
       const appScheme = "suretech://";
-      const appUrl = targetPath ? `${appScheme}${targetPath}` : appScheme;
+      const appUrl = action ? `${appScheme}${action}` : appScheme;
 
       const androidPackage = process.env.NEXT_PUBLIC_ANDROID_PACKAGE || "com.suretech.carsurpromobile";
 
@@ -37,7 +26,7 @@ export default function R() {
       // Android 인텐트 방식의 딥링크
       if (isAndroid) {
         const intentUrl =
-          `intent://${targetPath || ""}#Intent;` +
+          `intent://${action || ""}#Intent;` +
           "scheme=suretech;" +
           `package=${androidPackage};` + // 개발/운영 환경에 따라 패키지명 변경
           "S.browser_fallback_url=" +
@@ -50,7 +39,7 @@ export default function R() {
       // iOS 유니버설 링크 방식
       else if (isIOS) {
         // 앱이 설치되어 있는지 확인하기 위해 딥링크 시도
-        const appUrl = targetPath ? `suretech://${targetPath}` : "suretech://";
+        const appUrl = action ? `suretech://${action}` : "suretech://";
 
         // 앱이 설치되어 있지 않으면 앱스토어로 이동
         const fallbackTimer = setTimeout(() => {
@@ -68,7 +57,7 @@ export default function R() {
     } else {
       // PC인 경우 웹으로 리다이렉트 (action이 있으면 해당 경로로)
       const webBaseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://carsur-pro.insurtech.co.kr/";
-      const webUrl = targetPath ? `${webBaseUrl}${targetPath}` : webBaseUrl;
+      const webUrl = action ? `${webBaseUrl}${action}` : webBaseUrl;
       window.location.href = webUrl;
     }
   };
