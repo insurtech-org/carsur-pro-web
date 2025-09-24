@@ -9,18 +9,20 @@ import { ICallList } from "@/type/call.type";
 import { postPropose } from "@/api/call.api";
 import { formatDate } from "@/utils/util";
 import { useMemo } from "react";
+import { useModalStore } from "@/store/modal";
 
 const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => void }) => {
   const router = useRouter();
   const { showSuccess, showWarning } = useToastStore();
   const { showProposeModal, hideProposeModal } = useProposeModalStore();
+  const { showModal } = useModalStore();
 
   const isAxa = useMemo(() => {
     return callData.insuranceCompanyName?.toLowerCase() === "axa";
   }, [callData]);
 
   const onClickDetail = (id: number) => {
-    router.push(`/call/${id}#mylocal`);
+    router.push(`/call/${id}#mycall`);
   };
 
   const handlePropose = () => {
@@ -35,7 +37,12 @@ const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => v
           window.location.hash = "#proposal";
         } catch (error) {
           console.log(error);
-          showWarning("이미 완료된 콜입니다.");
+          showModal({
+            type: "alert",
+            title: "이미 다른 업체로 확정되었어요",
+            description: "해당 콜은 이미 마감되어 제안할 수 없어요.",
+            cancelButtonText: "확인",
+          });
           refetch();
           hideProposeModal();
         }

@@ -50,6 +50,7 @@ export interface ModalConfig {
   onConfirm?: () => void;
   onCancel?: () => void;
   type?: "confirm" | "alert";
+  isSolidBg?: boolean;
 }
 
 export interface ModalState {
