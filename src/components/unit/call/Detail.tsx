@@ -38,8 +38,18 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
         showWarning("이미 입고확정 또는 취소된 건이에요.", "현재 상태는 제안내역에서 확인할 수 있어요.");
         router.push("/call#proposal");
       } else {
-        showWarning(`이미 완료된 콜입니다.`);
-        router.push("/call#mylocal");
+        showModal({
+          type: "alert",
+          title: "이미 다른 업체로 확정되었어요",
+          description: "해당 콜은 이미 마감되어 제안할 수 없어요.",
+          cancelButtonText: "확인",
+          onConfirm: () => {
+            router.push("/call#mycall");
+          },
+          isSolidBg: true,
+        });
+
+        router.push("/call#mycall");
       }
     }
   };
@@ -91,7 +101,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
     if (isProposal) {
       router.push("/call#proposal");
     } else {
-      router.push("/call#mylocal");
+      router.push("/call#mycall");
     }
   };
 

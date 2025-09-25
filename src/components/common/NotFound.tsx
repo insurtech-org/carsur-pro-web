@@ -31,7 +31,7 @@ const NotFound = () => {
       {/* 추가 정보 */}
       <div className="mt-6 text-center">
         <p className="text-gray-500 text-xs">문제가 지속되면 카슈어 운영팀에 문의해 주세요</p>
-        <p>운영팀: 1555-4473</p>
+        <p className="text-gray-500">운영팀: 1555-4473</p>
       </div>
     </div>
   );

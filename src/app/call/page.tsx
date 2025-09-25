@@ -6,7 +6,7 @@ import CallList from "@/components/unit/call/CallList";
 import { useRouter } from "next/navigation";
 
 export default function CallPage() {
-  const [activeTab, setActiveTab] = useState<"call" | "proposal">("call");
+  const [activeTab, setActiveTab] = useState<"mycall" | "proposal">("mycall");
   const router = useRouter();
 
   // 페이지 로드 시 URL 해시에 따라 탭 설정
@@ -15,7 +15,7 @@ export default function CallPage() {
     if (hash.includes("proposal")) {
       setActiveTab("proposal");
     } else {
-      setActiveTab("call");
+      setActiveTab("mycall");
     }
   }, []);
 
@@ -26,7 +26,7 @@ export default function CallPage() {
       if (hash.includes("proposal")) {
         setActiveTab("proposal");
       } else {
-        setActiveTab("call");
+        setActiveTab("mycall");
       }
     };
 
@@ -40,16 +40,16 @@ export default function CallPage() {
   }, []);
 
   // 탭 변경 시 URL 해시 업데이트
-  const handleTabChange = (tab: "call" | "proposal") => {
+  const handleTabChange = (tab: "mycall" | "proposal") => {
     setActiveTab(tab);
     if (tab === "proposal") {
       window.location.hash = "#proposal";
     } else {
-      window.location.hash = "#call";
+      window.location.hash = "#mycall";
     }
   };
 
-  const onClickTab = (tab: "call" | "proposal") => {
+  const onClickTab = (tab: "mycall" | "proposal") => {
     handleTabChange(tab);
     setActiveTab(tab);
   };
@@ -73,15 +73,15 @@ export default function CallPage() {
         <div className="flex w-full items-start gap-4 border-b-[1px] border-neutral-200">
           <button
             className={`flex flex-col shrink-0 flex-1 items-center pt-[12px] pb-[2px] cursor-pointer transition-colors ${
-              activeTab === "call"
+              activeTab === "mycall"
                 ? "text-[#131211] border-b-2 border-[#131211]"
                 : "text-[#212121] hover:text-[#131211]"
             }`}
-            onClick={() => onClickTab("call")}
+            onClick={() => onClickTab("mycall")}
           >
             <span
               className={`text-base font-semibold ${
-                activeTab === "call" ? "text-primary-normal" : "text-primary-assistive"
+                activeTab === "mycall" ? "text-primary-normal" : "text-primary-assistive"
               }`}
             >
               내 지역 콜
@@ -107,7 +107,7 @@ export default function CallPage() {
       </div>
 
       {/* 탭 컨텐츠 */}
-      {activeTab === "call" ? <CallList /> : <ProposalList />}
+      {activeTab === "mycall" ? <CallList /> : <ProposalList />}
     </div>
   );
 }

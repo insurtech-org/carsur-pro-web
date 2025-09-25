@@ -7,6 +7,7 @@ import ArrowButton from "@/components/unit/mypage/elements/ArrowButton";
 import { useRouter } from "next/navigation";
 import { useModalStore } from "@/store/modal";
 import { useUserStore } from "@/store/user";
+import { logout } from "@/api/auth.api";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -19,22 +20,28 @@ export default function AccountPage() {
       type: "confirm",
       confirmButtonText: "로그아웃",
       cancelButtonText: "취소",
-      onConfirm: () => {
-        setTokens({
-          accessToken: "",
-          refreshToken: "",
-        });
+      onConfirm: async () => {
+        try {
+          await logout();
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setTokens({
+            accessToken: "",
+            refreshToken: "",
+          });
 
-        setUser({
-          id: "",
-          username: "",
-          userId: "",
-          tellNo: "",
-          factoryName: "",
-          roles: "",
-        });
+          setUser({
+            id: "",
+            username: "",
+            userId: "",
+            tellNo: "",
+            factoryName: "",
+            roles: "",
+          });
 
-        router.replace("/login");
+          router.replace("/login");
+        }
       },
     });
   };

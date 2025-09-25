@@ -18,19 +18,16 @@ const CommonModal = () => {
     confirmButtonText = "확인",
     onConfirm,
     onCancel,
+    isSolidBg = false, // 불투명 여부
   } = config;
 
   const handleConfirm = () => {
-    if (onConfirm) {
-      onConfirm();
-    }
+    if (onConfirm) onConfirm();
     hideModal();
   };
 
   const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    }
+    if (onCancel) onCancel();
     hideModal();
   };
 
@@ -39,9 +36,13 @@ const CommonModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-end justify-center">
+    <div className="fixed inset-0 z-[9999] flex items-end justify-center ">
       {/* 검은색 배경 오버레이 */}
-      <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300" />
+      <div
+        className={`absolute inset-0 transition-opacity duration-300 ${
+          isSolidBg ? "bg-[#878787]" : "bg-black bg-opacity-50"
+        }`}
+      />
 
       {/* 모달 컨텐츠 - 아래에서 위로 올라오는 애니메이션 */}
       <div className="relative w-full max-w-md transform transition-transform duration-300 ease-out translate-y-full animate-slide-up">
@@ -55,9 +56,7 @@ const CommonModal = () => {
             <div className="flex flex-col self-stretch bg-white rounded-t-2xl">
               {/* 제목과 아이콘 */}
               <div className="flex items-start self-stretch mb-4">
-                <span className="flex-1 text-[#131211] text-xl font-bold whitespace-pre-line">
-                  {title}
-                </span>
+                <span className="flex-1 text-[#131211] text-xl font-bold whitespace-pre-line">{title}</span>
 
                 <button onClick={handleClose}>
                   <img src={"/images/icon/ic_x-line.svg"} />
@@ -65,21 +64,13 @@ const CommonModal = () => {
               </div>
 
               {/* 설명 텍스트 */}
-              <div
-                className={`flex flex-col gap-1 ${
-                  description ? "mb-6" : "mb-0"
-                } `}
-              >
-                <span className="text-neutral-800 text-base font-regular whitespace-pre-line">
-                  {description}
-                </span>
+              <div className={`flex flex-col gap-1 ${description ? "mb-6" : "mb-0"} `}>
+                <span className="text-neutral-800 text-base font-regular whitespace-pre-line">{description}</span>
               </div>
 
               {/* 버튼 영역 - alert 타입일 때는 확인 버튼만 표시 */}
               <div className="flex flex-row bg-white py-4 gap-2">
-                {type === "confirm" && (
-                  <SubButton text={cancelButtonText} onClick={handleCancel} />
-                )}
+                {type === "confirm" && <SubButton text={cancelButtonText} onClick={handleCancel} />}
 
                 <MainButton text={confirmButtonText} onClick={handleConfirm} />
               </div>
