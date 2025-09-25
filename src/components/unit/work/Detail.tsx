@@ -188,6 +188,12 @@ export default function WorkDetail() {
     router.push(`/work?status=${workStatus}`);
   };
 
+  const onClickPhoneNumber = () => {
+    if (workData?.tellNo) {
+      window.location.href = `tel:${workData.tellNo}`;
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col self-stretch bg-bg-main">
@@ -238,8 +244,11 @@ export default function WorkDetail() {
             </span>
             <div className="flex w-full items-center justify-between">
               <span className="text-neutral-600 text-base font-regular">고객전화번호</span>
-              <div className="flex items-center gap-1">
-                <img src={"/images/img/img_call-orange.png"} className="w-6 h-6 object-fill" />
+              <div
+                onClick={onClickPhoneNumber}
+                className="flex items-center gap-1 bg-primary-light hover:bg-primary-lighter active:bg-primary-lighter px-3 py-2 rounded-lg transition-colors cursor-pointer"
+              >
+                <img src={"/images/img/img_call-orange.png"} className="w-5 h-5 object-fill" />
                 <span className="text-primary-normal text-base font-medium">
                   {formatPhoneNumber(String(workData?.tellNo))}
                 </span>
