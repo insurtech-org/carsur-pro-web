@@ -5,12 +5,17 @@ import VailedInput from "@/components/common/VailedInput";
 import { useUserStore } from "@/store/user";
 import { extractErrorMessage, validateId, validatePassword2 } from "@/utils/util";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Login() {
   const router = useRouter();
 
-  const { setUser, setTokens } = useUserStore();
+  const { setUser, setTokens, isLoggedIn } = useUserStore();
+
+  // 로그인 상태 체크 및 리다이렉트
+  useEffect(() => {
+    if (isLoggedIn()) router.push("/call");
+  }, [isLoggedIn, router]);
 
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -128,7 +133,7 @@ export default function Login() {
 
               <VailedInput
                 type="text"
-                placeholder="아이디를 입력해주세요."
+                placeholder="사업자번호 10자리를 입력해주세요."
                 value={userId}
                 isFocused={isUserFocused}
                 isError={isUserIdError || isFailedLogin}
