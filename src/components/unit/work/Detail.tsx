@@ -194,16 +194,15 @@ export default function WorkDetail() {
     router.push(`/work?status=${workStatus}`);
   };
 
-  const onClickPhoneNumber = async () => {
+  const onClickPhoneNumber = () => {
     if (workData?.tellNo) {
-      window.location.href = `tel:${workData.tellNo}`;
+      // API 호출은 별도로 처리
+      completeCall(detailId).catch(error => {
+        console.log("통화 완료 처리 실패:", error);
+      });
 
-      //통화 완료 api 호출
-      try {
-        await completeCall(detailId);
-      } catch (error) {
-        console.log(error);
-      }
+      // 전화 앱으로 이동
+      window.location.href = `tel:${workData.tellNo}`;
     }
   };
 
@@ -389,7 +388,7 @@ export default function WorkDetail() {
       </div>
 
       {/* 청구 완료 버튼 */}
-      <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch mx-5 gap-1 rounded-xl bg-bg-normal pb-8 pt-4 ">
+      <div className="sticky bottom-0 left-0 right-0 flex flex-col items-center self-stretch mx-5 gap-1 rounded-xl bg-bg-normal pb-4 pt-4 ">
         {!isCancelled && (
           <MainButton text={mainButtonText} onClick={onClickMainButton} disabled={workStatus === "BILLING_COMPLETED"} />
         )}
