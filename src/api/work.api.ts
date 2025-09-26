@@ -44,3 +44,9 @@ export const completeBilling = async (id: number, body: { laborPrice: number; pa
   const res = await apiInstance.post(`${prefix}/${id}/billing-complete`, body);
   return res;
 };
+
+//통화 완료 처리
+export const completeCall = async (id: number) => {
+  const res = await apiInstance.post(`${prefix}/${id}/call-completed`);
+  return res;
+};

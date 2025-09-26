@@ -11,7 +11,13 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import StatusBarCard from "./elements/StatusBarCard";
 import ComplatedCard from "./elements/ComplatedCard";
-import { cancelWorkSchedule, completeBilling, getWorkScheduleDetail, updateWorkScheduleStatus } from "@/api/work.api";
+import {
+  cancelWorkSchedule,
+  completeBilling,
+  completeCall,
+  getWorkScheduleDetail,
+  updateWorkScheduleStatus,
+} from "@/api/work.api";
 import { IWorkDetail, StatusChangeType } from "@/type/work.type";
 import { WORK_STATUS } from "@/utils/enum";
 import DetailInfoRow from "./elements/DetailInfoRow";
@@ -188,9 +194,16 @@ export default function WorkDetail() {
     router.push(`/work?status=${workStatus}`);
   };
 
-  const onClickPhoneNumber = () => {
+  const onClickPhoneNumber = async () => {
     if (workData?.tellNo) {
       window.location.href = `tel:${workData.tellNo}`;
+
+      //통화 완료 api 호출
+      try {
+        await completeCall(detailId);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
