@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 
 export default function ProposalHistoryPage() {
   const router = useRouter();
+
   return (
     <>
-      <BackHeader title="제안내역" onBack={() => router.back()} />
+      <BackHeader title="제안내역" onBack={() => router.push("/call#mycall")} />
       <ProposalHistory />
     </>
   );
