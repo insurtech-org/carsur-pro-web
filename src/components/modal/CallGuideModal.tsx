@@ -71,8 +71,8 @@ export default function CallGuideModal({
             {/* 안내 섹션 */}
             <div className="self-stretch px-4 py-2 bg-bg-alternative rounded-lg justify-center items-center">
               <div className="flex-1 justify-start text-secondary-normal text-base font-medium">
-                안녕하세요 고객님, {insuranceCompanyName} 우수협력업체 OO공업사 입니다. 접수하신 차량 수리 건이 저희
-                공업사로 배정되어 연락드렸습니다.
+                안녕하세요 고객님, <span className="font-bold">{insuranceCompanyName}</span> 우수협력업체 OO공업사
+                입니다. 접수하신 차량 수리 건이 저희 공업사로 배정되어 연락드렸습니다.
                 <br />
                 차량은 고객님이 원하시는 장소에서 저희가 직접 픽업해 공업사로 옮겨드립니다. 편하신 장소와 시간 말씀해
                 주세요.
