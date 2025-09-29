@@ -30,7 +30,9 @@ instance.interceptors.response.use(
 
       // 비밀번호 변경이나 인증 관련 페이지가 아닌 경우에만 리다이렉트
       if (!isPasswordChange && !isAuthPage) {
-        localStorage.removeItem("authToken");
+        // Zustand store의 logout 함수 사용
+        const { logout } = useUserStore.getState();
+        logout(); // 이렇게 하면 user-storage도 함께 삭제됨
         window.location.href = "/login";
       }
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MainButton from "../common/MainButton";
 import SubButton from "../common/SubButton";
 
@@ -15,7 +15,20 @@ const CancelSelectModal = ({
   onClose = () => {},
   onClickConfirm = () => {},
 }: CancelSelectModalProps) => {
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      // 모달이 열릴 때 body 스크롤 막기
+      document.body.style.overflow = "hidden";
+    } else {
+      // 모달이 닫힐 때 body 스크롤 복구
+      document.body.style.overflow = "unset";
+    }
+
+    // 컴포넌트가 언마운트될 때 스크롤 복구
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   const cancelReasons = {
     "1": "다른 공업사로 수리 예약",
@@ -36,12 +49,14 @@ const CancelSelectModal = ({
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
     <>
       <div className="fixed inset-0 z-[9999] flex items-end justify-center">
         <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300" />
 
-        <div className="relative w-full max-w-md transform transition-transform duration-300 ease-out translate-y-full animate-slide-up px-2">
+        <div className="relative w-full max-w-md transform transition-transform duration-300 ease-out translate-y-full animate-slide-up">
           <div className="w-full inline-flex justify-start items-end">
             <div className="flex-1 bg-bg-normal rounded-tl-2xl rounded-tr-2xl inline-flex flex-col justify-start items-end">
               <div className="self-stretch flex flex-col justify-start items-start">

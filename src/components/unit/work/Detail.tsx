@@ -24,6 +24,7 @@ import DetailInfoRow from "./elements/DetailInfoRow";
 import { convertStatusToType, getStatusToastMessage, workSteps } from "@/utils/workStatus";
 import CancelCard from "./elements/CancelCard";
 import dayjs from "dayjs";
+import CallGuideModal from "@/components/modal/CallGuideModal";
 
 export default function WorkDetail() {
   const params = useParams();
@@ -37,6 +38,7 @@ export default function WorkDetail() {
   const [cancelSelectModalOpen, setCancelSelectModalOpen] = useState(false);
   const [calendarSelectModalOpen, setCalendarSelectModalOpen] = useState(false);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
+  const [callGuideModalOpen, setCallGuideModalOpen] = useState(false);
 
   const [mainButtonText, setMainButtonText] = useState("입고 완료");
   const [calendarText, setCalendarText] = useState("입고가 완료된");
@@ -195,6 +197,11 @@ export default function WorkDetail() {
   };
 
   const onClickPhoneNumber = () => {
+    setCallGuideModalOpen(true);
+  };
+
+  const onClickCallGuideConfirm = () => {
+    setCallGuideModalOpen(false);
     if (workData?.tellNo) {
       // API 호출은 별도로 처리
       completeCall(detailId).catch(error => {
@@ -252,19 +259,34 @@ export default function WorkDetail() {
         {workStatus !== "BILLING_COMPLETED" && !isCancelled && (
           <div className="flex flex-col items-start self-stretch bg-neutral-50 py-4 mx-5 gap-4 rounded-xl p-4">
             <span className="text-primary-normal text-[17px] font-semibold">
-              {workData?.accidentStatus === "CONFIRMED" ? "고객과 통화해 입고 일정을 확정하세요❗️" : "고객 정보"}
+              {workData?.accidentStatus === "CONFIRMED" ? "고객과 통화해 입고 일정을 확정하세요" : "고객 정보"}
             </span>
             <div className="flex w-full items-center justify-between">
-              <span className="text-neutral-600 text-base font-regular">고객전화번호</span>
-              <div
-                onClick={onClickPhoneNumber}
-                className="flex items-center gap-1 bg-primary-light hover:bg-primary-lighter active:bg-primary-lighter px-3 py-2 rounded-lg transition-colors cursor-pointer"
-              >
-                <img src={"/images/img/img_call-orange.png"} className="w-5 h-5 object-fill" />
-                <span className="text-primary-normal text-base font-medium">
+              <div>
+                <span className="text-neutral-600 text-base font-regular mr-2">전화번호</span>
+                <span className="text-neutral-600 text-base font-regular">
                   {formatPhoneNumber(String(workData?.tellNo))}
                 </span>
               </div>
+              <button
+                onClick={onClickPhoneNumber}
+                className="flex items-center gap-1 bg-white px-3 py-2 rounded-full transition-colors cursor-pointer border border-solid border-[#FF934D]"
+              >
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 28 28"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4 object-fill"
+                >
+                  <path
+                    d="M7.84987 2.70292L9.78687 2.11892C10.4261 1.92648 11.1136 1.97317 11.721 2.25028C12.3284 2.52738 12.8142 3.01597 13.0879 3.62492L14.4459 6.64492C14.6816 7.16884 14.7473 7.75342 14.6337 8.31659C14.5202 8.87976 14.2331 9.39323 13.8129 9.78492L11.7459 11.7109C11.4689 11.9739 11.6789 12.9989 12.6909 14.7529C13.7039 16.5079 14.4869 17.2019 14.8479 17.0939L17.5559 16.2659C18.1048 16.098 18.6925 16.1061 19.2366 16.289C19.7807 16.4719 20.2539 16.8205 20.5899 17.2859L22.5199 19.9609C22.9097 20.5011 23.0902 21.1644 23.0278 21.8276C22.9655 22.4908 22.6645 23.1089 22.1809 23.5669L20.6889 24.9799C20.2072 25.436 19.6132 25.7562 18.9674 25.9078C18.3216 26.0595 17.6472 26.0371 17.0129 25.8429C13.8869 24.8859 10.9919 22.0459 8.28887 17.3629C5.57987 12.6729 4.55687 8.71692 5.26987 5.48492C5.41367 4.83367 5.72856 4.23256 6.18206 3.74354C6.63557 3.25453 7.21129 2.89531 7.84987 2.70292Z"
+                    fill="#ED6C00"
+                  />
+                </svg>
+                <span className="text-[#ED6C00] text-sm font-medium">통화</span>
+              </button>
             </div>
           </div>
         )}
@@ -442,6 +464,14 @@ export default function WorkDetail() {
         isOpen={accountModalOpen}
         onClose={() => setAccountModalOpen(false)}
         onClickConfirm={(price, laborPrice, partsPrice) => onClickAccountConfirm(price, laborPrice, partsPrice)}
+      />
+
+      <CallGuideModal
+        title="고객 통화 예시 가이드"
+        insuranceCompanyName={workData?.insuranceCompanyName || ""}
+        isOpen={callGuideModalOpen}
+        onClose={() => setCallGuideModalOpen(false)}
+        onClickConfirm={onClickCallGuideConfirm}
       />
     </>
   );

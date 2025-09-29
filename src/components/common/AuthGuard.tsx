@@ -36,12 +36,27 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       return;
     }
 
-    // accessToken이 없으면 로그인 페이지로 리다이렉트
-    if (!tokens?.accessToken) {
+    // 토큰 존재 여부와 유효성 모두 체크
+    if (!tokens?.accessToken || !isValidToken(tokens.accessToken)) {
       router.replace("/login");
       return;
     }
   }, [pathname, tokens?.accessToken, router, isHydrated]);
+
+  // 토큰 유효성 검증 함수 추가
+  const isValidToken = (token: string) => {
+    try {
+      const parts = token.split(".");
+      if (parts.length !== 3) return false;
+
+      const payload = JSON.parse(atob(parts[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      return payload.exp && payload.exp > currentTime;
+    } catch {
+      return false;
+    }
+  };
 
   // 하이드레이션이 완료되지 않았거나, 공개 라우트가 아니고 accessToken이 없으면 로딩 페이지 표시
   if (!isHydrated || (!publicRoutes.includes(pathname) && !tokens?.accessToken)) {
