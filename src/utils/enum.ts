@@ -22,3 +22,9 @@ export const FILTER_STATUS = {
   CANCELLED: "취소",
   TOTAL: "전체",
 };
+
+//사고 구분
+export const COVERAGE_TYPE = {
+  "20": "대물",
+  "40": "자차",
+};

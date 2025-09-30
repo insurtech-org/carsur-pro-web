@@ -136,9 +136,11 @@ export default function WorkDetail() {
   };
 
   //입고 확정 취소 이벤트
-  const onClickCancelConfirm = async (abandonReason: string) => {
+  const onClickCancelConfirm = async (abandonReason: string, etcReason: string, selectedValue: string) => {
     try {
-      await cancelWorkSchedule(detailId, { abandonReason });
+      //기타 사유 입력 시 기타 사유 사용
+      const cancelReason = selectedValue === "5" ? etcReason : abandonReason;
+      await cancelWorkSchedule(detailId, { abandonReason: cancelReason });
 
       showSuccess("입고 확정이 포기되었어요.");
       goBack();
@@ -422,7 +424,9 @@ export default function WorkDetail() {
       <CancelSelectModal
         isOpen={cancelSelectModalOpen}
         onClose={() => setCancelSelectModalOpen(false)}
-        onClickConfirm={abandonReason => onClickCancelConfirm(abandonReason)}
+        onClickConfirm={(abandonReason, etcReason, selectedValue) =>
+          onClickCancelConfirm(abandonReason, etcReason, selectedValue)
+        }
       />
 
       <CalendarSelectModal

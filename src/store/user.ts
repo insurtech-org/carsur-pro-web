@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { logout as logoutApi } from "@/api/auth.api";
+
 // 사용자 정보 인터페이스
 interface IUser {
   id: number | string;
@@ -37,7 +39,7 @@ interface IUserStore {
   // 토큰만 업데이트
   updateTokens: (tokens: Partial<ITokens>) => void;
 
-  // 로그아웃 (모든 데이터 초기화)
+  // 로그아웃 (API 호출 후 데이터 초기화)
   logout: () => void;
 
   // 로그인 상태 확인
@@ -66,7 +68,16 @@ export const useUserStore = create<IUserStore>()(
           tokens: state.tokens ? { ...state.tokens, ...tokens } : null,
         })),
 
-      logout: () => set({ user: null, tokens: null }),
+      // 로그아웃 (API 호출 후 데이터 초기화)
+      logout: async () => {
+        try {
+          await logoutApi();
+        } catch (error) {
+          console.error("로그아웃 API 호출 실패:", error);
+        } finally {
+          set({ user: null, tokens: null });
+        }
+      },
 
       isLoggedIn: () => {
         const state = get();
