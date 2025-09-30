@@ -44,6 +44,9 @@ interface IUserStore {
 
   // 로그인 상태 확인
   isLoggedIn: () => boolean;
+
+  // 스토어 초기화 함수 추가
+  clearUserStore: () => void;
 }
 
 export const useUserStore = create<IUserStore>()(
@@ -83,6 +86,9 @@ export const useUserStore = create<IUserStore>()(
         const state = get();
         return !!(state.user && state.tokens?.accessToken);
       },
+
+      // 스토어 초기화 함수 추가
+      clearUserStore: () => set({ user: null, tokens: null }),
     }),
     {
       name: "user-storage", // localStorage에 저장될 키 이름

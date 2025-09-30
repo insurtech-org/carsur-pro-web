@@ -3,19 +3,22 @@
 import { login } from "@/api/auth.api";
 import VailedInput from "@/components/common/VailedInput";
 import { useUserStore } from "@/store/user";
-import { extractErrorMessage, validateId, validatePassword2 } from "@/utils/util";
+import { validateId, validatePassword2 } from "@/utils/util";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function Login() {
   const router = useRouter();
 
-  const { setUser, setTokens, isLoggedIn } = useUserStore();
+  const { setUser, setTokens, user, tokens } = useUserStore();
 
-  // 로그인 상태 체크 및 리다이렉트
-  // useEffect(() => {
-  //   if (isLoggedIn()) router.push("/call");
-  // }, [isLoggedIn, router]);
+  // 이미 로그인되어 있는지 확인하는 useEffect 추가
+  useEffect(() => {
+    // user와 token이 모두 있는 경우에만 리다이렉트
+    if (user?.id && tokens?.accessToken) {
+      router.replace("/call");
+    }
+  }, [user, tokens, router]);
 
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
