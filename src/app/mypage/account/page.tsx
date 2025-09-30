@@ -60,7 +60,7 @@ export default function AccountPage() {
 
     showModal({
       title,
-      description: "카슈어 운영팀 : 1555-4473",
+      description: "카슈어 운영팀 : 1555-4473 \n (평일 09:00~18:00 / 주말・공휴일 제외)",
       type: "alert",
     });
   };

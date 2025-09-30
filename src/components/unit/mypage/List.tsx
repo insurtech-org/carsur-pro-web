@@ -85,7 +85,10 @@ export default function MyPageList() {
             2025 ⓒ 슈어테크 all rights reserved.
           </div>
 
-          <div className="text-primary-neutral text-[15px] font-medium"> 카슈어 운영팀 : 1555-4473</div>
+          <div className="text-primary-neutral text-[12px] font-medium">
+            카슈어 운영팀 : 1555-4473 <br />
+            (평일 09:00~18:00 / 주말・공휴일 제외)
+          </div>
         </div>
       </div>
     </>
