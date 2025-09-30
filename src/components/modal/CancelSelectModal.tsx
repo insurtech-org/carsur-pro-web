@@ -4,10 +4,15 @@ import { useEffect, useState } from "react";
 import MainButton from "../common/MainButton";
 import SubButton from "../common/SubButton";
 
+/**
+ * abandonReason: 포기 사유
+ * etcReason: 기타 사유
+ * selectedValue: 사유 번호
+ */
 interface CancelSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onClickConfirm: (abandonReason: string) => void;
+  onClickConfirm: (abandonReason: string, etcReason: string, selectedValue: string) => void;
 }
 
 const CancelSelectModal = ({
@@ -35,17 +40,36 @@ const CancelSelectModal = ({
     "2": "미수선처리",
     "3": "고객변심",
     "4": "입고 일자를 맞추지 못함",
+    "5": "기타 사유",
   };
 
   const [selectedValue, setSelectedValue] = useState("1");
+
   const [abandonReason, setAbandonReason] = useState(cancelReasons["1"]);
+  const [etcReason, setEtcReason] = useState("");
+
+  const [isEtcReasonNull, setIsEtcReasonNull] = useState(false);
+
+  //기타 사유 입력 시 isEtcReasonNull 상태 변경
+  useEffect(() => {
+    if (etcReason.length > 0) {
+      setIsEtcReasonNull(false);
+    } else {
+      setIsEtcReasonNull(true);
+    }
+  }, [etcReason]);
 
   const onChangeChecked = (value: string) => {
+    setIsEtcReasonNull(false);
+    setEtcReason("");
+
     setSelectedValue(value);
     setAbandonReason(cancelReasons[value as keyof typeof cancelReasons]);
   };
 
   const onClickClose = () => {
+    setSelectedValue("1");
+    setEtcReason("");
     onClose();
   };
 
@@ -156,6 +180,54 @@ const CancelSelectModal = ({
                         {cancelReasons["4"]}
                       </label>
                     </div>
+
+                    <div className="justify-start text-primary-alternative text-sm font-medium">기타 사유</div>
+                    <div className="inline-flex justify-start items-center gap-2">
+                      <input
+                        id="cancel-select-5"
+                        type="radio"
+                        name="cancel-select"
+                        className="customRadio"
+                        value="5"
+                        checked={selectedValue === "5"}
+                        onChange={event => onChangeChecked(event.target.value)}
+                      />
+                      <label
+                        htmlFor="cancel-select-5"
+                        className="justify-start text-primary-normal text-base font-regular"
+                      >
+                        {cancelReasons["5"]}
+                      </label>
+                    </div>
+
+                    {selectedValue === "5" && (
+                      <div className="flex flex-col items-end self-stretch gap-2">
+                        <textarea
+                          className={`w-full h-20 border rounded-lg p-3 text-primary-normal text-base font-regular resize-none border-line-normal ${
+                            isEtcReasonNull ? "border-status-destructive" : "border-line-normal"
+                          }`}
+                          id="cancel-select-5"
+                          name="cancel-select"
+                          value={etcReason}
+                          onChange={event => setEtcReason(event.target.value)}
+                          placeholder="상세 사유를 입력해 주세요."
+                          maxLength={100}
+                        />
+
+                        <div
+                          className={`flex flex-row self-stretch ${
+                            isEtcReasonNull ? "justify-between" : "justify-end"
+                          }`}
+                        >
+                          {isEtcReasonNull && (
+                            <span className="text-status-destructive text-xs font-regular">
+                              상세 사유를 입력해 주세요
+                            </span>
+                          )}
+                          <span className="text-primary-alternative text-xs font-regular">{etcReason.length}/100</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -166,7 +238,14 @@ const CancelSelectModal = ({
 
                     <MainButton
                       text="입고 확정 포기하기"
-                      onClick={() => onClickConfirm(abandonReason)}
+                      onClick={() => {
+                        if (selectedValue === "5" && etcReason.trim() === "") {
+                          setIsEtcReasonNull(true);
+                        } else {
+                          setIsEtcReasonNull(false);
+                          onClickConfirm(abandonReason, etcReason, selectedValue);
+                        }
+                      }}
                       disabled={!selectedValue}
                     />
                   </div>

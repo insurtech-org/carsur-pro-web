@@ -6,9 +6,10 @@ import { useProposeModalStore } from "@/store/proposeModal";
 import { useToastStore } from "@/store/toast";
 import { ICallDetail } from "@/type/call.type";
 import { formatDate } from "@/utils/util";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import DetailInfoRow from "../work/elements/DetailInfoRow";
+import { COVERAGE_TYPE } from "@/utils/enum";
 
 export default function Detail({ id, hash }: { id: number; hash: string }) {
   const router = useRouter();
@@ -130,13 +131,24 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
 
                 <DetailInfoRow label="사고접수번호" value={detailData?.insuranceClaimNo || "-"} />
                 <DetailInfoRow label="보험사" value={detailData?.insuranceCompanyName || "-"} />
+                <DetailInfoRow
+                  label="사고구분"
+                  value={
+                    detailData?.coverageType
+                      ? COVERAGE_TYPE[detailData?.coverageType as keyof typeof COVERAGE_TYPE]
+                      : "-"
+                  }
+                />
               </div>
 
               <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
 
               <div className="flex flex-col items-start self-stretch">
                 <span className="text-primary-normal text-base font-medium mb-2">예약 기본 정보</span>
-                <DetailInfoRow label="예약지역" value={detailData?.sido + " " + detailData?.sigungu || "-"} />
+                <DetailInfoRow
+                  label="예약지역"
+                  value={detailData?.sido || detailData?.sigungu ? detailData?.sido + " " + detailData?.sigungu : "-"}
+                />
                 <DetailInfoRow label="입고 예약일" value={formatDate(detailData?.reservationDate) || "-"} />
               </div>
 
@@ -148,7 +160,7 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
                 <DetailInfoRow label="차량번호" value={detailData?.carNumber || "-"} />
                 <DetailInfoRow label="차종" value={detailData?.carModel || "-"} />
                 <DetailInfoRow label="배기량" value={detailData?.engineDisplacement || "-"} />
-                <DetailInfoRow label="연식" value={`${detailData?.carModelYear}` || "-"} />
+                <DetailInfoRow label="연식" value={detailData?.carModelYear || "-"} />
               </div>
             </div>
 
