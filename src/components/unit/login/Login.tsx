@@ -13,9 +13,9 @@ export default function Login() {
   const { setUser, setTokens, isLoggedIn } = useUserStore();
 
   // 로그인 상태 체크 및 리다이렉트
-  useEffect(() => {
-    if (isLoggedIn()) router.push("/call");
-  }, [isLoggedIn, router]);
+  // useEffect(() => {
+  //   if (isLoggedIn()) router.push("/call");
+  // }, [isLoggedIn, router]);
 
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
