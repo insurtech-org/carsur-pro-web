@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useUserStore } from "@/store/user";
 import LoadingPage from "./LoadingPage";
-import { useToastStore } from "@/store/toast";
 
 // 인증이 필요하지 않은 공개 라우트들
 const publicRoutes = ["/login", "/find-id", "/r"];
@@ -17,7 +16,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { tokens } = useUserStore();
-  const { showSuccess } = useToastStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -37,26 +35,11 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }
 
     // 토큰 존재 여부와 유효성 모두 체크
-    if (!tokens?.accessToken || !isValidToken(tokens.accessToken)) {
+    if (!tokens?.accessToken) {
       router.replace("/login");
       return;
     }
   }, [pathname, tokens?.accessToken, router, isHydrated]);
-
-  // 토큰 유효성 검증 함수 추가
-  const isValidToken = (token: string) => {
-    try {
-      const parts = token.split(".");
-      if (parts.length !== 3) return false;
-
-      const payload = JSON.parse(atob(parts[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      return payload.exp && payload.exp > currentTime;
-    } catch {
-      return false;
-    }
-  };
 
   // 하이드레이션이 완료되지 않았거나, 공개 라우트가 아니고 accessToken이 없으면 로딩 페이지 표시
   if (!isHydrated || (!publicRoutes.includes(pathname) && !tokens?.accessToken)) {
