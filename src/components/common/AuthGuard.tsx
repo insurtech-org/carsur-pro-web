@@ -6,7 +6,7 @@ import { useUserStore } from "@/store/user";
 import LoadingPage from "./LoadingPage";
 
 // 인증이 필요하지 않은 공개 라우트들
-const publicRoutes = ["/login", "/find-id", "/r"];
+const publicRoutes = ["/login", "/find-id", "/r", "/not-found"];
 
 interface AuthGuardProps {
   children: React.ReactNode;
