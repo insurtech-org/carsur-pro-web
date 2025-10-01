@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import BackHeader from "@/components/common/BackHeader";
 import ArrowButton from "@/components/unit/mypage/elements/ArrowButton";
 import { useRouter } from "next/navigation";
@@ -12,7 +10,6 @@ import { logout } from "@/api/auth.api";
 export default function AccountPage() {
   const router = useRouter();
   const { showModal } = useModalStore();
-  const { setTokens, setUser } = useUserStore();
 
   const onClickLogout = () => {
     showModal({
@@ -26,20 +23,8 @@ export default function AccountPage() {
         } catch (error) {
           console.log(error);
         } finally {
-          setTokens({
-            accessToken: "",
-            refreshToken: "",
-          });
-
-          setUser({
-            id: "",
-            username: "",
-            userId: "",
-            tellNo: "",
-            factoryName: "",
-            roles: "",
-          });
-
+          const { clearUserStore } = useUserStore.getState();
+          clearUserStore();
           router.replace("/login");
         }
       },
