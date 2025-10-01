@@ -10,15 +10,15 @@ import { useState, useEffect } from "react";
 export default function Login() {
   const router = useRouter();
 
-  const { setUser, setTokens, user, tokens } = useUserStore();
+  const { setUser, setTokens, tokens } = useUserStore();
 
   // 이미 로그인되어 있는지 확인하는 useEffect 추가
   useEffect(() => {
     // user와 token이 모두 있는 경우에만 리다이렉트
-    if (user?.id && tokens?.accessToken) {
+    if (tokens?.accessToken) {
       router.replace("/call");
     }
-  }, [user, tokens, router]);
+  }, [tokens?.accessToken, router]);
 
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
