@@ -1,8 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { logout as logoutApi } from "@/api/auth.api";
-
 // 사용자 정보 인터페이스
 interface IUser {
   id: number | string;
@@ -72,14 +70,8 @@ export const useUserStore = create<IUserStore>()(
         })),
 
       // 로그아웃 (API 호출 후 데이터 초기화)
-      logout: async () => {
-        try {
-          await logoutApi();
-        } catch (error) {
-          console.error("로그아웃 API 호출 실패:", error);
-        } finally {
-          set({ user: null, tokens: null });
-        }
+      logout: () => {
+        set({ user: null, tokens: null });
       },
 
       isLoggedIn: () => {

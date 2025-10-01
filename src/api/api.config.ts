@@ -96,8 +96,9 @@ instance.interceptors.response.use(
           console.error("토큰 갱신 실패:", refreshError);
           processQueue(refreshError as Error, null);
 
-          const { logout } = useUserStore.getState();
-          await logout();
+          const { clearUserStore } = useUserStore.getState();
+          clearUserStore();
+
           window.location.href = "/login";
 
           return Promise.reject(refreshError);
