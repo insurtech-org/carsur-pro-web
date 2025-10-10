@@ -448,10 +448,23 @@ export default function WorkDetail() {
           return targetTime ? formatDateTime(targetTime, "HH:mm") : "";
         })()}
         minDate={(() => {
+          // CONFIRMED 상태일 때 특별한 로직 적용
+          if (workStatus === "CONFIRMED" && workData?.confirmedDate) {
+            const confirmedDate = dayjs(workData.confirmedDate);
+            const today = dayjs();
+            const diffDays = today.diff(confirmedDate, "day");
+
+            // confirmedDate와 today 간격이 5일 초과 시, 최근 5일만 선택 가능
+            if (diffDays > 5) {
+              return today.subtract(4, "day").format("YYYY-MM-DD");
+            }
+
+            // 5일 이하면 confirmedDate부터 선택 가능
+            return confirmedDate.format("YYYY-MM-DD");
+          }
+
+          // 다른 상태들의 기존 로직
           const statusDateMap = {
-            CONFIRMED: workData?.reservationDate
-              ? dayjs(workData.reservationDate).subtract(1, "day").format("YYYYMMDD")
-              : "",
             ARRIVED: workData?.arrivedDate,
             REPAIR_STARTED: workData?.repairStartedDate,
             REPAIR_COMPLETED: workData?.repairCompletedDate,
