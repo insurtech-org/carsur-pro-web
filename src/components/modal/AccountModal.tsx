@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import dayjs from "dayjs";
+import { usePreventScroll } from "@/hook/usePreventScroll";
 import MainButton from "../common/MainButton";
 import SubButton from "../common/SubButton";
 
@@ -30,6 +30,16 @@ export default function AccountModal({ title, isOpen, onClose, onClickConfirm }:
   const [isFocused1, setIsFocused1] = useState<boolean>(false);
   const [isFocused2, setIsFocused2] = useState<boolean>(false);
   const [currentFocusedInput, setCurrentFocusedInput] = useState<"input1" | "input2" | null>(null);
+
+  // 모달이 열릴 때 스크롤 방지
+  usePreventScroll(isOpen);
+
+  // 모달이 열릴 때 공임비 입력란에 포커스
+  useEffect(() => {
+    if (isOpen) {
+      handleInputFocus("input1");
+    }
+  }, [isOpen]);
 
   // 숫자 입력 함수
   const handleNumberInput = (number: string) => {
@@ -138,7 +148,9 @@ export default function AccountModal({ title, isOpen, onClose, onClickConfirm }:
                       readOnly
                     />
 
-                    <div className="text-right justify-center text-primary-normal text-base font-medium">원</div>
+                    <div className="min-w-[24px] whitespace-nowrap text-right justify-center text-primary-normal text-base font-medium">
+                      원
+                    </div>
                   </div>
                 </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -162,7 +174,9 @@ export default function AccountModal({ title, isOpen, onClose, onClickConfirm }:
                       readOnly
                     />
 
-                    <div className="text-right justify-center text-primary-normal text-base font-medium">원</div>
+                    <div className="min-w-[24px] whitespace-nowrap text-right justify-center text-primary-normal text-base font-medium">
+                      원
+                    </div>
                   </div>
                 </div>
               </div>

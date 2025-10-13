@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePreventScroll } from "@/hook/usePreventScroll";
 import dayjs from "dayjs";
 import MainButton from "../common/MainButton";
 import SubButton from "../common/SubButton";
@@ -73,20 +74,7 @@ export default function CalendarSelectModal({
     fetchHolidays();
   }, [currentMonth.year()]);
 
-  useEffect(() => {
-    if (isOpen) {
-      // 모달이 열릴 때 body 스크롤 막기
-      document.body.style.overflow = "hidden";
-    } else {
-      // 모달이 닫힐 때 body 스크롤 복구
-      document.body.style.overflow = "unset";
-    }
-
-    // 컴포넌트가 언마운트될 때 스크롤 복구
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
+  usePreventScroll(isOpen);
 
   // 월 변경 함수 - dayjs 사용
   const changeMonth = (direction: number) => {
