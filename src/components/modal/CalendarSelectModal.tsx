@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { usePreventScroll } from "@/hook/usePreventScroll";
 import dayjs from "dayjs";
 import MainButton from "../common/MainButton";
 import SubButton from "../common/SubButton";
@@ -16,21 +17,24 @@ interface CalendarSelectModalProps {
 
 // 공휴일 데이터 타입 정의
 interface HolidayItem {
-  dateKind: string;
-  dateName: string;
-  isHoliday: string;
-  locdate: number;
-  seq: number;
+  date: number;
+  name: string;
 }
 
-interface HolidayResponse {
-  result: boolean;
-  code: string;
-  message: string;
-  data: {
-    rawXml: string;
-  };
-}
+// 하드코딩된 한국 공휴일 데이터
+const HARDCODED_HOLIDAYS: HolidayItem[] = [
+  { date: 20251003, name: "개천절" },
+  { date: 20251006, name: "추석" },
+  { date: 20251007, name: "추석" },
+  { date: 20251008, name: "대체휴일" },
+  { date: 20251009, name: "한글날" },
+  { date: 20251225, name: "크리스마스" },
+  { date: 20260101, name: "신정" },
+  { date: 20260216, name: "설날" },
+  { date: 20260217, name: "설날" },
+  { date: 20260218, name: "설날" },
+  { date: 20260302, name: "대체휴일" },
+];
 
 export default function CalendarSelectModal({
   title,
@@ -44,49 +48,8 @@ export default function CalendarSelectModal({
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
-  const [holidays, setHolidays] = useState<HolidayItem[]>([]);
 
-  // 공휴일 데이터 가져오기
-  useEffect(() => {
-    const fetchHolidays = async () => {
-      try {
-        const year = currentMonth.year();
-        const response = await fetch(`https://api.insurtech.co.kr/common/holidays?solYear=${year}`);
-        const data: HolidayResponse = await response.json();
-
-        if (data.result && data.data.rawXml) {
-          // XML 문자열을 파싱하여 공휴일 데이터 추출
-          const xmlData = JSON.parse(data.data.rawXml);
-          const holidayItems = xmlData.response.body.items.item;
-
-          if (Array.isArray(holidayItems)) {
-            setHolidays(holidayItems);
-          }
-        }
-      } catch (error) {
-        console.error("공휴일 데이터를 가져오는데 실패했습니다:", error);
-        // 에러 발생 시 기본 공휴일 사용
-        setHolidays([]);
-      }
-    };
-
-    fetchHolidays();
-  }, [currentMonth.year()]);
-
-  useEffect(() => {
-    if (isOpen) {
-      // 모달이 열릴 때 body 스크롤 막기
-      document.body.style.overflow = "hidden";
-    } else {
-      // 모달이 닫힐 때 body 스크롤 복구
-      document.body.style.overflow = "unset";
-    }
-
-    // 컴포넌트가 언마운트될 때 스크롤 복구
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
+  usePreventScroll(isOpen);
 
   // 월 변경 함수 - dayjs 사용
   const changeMonth = (direction: number) => {
@@ -136,7 +99,7 @@ export default function CalendarSelectModal({
     return isFutureDate;
   };
 
-  // 휴일 여부 확인 - API 데이터 사용 (수정됨)
+  // 휴일 여부 확인 - 하드코딩된 공휴일 데이터 사용
   const isHoliday = (day: number, isCurrentMonth: boolean) => {
     if (!isCurrentMonth) return false;
 
@@ -145,14 +108,14 @@ export default function CalendarSelectModal({
     // 주말인지 확인
     const isWeekend = date.day() === 0;
 
-    // API에서 가져온 공휴일인지 확인
-    const dateString = date.format("YYYYMMDD");
-    const isPublicHoliday = holidays.some(holiday => holiday.locdate.toString() === dateString);
+    // 하드코딩된 공휴일인지 확인
+    const dateNumber = parseInt(date.format("YYYYMMDD"));
+    const isPublicHoliday = HARDCODED_HOLIDAYS.some(holiday => holiday.date === dateNumber);
 
     return isWeekend || isPublicHoliday;
   };
 
-  // 휴일 이름 가져오기 - API 데이터 사용 (수정됨)
+  // 휴일 이름 가져오기 - 하드코딩된 공휴일 데이터 사용
   const getHolidayName = (day: number, isCurrentMonth: boolean) => {
     if (!isCurrentMonth) return "";
 
@@ -162,11 +125,11 @@ export default function CalendarSelectModal({
     if (date.day() === 0) return "일요일";
     if (date.day() === 6) return "토요일";
 
-    // API에서 가져온 공휴일 확인
-    const dateString = date.format("YYYYMMDD");
-    const holiday = holidays.find(h => h.locdate.toString() === dateString);
+    // 하드코딩된 공휴일 확인
+    const dateNumber = parseInt(date.format("YYYYMMDD"));
+    const holiday = HARDCODED_HOLIDAYS.find(h => h.date === dateNumber);
 
-    return holiday ? holiday.dateName : "";
+    return holiday ? holiday.name : "";
   };
 
   // 날짜 선택 처리 - dayjs 사용 (수정됨)
