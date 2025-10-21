@@ -4,11 +4,11 @@ import { IWorkDetail } from "@/type/work.type";
 import { useMemo } from "react";
 
 const ComplatedCard = ({ data }: { data: IWorkDetail }) => {
+  //총수리비 VAT 포함
   const totalPrice = useMemo(() => {
-    const laborPrice = data.laborPrice || 0;
-    const partsPrice = data.partsPrice || 0;
-
-    return (laborPrice + partsPrice).toLocaleString();
+    const sumPrice = (data.laborPrice || 0) + (data.partsPrice || 0);
+    const vatPrice = sumPrice * 0.1;
+    return Math.floor(sumPrice + vatPrice).toLocaleString();
   }, [data.laborPrice, data.partsPrice]);
 
   return (
