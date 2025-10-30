@@ -42,6 +42,7 @@ export interface IWorkDetail {
   carModel: string;
   engineDisplacement: string;
   carModelYear: string;
+  customerAddReq?: string | null;
   confirmedDate: string;
   arrivedDate: string;
   repairStartedDate: string;

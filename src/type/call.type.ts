@@ -33,6 +33,7 @@ export interface ICallDetail {
   insuranceCompanyName: string;
   reservationDate: string;
   coverageType: string | null;
+  customerAddReq: string | null;
   proposal: {
     id: number;
     status: string;
