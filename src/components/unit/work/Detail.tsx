@@ -48,6 +48,10 @@ export default function WorkDetail() {
 
   const isCancelled = useMemo(() => workStatus?.includes("CANCELLED"), [workStatus]);
 
+  // 추가요청사항 로직
+  const requestText = (workData?.customerAddReq || workData?.insuranceAddReq || "").trim();
+  const hasRequest = Boolean(requestText.length > 0);
+
   useEffect(() => {
     fetchData();
     //스크롤 가장 위로
@@ -326,9 +330,9 @@ export default function WorkDetail() {
                 <div className="w-full px-3 py-2 bg-bg-alternative rounded-lg outline outline-1 outline-offset-[-1px] outline-line-neutral inline-flex flex-col items-start gap-1">
                   <div className="text-neutral-700 text-sm leading-5 tracking-tight">추가 요청사항</div>
                   <div
-                    className={`self-stretch text-sm leading-5 tracking-tight whitespace-pre-wrap break-words ${workData?.customerAddReq ? "text-primary-normal" : "text-primary-assistive"}`}
+                    className={`self-stretch text-sm leading-5 tracking-tight whitespace-pre-wrap break-words ${hasRequest ? "text-primary-normal" : "text-primary-assistive"}`}
                   >
-                    {workData?.customerAddReq ?? "요청사항이 없습니다."}
+                    {hasRequest ? requestText : "요청사항이 없습니다."}
                   </div>
                 </div>
               </div>
