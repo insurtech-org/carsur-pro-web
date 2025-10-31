@@ -7,6 +7,8 @@ export interface ICallList {
   carModel: string | null;
   sido: string | null;
   sigungu: string | null;
+  customerAddReq?: string | null;
+  insuranceAddReq?: string | null;
 }
 //제안 목록
 export interface IProposeList {
