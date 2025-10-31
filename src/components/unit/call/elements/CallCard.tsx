@@ -13,12 +13,16 @@ import { useModalStore } from "@/store/modal";
 
 const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => void }) => {
   const router = useRouter();
-  const { showSuccess, showWarning } = useToastStore();
+  const { showSuccess } = useToastStore();
   const { showProposeModal, hideProposeModal } = useProposeModalStore();
   const { showModal } = useModalStore();
 
   const isAxa = useMemo(() => {
     return callData.insuranceCompanyName?.toLowerCase() === "axa";
+  }, [callData]);
+
+  const requestText = useMemo(() => {
+    return (callData?.customerAddReq || callData?.insuranceAddReq || "").trim();
   }, [callData]);
 
   const onClickDetail = (id: number) => {
@@ -33,7 +37,6 @@ const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => v
           await postPropose(callData.id);
           showSuccess("제안이 완료되었어요.", "예약이 확정되면 바로 알려드릴게요.");
           hideProposeModal();
-
           window.location.hash = "#proposal";
         } catch (error) {
           console.log(error);
@@ -47,7 +50,8 @@ const CallCard = ({ callData, refetch }: { callData: ICallList; refetch: () => v
           hideProposeModal();
         }
       },
-      isAxa ? "• AXA손해보험 DRP계약 상 공임단가 적용" : ""
+      isAxa,
+      requestText
     );
   };
 
