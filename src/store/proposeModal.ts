@@ -3,25 +3,25 @@ import { create } from "zustand";
 interface ProposeModalState {
   isOpen: boolean;
   callId: number | null;
-  content1?: string;
-  content2?: string;
+  isAxa: boolean;
+  additionalRequest?: string;
   onConfirm: (() => void) | null;
 }
 
 interface ProposeModalActions {
-  showProposeModal: (callId: number, onConfirm: () => void, content1?: string, content2?: string) => void;
+  showProposeModal: (callId: number, onConfirm: () => void, isAxa: boolean, additionalRequest?: string) => void;
   hideProposeModal: () => void;
 }
 
 export const useProposeModalStore = create<ProposeModalState & ProposeModalActions>(set => ({
   isOpen: false,
   callId: null,
-  content1: "",
-  content2: "",
+  isAxa: false,
+  additionalRequest: "",
   onConfirm: null,
 
-  showProposeModal: (callId: number, onConfirm: () => void, content1?: string, content2?: string) =>
-    set({ isOpen: true, callId, onConfirm, content1, content2 }),
+  showProposeModal: (callId: number, onConfirm: () => void, isAxa: boolean, additionalRequest?: string) =>
+    set({ isOpen: true, callId, onConfirm, isAxa, additionalRequest }),
 
-  hideProposeModal: () => set({ isOpen: false, callId: null, onConfirm: null, content1: "", content2: "" }),
+  hideProposeModal: () => set({ isOpen: false, callId: null, onConfirm: null, isAxa: false, additionalRequest: "" }),
 }));
