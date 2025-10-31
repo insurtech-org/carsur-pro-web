@@ -25,7 +25,6 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
     return detailData?.insuranceCompanyName?.toLowerCase() === "axa";
   }, [detailData]);
 
-  // 추가요청사항 로직
   const requestText = (detailData?.customerAddReq || detailData?.insuranceAddReq || "").trim();
   const hasRequest = Boolean(requestText.length > 0);
 
@@ -75,7 +74,8 @@ export default function Detail({ id, hash }: { id: number; hash: string }) {
           router.push("/call");
         }
       },
-      isAxa ? "• AXA손해보험 DRP계약 상 공임단가 적용" : ""
+      isAxa,
+      requestText
     );
   };
 
