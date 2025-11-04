@@ -78,11 +78,11 @@ export default function MyPageList() {
         <div className="w-full inline-flex flex-col justify-start items-start gap-2">
           <img className="w-[91px] h-[23px]" src="/images/logo_hearder-horizen.png" />
           <div className="self-stretch justify-center text-primary-alternative opacity-60 text-xs font-regular leading-snug">
-            (주) 슈어테크 | 대표자 : 곽권일 | 사업자등록번호 : 690-88-03133
+            슈어테크(주) | 대표자 : 곽권일 | 사업자등록번호 : 690-88-03133
             <br />
             통신판매업신고번호 : 제 2025-서울광진-0185호 <br />
             주소 : 서울특별시 광진구 자양로 86 (자양동), 세경빌딩 306호 <br />
-            2025 ⓒ 슈어테크 all rights reserved.
+            2025 ⓒ 슈어테크(주) all rights reserved.
           </div>
 
           <div className="text-primary-neutral text-[12px] font-medium">
