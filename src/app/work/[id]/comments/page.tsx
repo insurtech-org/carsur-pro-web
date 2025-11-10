@@ -9,7 +9,6 @@ import { useToastStore } from "@/store/toast";
 import { WORK_STATUS } from "@/utils/enum";
 import { statusColor, formatDateTime } from "@/utils/util";
 import dayjs from "dayjs";
-import PullToRefresh from "@/components/common/PullToRefresh";
 
 export default function WorkComments() {
   const router = useRouter();
@@ -97,10 +96,6 @@ export default function WorkComments() {
     router.push(`/work/${workId}?${String(params)}`);
   };
 
-  const handleRefresh = async () => {
-    await Promise.all([fetchWorkDetail(), fetchComments(false)]);
-  };
-
   // 날짜별로 댓글 그룹화
   const groupedComments = comments.reduce((groups, comment) => {
     const date = dayjs(comment.createdAt).format("YYYY년 MM월 DD일");
@@ -118,11 +113,11 @@ export default function WorkComments() {
 
   // 작성자 아바타 렌더링
   const renderAvatar = (comment: ICommentList) => {
-    if (comment.authorType === "INSURANCE_COMPANY_MEMBER") {
-      // 보험사 직원 아이콘
+    if (comment.authorType === "ADMIN") {
+      // 어드민 아이콘
       return (
         <div className="w-9 h-9 bg-common-white rounded-full border border-line-neutral flex items-center justify-center">
-          <img src="/images/img/img-insurance_manager_profile.png" alt="insurance" width={20} height={20} />
+          <img src="/images/img/img-carsur_manager_profile.png" alt="manager" />
         </div>
       );
     } else if (comment.authorType === "FACTORY_MEMBER") {
@@ -142,19 +137,19 @@ export default function WorkComments() {
         </div>
       );
     } else {
-      // 카슈어 운영팀 - 기본 아바타
+      // 보험사 직원 아이콘
       return (
         <div className="w-9 h-9 bg-common-white rounded-full border border-line-neutral flex items-center justify-center">
-          <img src="/images/img/img-carsur_manager_profile.png" alt="manager" width={20} height={20} />
+          <img src="/images/img/img-insurance_manager_profile.png" alt="insurance" />
         </div>
       );
     }
   };
 
   return (
-    <div className="flex flex-col w-full h-screen bg-bg-main">
+    <div className="flex flex-col w-full h-svh bg-bg-main">
       {/* 상단 헤더 */}
-      <div className="w-full flex flex-row px-5 py-3 justify-between items-center bg-common-white border-b border-line-neutral">
+      <div className="sticky top-0 z-10 w-full flex flex-row px-5 py-3 justify-between items-center bg-common-white border-b border-line-neutral">
         {/* 뒤로 가기 버튼 */}
         <button onClick={handleBack} className="w-6">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -188,61 +183,59 @@ export default function WorkComments() {
       </div>
 
       {/* 댓글 목록 */}
-      <div className="flex-1">
-        <PullToRefresh onRefresh={handleRefresh}>
-          <div className="px-5 py-6">
-            <div className="flex flex-col gap-6">
-              {Object.entries(groupedComments).map(([date, dateComments]) => (
-                <div key={date} className="flex flex-col items-center gap-6">
-                  <div className="text-center text-neutral-600 text-xs">{date}</div>
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-5 py-6">
+          <div className="flex flex-col gap-6">
+            {Object.entries(groupedComments).map(([date, dateComments]) => (
+              <div key={date} className="flex flex-col items-center gap-6">
+                <div className="text-center text-neutral-600 text-xs">{date}</div>
 
-                  <div className="w-full flex flex-col gap-4">
-                    {dateComments.map(comment =>
-                      isMyComment(comment) ? (
-                        // 내 댓글 - 오른쪽 정렬
-                        <div key={comment.id} className="w-full flex justify-end items-end gap-1">
-                          <div className="text-primary-assistive text-xs">
-                            {formatDateTime(comment.createdAt, "A h:mm")}
+                <div className="w-full flex flex-col gap-4">
+                  {dateComments.map(comment =>
+                    isMyComment(comment) ? (
+                      // 내 댓글 - 오른쪽 정렬
+                      <div key={comment.id} className="w-full flex justify-end items-end gap-1">
+                        <div className="text-primary-assistive text-xs">
+                          {formatDateTime(comment.createdAt, "A h:mm")}
+                        </div>
+                        <div className="max-w-[240px] px-3 py-2 bg-secondary-normal rounded-tl-xl rounded-bl-xl rounded-br-xl">
+                          <div className="text-common-white text-sm leading-tight whitespace-pre-wrap break-words">
+                            {comment.commentContent}
                           </div>
-                          <div className="max-w-[240px] px-3 py-2 bg-secondary-normal rounded-tl-xl rounded-bl-xl rounded-br-xl">
-                            <div className="text-common-white text-sm leading-tight whitespace-pre-wrap break-words">
-                              {comment.commentContent}
+                        </div>
+                      </div>
+                    ) : (
+                      // 다른 사람 댓글 - 왼쪽 정렬
+                      <div key={comment.id} className="w-full flex justify-start items-start gap-2">
+                        {renderAvatar(comment)}
+
+                        <div className="flex flex-col gap-2">
+                          <div className="text-primary-normal text-xs">{comment.authorTypeDisplay}</div>
+
+                          <div className="flex items-end gap-1">
+                            <div className="max-w-[240px] px-3 py-2 bg-bg-normal rounded-tr-xl rounded-bl-xl rounded-br-xl shadow-[0px_4px_12px_0px_rgba(0,0,0,0.08)] border border-line-alternative">
+                              <div className="text-primary-neutral text-sm leading-tight whitespace-pre-wrap break-words">
+                                {comment.commentContent}
+                              </div>
+                            </div>
+                            <div className="text-primary-assistive text-xs">
+                              {formatDateTime(comment.createdAt, "A h:mm")}
                             </div>
                           </div>
                         </div>
-                      ) : (
-                        // 다른 사람 댓글 - 왼쪽 정렬
-                        <div key={comment.id} className="w-full flex justify-start items-start gap-2">
-                          {renderAvatar(comment)}
-
-                          <div className="flex flex-col gap-2">
-                            <div className="text-primary-normal text-xs">{comment.authorName}</div>
-
-                            <div className="flex items-end gap-1">
-                              <div className="max-w-[240px] px-3 py-2 bg-bg-normal rounded-tr-xl rounded-bl-xl rounded-br-xl shadow-[0px_4px_12px_0px_rgba(0,0,0,0.08)] border border-line-alternative">
-                                <div className="text-primary-neutral text-sm leading-tight whitespace-pre-wrap break-words">
-                                  {comment.commentContent}
-                                </div>
-                              </div>
-                              <div className="text-primary-assistive text-xs">
-                                {formatDateTime(comment.createdAt, "A h:mm")}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
+                      </div>
+                    )
+                  )}
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-        </PullToRefresh>
+        </div>
       </div>
 
       {/* 하단 입력창 */}
-      <div className="w-full px-5 py-4 bg-common-white border-t border-line-neutral">
+      <div className="sticky bottom-0 z-10 w-full px-5 py-4 bg-common-white border-t border-line-neutral">
         <div className="flex items-center gap-2">
           <div className="flex-1 px-3 py-2 bg-bg-main rounded-full border border-line-neutral flex items-center gap-2">
             <input

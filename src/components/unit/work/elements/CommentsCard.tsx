@@ -8,7 +8,7 @@ export const CommentsCard = ({ workId, comments }: { workId: number; comments: I
   const router = useRouter();
 
   const totalComments = comments.length;
-  const latestComment = comments[0];
+  const latestComment = comments[comments.length - 1];
 
   const handleClick = () => {
     router.push(`/work/${workId}/comments`);
