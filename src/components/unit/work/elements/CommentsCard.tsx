@@ -26,7 +26,7 @@ export const CommentsCard = ({ workId, comments }: { workId: number; comments: I
 
         <div className="self-stretch flex justify-start items-center">
           <div className="w-14 text-center justify-start text-primary-assistive text-xs font-normal leading-4 tracking-tight">
-            {totalComments > 0 && latestComment ? formatDateTime(latestComment.createdAt, "MM.DD") : ""}
+            {totalComments > 0 && latestComment ? formatDateTime(latestComment.createdAt, "MM.DD HH:mm") : ""}
           </div>
           <button className="w-6 h-6 relative overflow-hidden text-line-normal" onClick={handleClick}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
