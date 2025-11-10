@@ -25,6 +25,8 @@ import { convertStatusToType, getStatusToastMessage, workSteps } from "@/utils/w
 import CancelCard from "./elements/CancelCard";
 import dayjs from "dayjs";
 import CallGuideModal from "@/components/modal/CallGuideModal";
+import { getComments, ICommentList } from "@/api/comments.api";
+import { CommentsCard } from "./elements/CommentsCard";
 
 export default function WorkDetail() {
   const params = useParams();
@@ -45,6 +47,7 @@ export default function WorkDetail() {
 
   const [workData, setWorkData] = useState<IWorkDetail>();
   const [workStatus, setWorkStatus] = useState<string>(detailStatus);
+  const [comments, setComments] = useState<ICommentList[]>([]);
 
   const isCancelled = useMemo(() => workStatus?.includes("CANCELLED"), [workStatus]);
 
@@ -54,6 +57,7 @@ export default function WorkDetail() {
 
   useEffect(() => {
     fetchData();
+    fetchComments();
     //스크롤 가장 위로
     window.scrollTo(0, 0);
   }, []);
@@ -87,6 +91,15 @@ export default function WorkDetail() {
     } catch (error) {
       console.log(error);
       throw error;
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const res = await getComments(detailId);
+      setComments(res || []);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -296,6 +309,11 @@ export default function WorkDetail() {
             </div>
           </div>
         )}
+
+        {/* 댓글 섹션 */}
+        <div className="flex flex-col items-start self-stretch mx-5">
+          <CommentsCard workId={detailId} comments={comments} />
+        </div>
 
         <div className="flex flex-col items-start self-stretch mx-5 gap-4">
           <span className="text-primary-normal text-lg font-semibold ml-1">예약 정보</span>

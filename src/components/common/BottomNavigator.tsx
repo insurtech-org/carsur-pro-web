@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useMyWorkStore } from "@/store/mywork";
-import { useHideNavigator } from "@/hook/useHideNavigator";
 
 // 네비게이션 아이템 타입 정의
 interface NavItem {
@@ -112,6 +111,7 @@ export default function BottomNavigator() {
     "/mypage/account", // 계정관리 페이지
     "/mypage/account/change-password", // 비밀번호 변경 페이지
     "/r", // 앱 열기 페이지
+    "/work/[id]/comments", // 댓글 페이지 (동적 라우트)
   ];
 
   // 현재 경로가 숨겨야 할 페이지인지 확인
@@ -134,7 +134,7 @@ export default function BottomNavigator() {
   return (
     <div className="responseNavigator fixed bottom-0 left-0 right-0 w-full bg-white rounded-t-lg z-50 ">
       <div className="flex items-center justify-around pb-2 bg-white shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.04)] rounded-t-lg">
-        {navItems.map((item, index) => (
+        {navItems.map(item => (
           <button
             key={item.id}
             onClick={() => handleNavClick(item)}
