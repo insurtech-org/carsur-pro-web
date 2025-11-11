@@ -10,6 +10,7 @@ import { logout } from "@/api/auth.api";
 export default function AccountPage() {
   const router = useRouter();
   const { showModal } = useModalStore();
+  const { user } = useUserStore();
 
   const onClickLogout = () => {
     showModal({
@@ -23,8 +24,18 @@ export default function AccountPage() {
         } catch (error) {
           console.log(error);
         } finally {
+          // localStorage에 저장된 FCM 토큰 삭제
+          if (user?.id) {
+            try {
+              localStorage.removeItem(`fcm_token_${user.id}`);
+            } catch (error) {
+              console.log("FCM 토큰 삭제 실패:", error);
+            }
+          }
+
           const { clearUserStore } = useUserStore.getState();
           clearUserStore();
+
           router.replace("/login");
         }
       },
