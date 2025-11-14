@@ -8,6 +8,7 @@ export interface IWorkList {
   tellNo: string;
   insuranceCompanyName: string;
   reservationDate: string;
+  unreadCommentCount?: number;
 }
 
 //상태 카운트
@@ -52,6 +53,7 @@ export interface IWorkDetail {
   billingCompletedDate: string;
   laborPrice?: number;
   partsPrice?: number;
+  unreadCommentCount?: number;
 }
 
 //상태 접수 타입
