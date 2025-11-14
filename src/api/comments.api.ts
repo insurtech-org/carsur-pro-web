@@ -18,6 +18,10 @@ export interface ICommentCreate {
   commentContent: string;
 }
 
+export interface ICommentRead {
+  lastReadCommentId: number;
+}
+
 //댓글 조회
 export const getComments = async (id: number) => {
   const res = await apiInstance.get(`${prefix}/${id}/comments`);
@@ -27,5 +31,11 @@ export const getComments = async (id: number) => {
 //댓글 작성
 export const postComment = async (id: number, body: ICommentCreate) => {
   const res = await apiInstance.post(`${prefix}/${id}/comments`, body);
+  return res;
+};
+
+//댓글 읽음 처리
+export const readComment = async (id: number, body: ICommentRead) => {
+  const res = await apiInstance.post(`${prefix}/${id}/comments/read`, body);
   return res;
 };
