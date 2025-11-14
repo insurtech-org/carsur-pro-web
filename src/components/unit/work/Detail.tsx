@@ -312,7 +312,7 @@ export default function WorkDetail() {
 
         {/* 댓글 섹션 */}
         <div className="flex flex-col items-start self-stretch mx-5">
-          <CommentsCard workId={detailId} comments={comments} />
+          <CommentsCard workId={detailId} comments={comments} unreadCommentCount={workData?.unreadCommentCount || 0} />
         </div>
 
         <div className="flex flex-col items-start self-stretch mx-5 gap-4">
@@ -344,16 +344,18 @@ export default function WorkDetail() {
               <DetailInfoRow label="예약지역" value={workData?.sigungu || "-"} />
               <DetailInfoRow label="입고 예약일" value={workData?.reservationDate || "-"} />
             </div>
-              <div className="flex flex-col items-start self-stretch">
-                <div className="w-full px-3 py-2 bg-bg-alternative rounded-lg outline outline-1 outline-offset-[-1px] outline-line-neutral inline-flex flex-col items-start gap-1">
-                  <div className="text-neutral-700 text-sm leading-5 tracking-tight">추가 요청사항</div>
-                  <div
-                    className={`self-stretch text-sm leading-5 tracking-tight whitespace-pre-wrap break-words ${hasRequest ? "text-primary-normal" : "text-primary-assistive"}`}
-                  >
-                    {hasRequest ? requestText : "요청사항이 없습니다."}
-                  </div>
+            <div className="flex flex-col items-start self-stretch">
+              <div className="w-full px-3 py-2 bg-bg-alternative rounded-lg outline outline-1 outline-offset-[-1px] outline-line-neutral inline-flex flex-col items-start gap-1">
+                <div className="text-neutral-700 text-sm leading-5 tracking-tight">추가 요청사항</div>
+                <div
+                  className={`self-stretch text-sm leading-5 tracking-tight whitespace-pre-wrap break-words ${
+                    hasRequest ? "text-primary-normal" : "text-primary-assistive"
+                  }`}
+                >
+                  {hasRequest ? requestText : "요청사항이 없습니다."}
                 </div>
               </div>
+            </div>
             <div className="self-stretch bg-neutral-100 h-0.5 mt-[12px] mb-[16px]"></div>
             <div className="flex flex-col items-start self-stretch">
               <span className="text-primary-normal text-base font-medium mb-2">차량 정보</span>

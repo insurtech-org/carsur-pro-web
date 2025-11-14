@@ -4,10 +4,17 @@ import { useRouter } from "next/navigation";
 import { ICommentList } from "@/api/comments.api";
 import { formatDateTime } from "@/utils/util";
 
-export const CommentsCard = ({ workId, comments }: { workId: number; comments: ICommentList[] }) => {
+export const CommentsCard = ({
+  workId,
+  comments,
+  unreadCommentCount,
+}: {
+  workId: number;
+  comments: ICommentList[];
+  unreadCommentCount: number;
+}) => {
   const router = useRouter();
 
-  const totalComments = comments.length;
   const latestComment = comments[comments.length - 1];
 
   const handleClick = () => {
@@ -26,7 +33,7 @@ export const CommentsCard = ({ workId, comments }: { workId: number; comments: I
 
         <div className="self-stretch flex justify-start items-center">
           <div className="w-14 text-center justify-start text-primary-assistive text-xs font-normal leading-4 tracking-tight">
-            {totalComments > 0 && latestComment ? formatDateTime(latestComment.createdAt, "MM.DD HH:mm") : ""}
+            {comments.length > 0 && latestComment ? formatDateTime(latestComment.createdAt, "MM.DD HH:mm") : ""}
           </div>
           <button className="w-6 h-6 relative overflow-hidden text-line-normal" onClick={handleClick}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -41,15 +48,15 @@ export const CommentsCard = ({ workId, comments }: { workId: number; comments: I
 
       <div className="self-stretch h-6 inline-flex justify-start items-start gap-8">
         <div className="flex-1 self-stretch justify-center text-neutral-700 text-sm font-normal leading-5 tracking-tight">
-          {totalComments > 0 && latestComment ? latestComment.commentContent : "메세지를 입력해보세요!"}
+          {comments.length > 0 && latestComment ? latestComment.commentContent : "메세지를 입력해보세요!"}
         </div>
-        {totalComments > 0 && (
+        {unreadCommentCount > 0 && (
           <button
             className="px-1.5 py-0.5 bg-orange-400 rounded-full inline-flex flex-col justify-center items-center"
             onClick={handleClick}
           >
             <div className="min-w-2 text-center justify-start text-common-white text-xs font-normal leading-4 tracking-tight">
-              {totalComments}
+              {unreadCommentCount}
             </div>
           </button>
         )}
