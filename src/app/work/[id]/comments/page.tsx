@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { getComments, postComment, ICommentList } from "@/api/comments.api";
+import { getComments, postComment, readComment, ICommentList } from "@/api/comments.api";
 import { getWorkScheduleDetail } from "@/api/work.api";
 import type { IWorkDetail } from "@/type/work.type";
 import { useToastStore } from "@/store/toast";
 import { WORK_STATUS } from "@/utils/enum";
 import { statusColor, formatDateTime } from "@/utils/util";
 import dayjs from "dayjs";
+
+// 상수 정의
+const COMMENT_POLLING_INTERVAL = 10000; // 10초
+const BILLING_WINDOW_DAYS = 30;
+const BILLING_WINDOW_MS = BILLING_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 
 export default function WorkComments() {
   const router = useRouter();
@@ -22,7 +27,12 @@ export default function WorkComments() {
   const [workDetail, setWorkDetail] = useState<IWorkDetail | null>(null);
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMessageVisible, setIsMessageVisible] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastReadCommentIdRef = useRef<number | null>(null);
+  const isMarkingReadRef = useRef(false);
+  const shouldScrollRef = useRef(true);
+  const isInitialLoadRef = useRef(true);
 
   const status = searchParams.get("status") || "";
 
@@ -38,7 +48,7 @@ export default function WorkComments() {
       console.error(error);
       showError("작업 정보를 불러올 수 없습니다.");
     }
-  }, [workId, showError]);
+  }, [workId]);
 
   const fetchComments = useCallback(
     async (showErrorMessage = false) => {
@@ -52,34 +62,106 @@ export default function WorkComments() {
         }
       }
     },
-    [workId, showError]
+    [workId]
   );
 
   useEffect(() => {
     fetchWorkDetail();
     fetchComments(true);
 
-    // 10초마다 댓글 목록 갱신 (실시간 업데이트)
     const intervalId = setInterval(() => {
       fetchComments(false);
-    }, 10000);
+    }, COMMENT_POLLING_INTERVAL);
 
     return () => {
       clearInterval(intervalId);
     };
   }, [fetchWorkDetail, fetchComments]);
 
-  useEffect(() => {
-    scrollToBottom();
+  // 최신 댓글 ID 계산
+  const latestCommentId = useMemo(() => {
+    if (comments.length === 0) return null;
+    return Math.max(...comments.map(comment => comment.id));
   }, [comments]);
 
+  // 댓글 읽음 처리
+  useEffect(() => {
+    if (!workId || latestCommentId == null) return;
+    if (lastReadCommentIdRef.current != null && latestCommentId <= lastReadCommentIdRef.current) return;
+    if (isMarkingReadRef.current) return;
+
+    isMarkingReadRef.current = true;
+    void readComment(workId, { lastReadCommentId: latestCommentId })
+      .then(() => {
+        lastReadCommentIdRef.current = latestCommentId;
+      })
+      .catch(error => {
+        console.error("읽음 처리 실패:", error);
+      })
+      .finally(() => {
+        isMarkingReadRef.current = false;
+      });
+  }, [workId, latestCommentId]);
+
+  useEffect(() => {
+    // 초기 로드 시 또는 댓글 작성 시 스크롤
+    if (shouldScrollRef.current && comments.length > 0) {
+      if (isInitialLoadRef.current) {
+        setTimeout(() => {
+          scrollToBottom();
+          isInitialLoadRef.current = false;
+          shouldScrollRef.current = false;
+        }, 100);
+      } else {
+        scrollToBottom();
+        shouldScrollRef.current = false;
+      }
+    }
+  }, [comments]);
+
+  // 댓글 입력 제어 로직
+  const { isInputDisabled, controlMessage } = useMemo(() => {
+    if (!workDetail) {
+      return { isInputDisabled: false, controlMessage: "" };
+    }
+
+    const billingCompletedDate = workDetail.billingCompletedDate ? new Date(workDetail.billingCompletedDate) : null;
+    const billingWindowExpired =
+      billingCompletedDate != null ? Date.now() - billingCompletedDate.getTime() >= BILLING_WINDOW_MS : false;
+
+    if (workDetail.accidentStatus?.includes("CANCELLED")) {
+      return {
+        isInputDisabled: true,
+        controlMessage: "안내 해당 건은 종결되어 메시지를 보낼 수 없어요",
+      };
+    }
+
+    if (billingCompletedDate) {
+      if (billingWindowExpired) {
+        return {
+          isInputDisabled: true,
+          controlMessage:
+            "안내 해당 건은 청구완료 후 30일이 지나 메시지를 보낼 수 없어요. 기존 대화는 열람만 가능해요.",
+        };
+      }
+
+      return {
+        isInputDisabled: false,
+        controlMessage: "안내 청구가 완료된 건이에요. 30일 동안은 메시지 작성이 가능하며, 이후에는 열람만 가능해요.",
+      };
+    }
+
+    return { isInputDisabled: false, controlMessage: "" };
+  }, [workDetail]);
+
   const handleSubmit = async () => {
-    if (!commentText.trim() || isSubmitting) return;
+    if (!commentText.trim() || isSubmitting || isInputDisabled) return;
 
     setIsSubmitting(true);
     try {
       await postComment(workId, { commentContent: commentText.trim() });
       setCommentText("");
+      shouldScrollRef.current = true;
       await fetchComments(true);
       showSuccess("메시지를 전송했습니다.");
     } catch (error) {
@@ -97,14 +179,16 @@ export default function WorkComments() {
   };
 
   // 날짜별로 댓글 그룹화
-  const groupedComments = comments.reduce((groups, comment) => {
-    const date = dayjs(comment.createdAt).format("YYYY년 MM월 DD일");
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(comment);
-    return groups;
-  }, {} as Record<string, ICommentList[]>);
+  const groupedComments = useMemo(() => {
+    return comments.reduce((groups, comment) => {
+      const date = dayjs(comment.createdAt).format("YYYY년 MM월 DD일");
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(comment);
+      return groups;
+    }, {} as Record<string, ICommentList[]>);
+  }, [comments]);
 
   // 내가 작성한 댓글인지 확인 (공업사가 작성한 댓글)
   const isMyComment = (comment: ICommentList) => {
@@ -210,7 +294,7 @@ export default function WorkComments() {
                         {renderAvatar(comment)}
 
                         <div className="flex flex-col gap-2">
-                          <div className="text-primary-normal text-xs">{comment.authorTypeDisplay}</div>
+                          <div className="text-primary-normal text-xs">{comment.authorName}</div>
 
                           <div className="flex items-end gap-1">
                             <div className="max-w-[240px] px-3 py-2 bg-bg-normal rounded-tr-xl rounded-bl-xl rounded-br-xl shadow-[0px_4px_12px_0px_rgba(0,0,0,0.08)] border border-line-alternative">
@@ -235,47 +319,64 @@ export default function WorkComments() {
       </div>
 
       {/* 하단 입력창 */}
-      <div className="sticky bottom-0 z-10 w-full px-5 py-4 bg-common-white border-t border-line-neutral">
-        <div className="flex items-center gap-2">
-          <div className="flex-1 px-3 py-2 bg-bg-main rounded-full border border-line-neutral flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="메시지를 입력하세요"
-              value={commentText}
-              onChange={e => setCommentText(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-primary-assistive text-primary-alternative"
-              disabled={isSubmitting}
-            />
-            <button
-              onClick={handleSubmit}
-              disabled={!commentText.trim() || isSubmitting}
-              className="w-8 h-8 rounded-full flex items-center justify-center disabled:bg-primary-disabled disabled:opacity-30 bg-secondary-normal"
+      <div className="sticky bottom-0 z-10 w-full border-line-neutral relative">
+        {/* 안내 메시지 - absolute로 입력창 위에 고정 */}
+        {controlMessage && isMessageVisible && (
+          <div className="absolute bottom-full left-0 right-0 px-5 mb-[10px] pointer-events-none">
+            <div
+              onClick={() => setIsMessageVisible(false)}
+              className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-[#E6E7EC]/80 backdrop-blur-sm pointer-events-auto cursor-pointer transition-all duration-200 hover:bg-[#E6E7EC]/60"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="rotate-90"
-              >
-                <path
-                  d="M12 4L12 20M12 4L6 10M12 4L18 10"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+              <span className="text-sm leading-relaxed flex-1 text-gray-500">{controlMessage}</span>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* 입력창 - 입력 불가능할 때는 완전히 숨김 */}
+        {!isInputDisabled && (
+          <div className="px-5 p-4 bg-common-white">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 px-3 py-2 bg-bg-main rounded-full border border-line-neutral flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="메시지를 입력하세요"
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit();
+                    }
+                  }}
+                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-primary-assistive text-primary-alternative"
+                  disabled={isSubmitting}
+                />
+                <button
+                  onClick={handleSubmit}
+                  disabled={!commentText.trim() || isSubmitting}
+                  className="w-8 h-8 rounded-full flex items-center justify-center disabled:bg-primary-disabled disabled:opacity-30 bg-secondary-normal transition-all duration-200 hover:opacity-90 active:scale-95"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="rotate-90"
+                  >
+                    <path
+                      d="M12 4L12 20M12 4L6 10M12 4L18 10"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
