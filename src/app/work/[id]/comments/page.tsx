@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 
 // 상수 정의
 const COMMENT_POLLING_INTERVAL = 10000; // 10초 - 폴링 간격
-const COMMENT_SUBMIT_COOLDOWN_MS = 1700; // 3초 - 댓글 전송 후 입력 비활성화 시간
+const COMMENT_SUBMIT_COOLDOWN_MS = 1700; // 1.7초 - 댓글 전송 후 입력 비활성화 시간
 const BILLING_WINDOW_DAYS = 30; // 청구완료 후 메시지 작성 가능 기간 (일)
 const BILLING_WINDOW_MS = BILLING_WINDOW_DAYS * 24 * 60 * 60 * 1000; // 밀리초로 변환
 
@@ -66,12 +66,15 @@ export default function WorkComments() {
     async (showErrorMessage = false) => {
       try {
         const response = await getComments(workId, false);
-        setComments(response || []);
+        const data = response || [];
+        setComments(data);
+        return data;
       } catch (error) {
         console.error(error);
         if (showErrorMessage) {
           showError("댓글을 불러올 수 없습니다.");
         }
+        return [];
       }
     },
     [workId, showError]
@@ -123,7 +126,7 @@ export default function WorkComments() {
   // 최신 댓글 ID 계산
   // - 읽음 처리 API 호출 시 사용
   // - 실제 댓글만 계산 (안전성을 위해 양수 ID만 필터링)
-  const latestCommentId = useMemo(() => {
+  const latestRealCommentId = useMemo(() => {
     // 실제 댓글만 필터링 (양수 ID만 유지)
     const realComments = comments.filter(comment => comment.id > 0);
     if (realComments.length === 0) return null;
@@ -135,14 +138,14 @@ export default function WorkComments() {
   // - 중복 호출 방지: 이미 읽은 댓글이거나 현재 처리 중이면 스킵
   // - 성공 시 lastReadCommentIdRef에 최신 ID 저장하여 다음 호출 시 중복 방지
   useEffect(() => {
-    if (!workId || latestCommentId == null) return;
-    if (lastReadCommentIdRef.current != null && latestCommentId <= lastReadCommentIdRef.current) return;
+    if (!workId || latestRealCommentId == null) return;
+    if (lastReadCommentIdRef.current != null && latestRealCommentId <= lastReadCommentIdRef.current) return;
     if (isMarkingReadRef.current) return;
 
     isMarkingReadRef.current = true;
-    void readComment(workId, { lastReadCommentId: latestCommentId })
+    void readComment(workId, { lastReadCommentId: latestRealCommentId })
       .then(() => {
-        lastReadCommentIdRef.current = latestCommentId;
+        lastReadCommentIdRef.current = latestRealCommentId;
       })
       .catch(error => {
         console.error("읽음 처리 실패:", error);
@@ -150,7 +153,7 @@ export default function WorkComments() {
       .finally(() => {
         isMarkingReadRef.current = false;
       });
-  }, [workId, latestCommentId]);
+  }, [workId, latestRealCommentId]);
 
   // useEffect 3: 스크롤 제어
   // - 댓글 목록이 변경될 때 자동 스크롤 처리
@@ -249,6 +252,16 @@ export default function WorkComments() {
     try {
       await postComment(workId, { commentContent: textToSubmit });
       // 성공 시: 폴링(fetchUnreadComments)에서 실제 댓글이 오면 임시 댓글(음수 ID)은 자동으로 제거되고 실제 댓글로 교체됨
+
+      // 댓글 전송 직후 읽음 처리 API 호출 (추가 fetch 없이 현재 목록 기준)
+      if (latestRealCommentId != null) {
+        try {
+          await readComment(workId, { lastReadCommentId: latestRealCommentId });
+          lastReadCommentIdRef.current = latestRealCommentId;
+        } catch (readError) {
+          console.error("댓글 전송 후 읽음 처리 실패:", readError);
+        }
+      }
     } catch (error) {
       console.error("댓글 작성 실패:", error);
       showError("메시지 전송에 실패했습니다.");
