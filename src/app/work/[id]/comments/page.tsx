@@ -11,35 +11,43 @@ import { statusColor, formatDateTime } from "@/utils/util";
 import dayjs from "dayjs";
 
 // 상수 정의
-const COMMENT_POLLING_INTERVAL = 10000; // 10초
-const BILLING_WINDOW_DAYS = 30;
-const BILLING_WINDOW_MS = BILLING_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+const COMMENT_POLLING_INTERVAL = 10000; // 10초 - 폴링 간격
+const COMMENT_SUBMIT_COOLDOWN_MS = 1700; // 3초 - 댓글 전송 후 입력 비활성화 시간
+const BILLING_WINDOW_DAYS = 30; // 청구완료 후 메시지 작성 가능 기간 (일)
+const BILLING_WINDOW_MS = BILLING_WINDOW_DAYS * 24 * 60 * 60 * 1000; // 밀리초로 변환
 
 export default function WorkComments() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const workId = Number(params.id);
+  const status = searchParams.get("status") || "";
 
-  const { showSuccess, showError } = useToastStore();
+  // 전역 상태 관리
+  const { showError } = useToastStore(); // 에러 토스트 메시지 표시
 
+  // 로컬 상태 관리
   const [comments, setComments] = useState<ICommentList[]>([]);
   const [workDetail, setWorkDetail] = useState<IWorkDetail | null>(null);
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMessageVisible, setIsMessageVisible] = useState(true);
+
+  // Ref 관리 (렌더링과 무관한 값 저장)
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastReadCommentIdRef = useRef<number | null>(null);
   const isMarkingReadRef = useRef(false);
   const shouldScrollRef = useRef(true);
   const isInitialLoadRef = useRef(true);
 
-  const status = searchParams.get("status") || "";
-
+  // 유틸리티 함수
+  // 댓글 목록 맨 아래로 스크롤
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // 데이터 조회 함수
+  // 작업 상세 정보 조회
   const fetchWorkDetail = useCallback(async () => {
     try {
       const response = await getWorkScheduleDetail(workId);
@@ -48,12 +56,16 @@ export default function WorkComments() {
       console.error(error);
       showError("작업 정보를 불러올 수 없습니다.");
     }
-  }, [workId]);
+  }, [workId, showError]);
 
-  const fetchComments = useCallback(
+  // 전체 댓글 조회 (unreadOnly=false)
+  // - false: 전체 댓글 조회
+  // - 초기 로드 시 사용
+  // - 기존 댓글 목록을 전체 교체
+  const fetchAllComments = useCallback(
     async (showErrorMessage = false) => {
       try {
-        const response = await getComments(workId);
+        const response = await getComments(workId, false);
         setComments(response || []);
       } catch (error) {
         console.error(error);
@@ -62,29 +74,66 @@ export default function WorkComments() {
         }
       }
     },
-    [workId]
+    [workId, showError]
   );
 
+  // 마지막 읽음 이후 댓글만 조회 (unreadOnly=true)
+  // - unreadOnly=true: 마지막 읽음 이후 댓글만 조회하여 기존 리스트에 추가
+  // - skipLoading=true: 폴링 시 로딩바 표시 안 함
+  // - 임시 댓글(음수 ID) 필터링: Optimistic Update로 추가된 임시 댓글은 제거하고 실제 댓글만 유지
+  // - 중복 체크: 백엔드에서 중복 없이 보내주지만, 댓글 전송과 폴링이 겹치는 경우를 대비해 클라이언트에서도 중복 체크
+  const fetchUnreadComments = useCallback(async () => {
+    try {
+      const response = await getComments(workId, true, true); // unreadOnly=true, skipLoading=true
+      if (response && response.length > 0) {
+        setComments(prev => {
+          // 임시 댓글(음수 ID) 제거하고 실제 댓글만 유지
+          const filteredPrev = prev.filter(comment => comment.id > 0);
+          // 기존 댓글 ID Set 생성 (중복 체크용)
+          const existingIds = new Set(filteredPrev.map(comment => comment.id));
+          // 중복되지 않은 새 댓글만 필터링
+          const newComments = response.filter((comment: ICommentList) => !existingIds.has(comment.id));
+          // 중복되지 않은 새 댓글만 추가
+          return newComments.length > 0 ? [...filteredPrev, ...newComments] : filteredPrev;
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [workId]);
+
+  // useEffect 1: 초기 데이터 로드 및 폴링 설정
+  // - 컴포넌트 마운트 시 작업 상세 정보와 전체 댓글 로드 (unreadOnly=false)
+  // - 10초마다 마지막 읽음 이후 댓글만 조회하여 기존 리스트에 추가 (unreadOnly=true)
+  // - 컴포넌트 언마운트 시 폴링 인터벌 정리
   useEffect(() => {
     fetchWorkDetail();
-    fetchComments(true);
+    fetchAllComments(true);
 
     const intervalId = setInterval(() => {
-      fetchComments(false);
+      fetchUnreadComments();
     }, COMMENT_POLLING_INTERVAL);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [fetchWorkDetail, fetchComments]);
+  }, [fetchWorkDetail, fetchAllComments, fetchUnreadComments]);
 
+  // 계산된 값 (useMemo)
   // 최신 댓글 ID 계산
+  // - 읽음 처리 API 호출 시 사용
+  // - 실제 댓글만 계산 (안전성을 위해 양수 ID만 필터링)
   const latestCommentId = useMemo(() => {
-    if (comments.length === 0) return null;
-    return Math.max(...comments.map(comment => comment.id));
+    // 실제 댓글만 필터링 (양수 ID만 유지)
+    const realComments = comments.filter(comment => comment.id > 0);
+    if (realComments.length === 0) return null;
+    return Math.max(...realComments.map(comment => comment.id));
   }, [comments]);
 
-  // 댓글 읽음 처리
+  // useEffect 2: 댓글 읽음 처리
+  // - 최신 댓글 ID가 변경될 때마다 읽음 처리 API 호출
+  // - 중복 호출 방지: 이미 읽은 댓글이거나 현재 처리 중이면 스킵
+  // - 성공 시 lastReadCommentIdRef에 최신 ID 저장하여 다음 호출 시 중복 방지
   useEffect(() => {
     if (!workId || latestCommentId == null) return;
     if (lastReadCommentIdRef.current != null && latestCommentId <= lastReadCommentIdRef.current) return;
@@ -103,6 +152,11 @@ export default function WorkComments() {
       });
   }, [workId, latestCommentId]);
 
+  // useEffect 3: 스크롤 제어
+  // - 댓글 목록이 변경될 때 자동 스크롤 처리
+  // - 초기 로드: DOM 렌더링 대기 후 스크롤 (100ms 지연)
+  // - 댓글 작성 후: 즉시 스크롤
+  // - 폴링으로 인한 댓글 추가 시에는 스크롤하지 않음 (shouldScrollRef로 제어)
   useEffect(() => {
     // 초기 로드 시 또는 댓글 작성 시 스크롤
     if (shouldScrollRef.current && comments.length > 0) {
@@ -119,7 +173,13 @@ export default function WorkComments() {
     }
   }, [comments]);
 
-  // 댓글 입력 제어 로직
+  // 댓글 입력 제어 로직 (useMemo)
+  // 작업 상태에 따라 댓글 입력 가능 여부와 안내 메시지 결정
+  // 우선순위:
+  // 1. 종결된 건 → 입력 불가
+  // 2. 청구완료 + 30일 경과 → 입력 불가
+  // 3. 청구완료 + 30일 이내 → 입력 가능 + 안내 메시지
+  // 4. 일반 → 입력 가능
   const { isInputDisabled, controlMessage } = useMemo(() => {
     if (!workDetail) {
       return { isInputDisabled: false, controlMessage: "" };
@@ -129,6 +189,7 @@ export default function WorkComments() {
     const billingWindowExpired =
       billingCompletedDate != null ? Date.now() - billingCompletedDate.getTime() >= BILLING_WINDOW_MS : false;
 
+    // 1순위: 종결된 건
     if (workDetail.accidentStatus?.includes("CANCELLED")) {
       return {
         isInputDisabled: true,
@@ -136,6 +197,7 @@ export default function WorkComments() {
       };
     }
 
+    // 2순위: 청구완료된 건
     if (billingCompletedDate) {
       if (billingWindowExpired) {
         return {
@@ -145,40 +207,70 @@ export default function WorkComments() {
         };
       }
 
+      // 30일 이내 → 입력 가능 + 안내 메시지
       return {
         isInputDisabled: false,
         controlMessage: "안내 청구가 완료된 건이에요. 30일 동안은 메시지 작성이 가능하며, 이후에는 열람만 가능해요.",
       };
     }
 
+    // 일반 상태 → 입력 가능
     return { isInputDisabled: false, controlMessage: "" };
   }, [workDetail]);
 
+  // 댓글 작성 핸들러 (Optimistic Update 패턴)
+  // - Optimistic Update: API 응답을 기다리지 않고 즉시 UI에 표시하여 빠른 사용자 경험 제공
+  // - 임시 댓글(음수 ID) 생성: 실제 댓글이 오기 전까지 임시로 표시
+  // - 폴링에서 실제 댓글이 오면: fetchUnreadComments에서 임시 댓글(음수 ID)을 필터링하여 제거하고 실제 댓글 추가
   const handleSubmit = async () => {
     if (!commentText.trim() || isSubmitting || isInputDisabled) return;
 
+    const textToSubmit = commentText.trim();
     setIsSubmitting(true);
+
+    // Optimistic Update: 임시 댓글 생성 (음수 ID로 실제 댓글과 구분)
+    const tempComment: ICommentList = {
+      id: -Date.now(), // 임시 ID (음수)
+      accidentRequestId: workId,
+      commentContent: textToSubmit,
+      authorType: "FACTORY_MEMBER",
+      authorTypeDisplay: "공업사",
+      authorId: 0,
+      authorName: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // 즉시 UI에 추가
+    setComments(prev => [...prev, tempComment]);
+    setCommentText("");
+    shouldScrollRef.current = true; // 스크롤 플래그 설정
+
     try {
-      await postComment(workId, { commentContent: commentText.trim() });
-      setCommentText("");
-      shouldScrollRef.current = true;
-      await fetchComments(true);
-      showSuccess("메시지를 전송했습니다.");
+      await postComment(workId, { commentContent: textToSubmit });
+      // 성공 시: 폴링(fetchUnreadComments)에서 실제 댓글이 오면 임시 댓글(음수 ID)은 자동으로 제거되고 실제 댓글로 교체됨
     } catch (error) {
-      console.error(error);
+      console.error("댓글 작성 실패:", error);
       showError("메시지 전송에 실패했습니다.");
     } finally {
-      setIsSubmitting(false);
+      // 1.7초 후 입력 비활성화 해제 (성급한 재전송 방지)
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, COMMENT_SUBMIT_COOLDOWN_MS);
     }
   };
 
+  // 뒤로 가기 버튼 클릭 시 작업 상세 페이지로 이동
   const handleBack = () => {
     const params = new URLSearchParams();
     if (status) params.set("status", status);
     router.push(`/work/${workId}?${String(params)}`);
   };
 
+  // 데이터 변환 함수들 (useMemo)
   // 날짜별로 댓글 그룹화
+  // - 댓글을 생성 날짜 기준으로 그룹화하여 UI에 표시
+  // - 날짜 형식: "YYYY년 MM월 DD일"
   const groupedComments = useMemo(() => {
     return comments.reduce((groups, comment) => {
       const date = dayjs(comment.createdAt).format("YYYY년 MM월 DD일");
@@ -190,6 +282,7 @@ export default function WorkComments() {
     }, {} as Record<string, ICommentList[]>);
   }, [comments]);
 
+  // UI 헬퍼 함수들
   // 내가 작성한 댓글인지 확인 (공업사가 작성한 댓글)
   const isMyComment = (comment: ICommentList) => {
     return comment.authorType === "FACTORY_MEMBER";
@@ -313,6 +406,7 @@ export default function WorkComments() {
                 </div>
               </div>
             ))}
+            {/* 스크롤 위치 참조용 div (맨 아래) */}
             <div ref={messagesEndRef} />
           </div>
         </div>
