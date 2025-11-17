@@ -239,7 +239,9 @@ export default function WorkDetail() {
           {/* 지역, 상태 배찌 */}
           <div className="flex items-start ml-5 gap-2">
             <div className="flex flex-col shrink-0 items-start bg-bg-normal text-left py-1 px-2 rounded-md border border-solid border-line-primary">
-              <span className="text-line-primary text-xs font-medium">{workData?.sigungu}</span>
+              <span className="text-line-primary text-xs font-medium">
+                {workData?.sido ? `${workData?.sido} ${workData?.sigungu}` : workData?.sigungu}
+              </span>
             </div>
             <div
               className="flex flex-col shrink-0 items-start text-left py-1 px-2 rounded-md border-0"
@@ -341,7 +343,10 @@ export default function WorkDetail() {
             <div className="self-stretch bg-neutral-100 h-0.5 mb-[16px]"></div>
             <div className="flex flex-col items-start self-stretch">
               <span className="text-primary-normal text-base font-medium mb-2">예약 기본 정보</span>
-              <DetailInfoRow label="예약지역" value={workData?.sigungu || "-"} />
+              <DetailInfoRow
+                label="예약지역"
+                value={workData?.sido ? `${workData?.sido} ${workData?.sigungu}` : workData?.sigungu || "-"}
+              />
               <DetailInfoRow label="입고 예약일" value={workData?.reservationDate || "-"} />
             </div>
             <div className="flex flex-col items-start self-stretch">
