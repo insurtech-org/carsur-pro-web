@@ -52,7 +52,7 @@ const WorkCard = ({ data }: { data: IWorkList }) => {
 
         <div className="flex items-start self-stretch mx-4">
           <div className="flex flex-1 flex-col items-start gap-0.5">
-            <span className="text-[#616161] text-sm">{data.sigungu}</span>
+            <span className="text-[#616161] text-sm">{data.sido ? `${data.sido} ${data.sigungu}` : data.sigungu}</span>
             <span className="text-[#616161] text-sm">{formatPhoneNumber(data.tellNo)}</span>
           </div>
           <span className="text-[#616161] text-sm mt-[22px]">{data.insuranceCompanyName}</span>
