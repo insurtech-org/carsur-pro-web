@@ -9,6 +9,7 @@ export interface IWorkList {
   insuranceCompanyName: string;
   reservationDate: string;
   unreadCommentCount?: number;
+  sido?: string;
 }
 
 //상태 카운트
@@ -38,6 +39,7 @@ export interface IWorkDetail {
   contactManagerPhone: string;
   contactManagerFax: string;
   sigungu: string;
+  sido?: string;
   reservationDate: string;
   carNumber: string;
   carModel: string;
