@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ProposalList from "@/components/unit/call/ProposalList";
 import CallList from "@/components/unit/call/CallList";
 import { useRouter } from "next/navigation";
+import NoticeBanner from "@/components/common/NoticeBanner";
 
 export default function CallPage() {
   const [activeTab, setActiveTab] = useState<"mycall" | "proposal">("mycall");
@@ -68,6 +69,9 @@ export default function CallPage() {
             제안내역
           </button>
         </div>
+
+        {/* 공지 배너 */}
+        <NoticeBanner title="메시지 및 푸시 기능 업데이트" buttonText="확인하기" badgeText="1 / 1" />
 
         {/* 탭 */}
         <div className="flex w-full items-start gap-4 border-b-[1px] border-neutral-200">
