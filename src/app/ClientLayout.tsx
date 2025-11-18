@@ -9,6 +9,7 @@ import CommonModal from "@/components/modal/CommonModal";
 import ProposeModal from "@/components/modal/ProposeModal";
 import { useToastStore } from "@/store/toast";
 import AuthGuard from "@/components/common/AuthGuard";
+import NoticeModal from "@/components/modal/Notice/NoticeModal";
 
 // 전역 Toast 컴포넌트
 function GlobalToast() {
@@ -62,6 +63,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <GlobalToast />
       <CommonModal />
       <ProposeModal />
+      <NoticeModal />
     </div>
   );
 }
