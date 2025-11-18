@@ -69,6 +69,12 @@ export default function MyPageList() {
 
           <div className="w-full inline-flex flex-col justify-start items-start">
             <ArrowButton text="계정관리" onClick={() => router.push("/mypage/account")} />
+            <ArrowButton
+              text="공지사황"
+              onClick={() =>
+                window.open("https://insurtech-kr.notion.site/carsurpro-notificaiton", "_blank", "noopener,noreferrer")
+              }
+            />
 
             <ArrowButton text="이용약관" onClick={() => router.push("/mypage/terms")} isUnderLine={false} />
           </div>
