@@ -1,5 +1,6 @@
 "use client";
 
+import { usePreventScroll } from "@/hook/usePreventScroll";
 import MainButton from "../common/MainButton";
 
 interface ForceUpdateModalProps {
@@ -9,6 +10,8 @@ interface ForceUpdateModalProps {
 }
 
 const ForceUpdateModal = ({ isOpen, platform, onClose }: ForceUpdateModalProps) => {
+  usePreventScroll(isOpen);
+
   // 모달이 열려있지 않으면 렌더링하지 않음
   if (!isOpen) return null;
 

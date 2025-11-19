@@ -15,7 +15,7 @@ import { registerTokenApi } from "@/api/push.api";
 import { waitForAppVersion, isVersionTooOld } from "@/utils/versionCheck";
 
 // 최소 요구 앱 버전 (필요 시 이 값을 변경)
-const MINIMUM_APP_VERSION = "1.1.0";
+const MINIMUM_APP_VERSION = "1.0.9";
 
 // 전역 Toast 컴포넌트
 function GlobalToast() {
