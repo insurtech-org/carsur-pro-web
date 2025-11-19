@@ -37,9 +37,9 @@ const WorkCard = ({ data }: { data: IWorkList }) => {
                   {WORK_STATUS[data.status as keyof typeof WORK_STATUS]}
                 </span>
               </div>
-              {data.status === "CONFIRMED" && (
+              {/* {data.status === "CONFIRMED" && (
                 <div className="w-2 h-2 absolute top-0 right-[-2px] rounded-xl object-fill bg-status-destructive"></div>
-              )}
+              )} */}
             </div>
             <CommentBubble count={data.unreadCommentCount || 0} />
           </div>
