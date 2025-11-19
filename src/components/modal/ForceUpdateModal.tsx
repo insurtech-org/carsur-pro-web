@@ -26,44 +26,36 @@ const ForceUpdateModal = ({ isOpen, platform, onClose }: ForceUpdateModalProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-end justify-center">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center px-5">
       {/* 배경 오버레이 - 불투명 */}
       <div className="absolute inset-0 bg-black bg-opacity-50" />
 
       {/* 모달 및 닫기 버튼 컨테이너 */}
-      <div className="relative w-full max-w-md transform transition-transform duration-300 ease-out flex flex-col items-center gap-4 pb-8">
-        {/* 모달 컨텐츠 - 아래에서 위로 올라오는 애니메이션 */}
-        <div className="relative w-full">
-          <div className="flex flex-col bg-white rounded-t-2xl">
-            {/* 모달 상단 핸들바 */}
-            <div className="flex flex-col items-center self-stretch mt-2">
-              <div className="bg-[#EDEDED] w-10 h-[5px] rounded-[1000px]"></div>
+      <div className="relative flex flex-col items-center gap-4">
+        {/* 모달 컨텐츠 */}
+        <div className="relative max-w-[380px] min-w-80 bg-white rounded-xl inline-flex flex-col justify-start items-start overflow-hidden p-5 gap-7">
+          {/* 헤더 영역 */}
+          <div className="justify-center text-black text-lg font-semibold">업데이트 안내</div>
+
+          {/* 본문 및 버튼 영역 */}
+          <div className="self-stretch flex flex-col justify-start items-start">
+            {/* 설명 텍스트 */}
+            <div className="self-stretch min-h-16 flex flex-col justify-start items-start">
+              <div className="self-stretch justify-start text-neutral-800 text-base font-normal whitespace-pre-line">
+                {"최신 버전으로 업데이트가 필요합니다.\n더 나은 서비스 이용을 위해 앱을 업데이트해 주세요."}
+              </div>
             </div>
 
-            <div className="flex flex-col items-start self-stretch bg-white rounded-t-2xl p-5">
-              <div className="flex flex-col self-stretch bg-white rounded-t-2xl">
-                {/* 제목 */}
-                <div className="flex items-start self-stretch mb-4">
-                  <span className="flex-1 text-[#131211] text-xl font-bold">업데이트 필요</span>
-                </div>
-
-                {/* 설명 텍스트 */}
-                <div className="flex flex-col gap-1 mb-6">
-                  <span className="text-neutral-800 text-base font-regular whitespace-pre-line">
-                    {"최신 버전으로 업데이트가 필요합니다.\n더 나은 서비스 이용을 위해 앱을 업데이트해 주세요."}
-                  </span>
-                </div>
-
-                {/* 버튼 영역 - 업데이트 버튼만 */}
-                <div className="flex flex-row bg-white py-4">
-                  <MainButton text="업데이트" onClick={handleUpdate} />
-                </div>
+            {/* 버튼 영역 */}
+            <div className="self-stretch bg-white flex flex-col justify-start items-start mt-4">
+              <div className="self-stretch flex flex-row justify-start items-start">
+                <MainButton text="업데이트" onClick={handleUpdate} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* 닫기 버튼 */}
+        {/*닫기 버튼*/}
         <button onClick={onClose} className="flex flex-row justify-center items-center gap-2 text-white cursor-pointer">
           <div className="w-[24px] h-[24px]">
             <svg
