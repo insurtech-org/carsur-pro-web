@@ -15,6 +15,7 @@ const COMMENT_POLLING_INTERVAL = 10000; // 10초 - 폴링 간격
 const COMMENT_SUBMIT_COOLDOWN_MS = 1700; // 1.7초 - 댓글 전송 후 입력 비활성화 시간
 const BILLING_WINDOW_DAYS = 30; // 청구완료 후 메시지 작성 가능 기간 (일)
 const BILLING_WINDOW_MS = BILLING_WINDOW_DAYS * 24 * 60 * 60 * 1000; // 밀리초로 변환
+const POLLING_AUTO_STOP_MS = 80000; // 3분 - 폴링 자동 중지 시간
 
 export default function WorkComments() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function WorkComments() {
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMessageVisible, setIsMessageVisible] = useState(true);
+  const [pollingKey, setPollingKey] = useState(0); // 폴링 재시작을 위한 키
 
   // Ref 관리 (렌더링과 무관한 값 저장)
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -39,11 +41,13 @@ export default function WorkComments() {
   const isMarkingReadRef = useRef(false);
   const shouldScrollRef = useRef(true);
   const isInitialLoadRef = useRef(true);
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollingStartTimeRef = useRef<number | null>(null); // 폴링 시작 시간 추적
 
   // 유틸리티 함수
   // 댓글 목록 맨 아래로 스크롤
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
   };
 
   // 데이터 조회 함수
@@ -105,22 +109,49 @@ export default function WorkComments() {
     }
   }, [workId]);
 
-  // useEffect 1: 초기 데이터 로드 및 폴링 설정
+  // useEffect 1: 초기 데이터 로드
   // - 컴포넌트 마운트 시 작업 상세 정보와 전체 댓글 로드 (unreadOnly=false)
-  // - 10초마다 마지막 읽음 이후 댓글만 조회하여 기존 리스트에 추가 (unreadOnly=true)
-  // - 컴포넌트 언마운트 시 폴링 인터벌 정리
   useEffect(() => {
     fetchWorkDetail();
     fetchAllComments(true);
+  }, [fetchWorkDetail, fetchAllComments]);
 
-    const intervalId = setInterval(() => {
+  // useEffect 2: 폴링 설정 (3분 후 자동 중지)
+  // - 10초마다 마지막 읽음 이후 댓글만 조회하여 기존 리스트에 추가 (unreadOnly=true)
+  // - 3분(180초) 경과 시 자동으로 폴링 중지
+  // - pollingKey 변경 시 폴링 재시작 (댓글 작성 후 사용)
+  useEffect(() => {
+    if (!workId) return;
+
+    // 폴링 시작 시간 기록
+    pollingStartTimeRef.current = dayjs().valueOf();
+
+    pollingIntervalRef.current = setInterval(() => {
+      // 경과 시간 체크 (3분 = 180,000ms)
+      const elapsedTime = dayjs().valueOf() - (pollingStartTimeRef.current ?? 0);
+
+      if (elapsedTime >= POLLING_AUTO_STOP_MS) {
+        // 3분 이상 경과 시 폴링 중지
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+          pollingStartTimeRef.current = null;
+        }
+        return;
+      }
+
+      // 폴링 실행
       fetchUnreadComments();
     }, COMMENT_POLLING_INTERVAL);
 
     return () => {
-      clearInterval(intervalId);
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+      pollingStartTimeRef.current = null;
     };
-  }, [fetchWorkDetail, fetchAllComments, fetchUnreadComments]);
+  }, [workId, fetchUnreadComments, pollingKey]); // pollingKey 변경 시 재시작
 
   // 계산된 값 (useMemo)
   // 최신 댓글 ID 계산
@@ -133,7 +164,7 @@ export default function WorkComments() {
     return Math.max(...realComments.map(comment => comment.id));
   }, [comments]);
 
-  // useEffect 2: 댓글 읽음 처리
+  // useEffect 3: 댓글 읽음 처리
   // - 최신 댓글 ID가 변경될 때마다 읽음 처리 API 호출
   // - 중복 호출 방지: 이미 읽은 댓글이거나 현재 처리 중이면 스킵
   // - 성공 시 lastReadCommentIdRef에 최신 ID 저장하여 다음 호출 시 중복 방지
@@ -155,7 +186,7 @@ export default function WorkComments() {
       });
   }, [workId, latestRealCommentId]);
 
-  // useEffect 3: 스크롤 제어
+  // useEffect 4: 스크롤 제어
   // - 댓글 목록이 변경될 때 자동 스크롤 처리
   // - 초기 로드: DOM 렌더링 대기 후 스크롤 (100ms 지연)
   // - 댓글 작성 후: 즉시 스크롤
@@ -164,15 +195,12 @@ export default function WorkComments() {
     // 초기 로드 시 또는 댓글 작성 시 스크롤
     if (shouldScrollRef.current && comments.length > 0) {
       if (isInitialLoadRef.current) {
-        setTimeout(() => {
-          scrollToBottom();
-          isInitialLoadRef.current = false;
-          shouldScrollRef.current = false;
-        }, 100);
+        scrollToBottom("auto"); // 최초 진입 시 즉시 맨 아래로 이동
+        isInitialLoadRef.current = false;
       } else {
         scrollToBottom();
-        shouldScrollRef.current = false;
       }
+      shouldScrollRef.current = false;
     }
   }, [comments]);
 
@@ -182,7 +210,7 @@ export default function WorkComments() {
   // 1. 종결된 건 → 입력 불가
   // 2. 청구완료 + 30일 경과 → 입력 불가
   // 3. 청구완료 + 30일 이내 → 입력 가능 + 안내 메시지
-  // 4. 일반 → 입력 가능
+  // 4. 일반 → 입력 가능 + 안내 메시지
   const { isInputDisabled, controlMessage } = useMemo(() => {
     if (!workDetail) {
       return { isInputDisabled: false, controlMessage: "" };
@@ -196,7 +224,7 @@ export default function WorkComments() {
     if (workDetail.accidentStatus?.includes("CANCELLED")) {
       return {
         isInputDisabled: true,
-        controlMessage: "안내 해당 건은 종결되어 메시지를 보낼 수 없어요",
+        controlMessage: "해당 건은 종결되어 메시지를 보낼 수 없어요",
       };
     }
 
@@ -205,20 +233,23 @@ export default function WorkComments() {
       if (billingWindowExpired) {
         return {
           isInputDisabled: true,
-          controlMessage:
-            "안내 해당 건은 청구완료 후 30일이 지나 메시지를 보낼 수 없어요. 기존 대화는 열람만 가능해요.",
+          controlMessage: "해당 건은 청구완료 후 30일이 지나 메시지를 보낼 수 없어요. 기존 대화는 열람만 가능해요.",
         };
       }
 
       // 30일 이내 → 입력 가능 + 안내 메시지
       return {
         isInputDisabled: false,
-        controlMessage: "안내 청구가 완료된 건이에요. 30일 동안은 메시지 작성이 가능하며, 이후에는 열람만 가능해요.",
+        controlMessage: "청구가 완료된 건이에요. 30일 동안은 메시지 작성이 가능하며, 이후에는 열람만 가능해요.",
       };
     }
 
-    // 일반 상태 → 입력 가능
-    return { isInputDisabled: false, controlMessage: "" };
+    // 4순위: 일반 상태 → 입력 가능 + 안내 메시지
+    return {
+      isInputDisabled: false,
+      controlMessage:
+        "보험사와 카슈어 운영팀에 입고 확정/일정/청구 등 주요 사항을 공유해 주세요. (예: 렌터카 업체가 픽업 후 O일 O시에 입고 예정입니다. 등)",
+    };
   }, [workDetail]);
 
   // 댓글 작성 핸들러 (Optimistic Update 패턴)
@@ -262,6 +293,9 @@ export default function WorkComments() {
           console.error("댓글 전송 후 읽음 처리 실패:", readError);
         }
       }
+
+      // 댓글 작성 후 폴링 재시작 (3분 타이머 리셋)
+      setPollingKey(prev => prev + 1);
     } catch (error) {
       console.error("댓글 작성 실패:", error);
       showError("메시지 전송에 실패했습니다.");
@@ -434,7 +468,12 @@ export default function WorkComments() {
               onClick={() => setIsMessageVisible(false)}
               className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-[#E6E7EC]/80 backdrop-blur-sm pointer-events-auto cursor-pointer transition-all duration-200 hover:bg-[#E6E7EC]/60"
             >
-              <span className="text-sm leading-relaxed flex-1 text-gray-500">{controlMessage}</span>
+              {controlMessage ? (
+                <>
+                  <span className="text-[13px] leading-[18px] font-semibold text-gray-500">안내</span>
+                  <span className="text-[13px] leading-[18px] font-normal flex-1 text-gray-500">{controlMessage}</span>
+                </>
+              ) : null}
             </div>
           </div>
         )}
