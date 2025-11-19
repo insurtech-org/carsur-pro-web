@@ -44,7 +44,7 @@ export default function R() {
         // 앱이 설치되어 있지 않으면 앱스토어로 이동
         const fallbackTimer = setTimeout(() => {
           window.location.href = iosStoreUrl;
-        }, 1000);
+        }, 2500);
 
         // 앱이 설치되어 있으면 앱으로 이동
         window.location.href = appUrl;
