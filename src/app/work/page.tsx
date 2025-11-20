@@ -92,7 +92,7 @@ export default function WorkPage() {
         </div>
 
         {/* 공지 배너 */}
-        <NoticeBanner title="메시지 및 푸시 기능 업데이트" buttonText="확인하기" badgeText="1 / 1" />
+        <NoticeBanner title="메시지 및 푸시 기능 업데이트" buttonText="확인하기" badgeText="" />
 
         {/* 필터 */}
         <div
