@@ -108,11 +108,18 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // 앱 버전 체크 (RN 환경에서만, 최초 1회)
   useEffect(() => {
     // Check RN environment inside useEffect for Next.js hydration
-    const isReactNative = typeof window !== "undefined" && window.ReactNativeWebView;
+    // 구버전 앱에는 window.ReactNativeWebView가 없으므로 User-Agent도 체크
+    const hasReactNativeWebView = typeof window !== "undefined" && !!window.ReactNativeWebView;
+    const isAndroidWebView = /wv|WebView/i.test(navigator.userAgent) && /Android/i.test(navigator.userAgent);
+    const isiOSWebView = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent);
+    const isReactNative = hasReactNativeWebView || isAndroidWebView || isiOSWebView;
 
     if (!isReactNative || hasCheckedVersion.current) {
       console.log("ℹ️ [웹] 버전 체크 건너뜀:", {
         isReactNative,
+        hasReactNativeWebView,
+        isAndroidWebView,
+        isiOSWebView,
         hasCheckedVersion: hasCheckedVersion.current,
       });
       return;
@@ -168,7 +175,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // RN으로부터 FCM 토큰을 받기 위한 메시지 리스너
   useEffect(() => {
     // Check RN environment inside useEffect for Next.js hydration
-    const isReactNative = typeof window !== "undefined" && window.ReactNativeWebView;
+    // 구버전 앱에는 window.ReactNativeWebView가 없으므로 User-Agent도 체크
+    const hasReactNativeWebView = typeof window !== "undefined" && !!window.ReactNativeWebView;
+    const isAndroidWebView = /wv|WebView/i.test(navigator.userAgent) && /Android/i.test(navigator.userAgent);
+    const isiOSWebView = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent);
+    const isReactNative = hasReactNativeWebView || isAndroidWebView || isiOSWebView;
 
     if (!isReactNative) {
       return;
