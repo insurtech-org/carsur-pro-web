@@ -38,9 +38,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const { isLoading } = useLoadingStore();
   const { user } = useUserStore();
 
-  // RN 환경인지 체크
-  const isReactNative = typeof window !== "undefined" && window.ReactNativeWebView;
-
   // FCM 토큰 요청 여부를 추적 (세션당 한 번만)
   const hasRequestedToken = useRef(false);
 
@@ -110,6 +107,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // 앱 버전 체크 (RN 환경에서만, 최초 1회)
   useEffect(() => {
+    // Check RN environment inside useEffect for Next.js hydration
+    const isReactNative = typeof window !== "undefined" && window.ReactNativeWebView;
+
     if (!isReactNative || hasCheckedVersion.current) {
       console.log("ℹ️ [웹] 버전 체크 건너뜀:", {
         isReactNative,
@@ -163,10 +163,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
     hasCheckedVersion.current = true;
     checkVersion();
-  }, [isReactNative]);
+  }, []);
 
   // RN으로부터 FCM 토큰을 받기 위한 메시지 리스너
   useEffect(() => {
+    // Check RN environment inside useEffect for Next.js hydration
+    const isReactNative = typeof window !== "undefined" && window.ReactNativeWebView;
+
     if (!isReactNative) {
       return;
     }
@@ -217,7 +220,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       window.removeEventListener("message", handleMessage);
       document.removeEventListener("message", handleMessage as EventListener);
     };
-  }, [isReactNative, user?.id, sendFCMToken]);
+  }, [user?.id, sendFCMToken]);
 
   useEffect(() => {
     const handleBackButton = (e: PopStateEvent) => {
