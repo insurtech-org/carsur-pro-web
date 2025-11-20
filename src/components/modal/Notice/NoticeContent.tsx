@@ -22,12 +22,12 @@ export default function NoticeContent({ onClose, onHideForToday }: NoticeContent
     <div className="relative w-full max-w-[433px] rounded-t-2xl overflow-hidden">
       {/* 헤더 - absolute로 이미지 위에 배치 */}
       <div className="absolute top-2 left-0 right-0 z-10 flex justify-end items-center px-[32px] pt-4 ">
-        <span
+        {/* <span
           className="flex items-center justify-center text-[11px] text-white rounded-full bg-gray-500 px-2 py-1 shadow-sm"
           style={{ textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)" }}
         >
           1 / 1
-        </span>
+        </span> */}
       </div>
 
       {/* 이미지 컨텐츠 - 375x375 사이즈, aspect ratio 유지 */}

@@ -31,7 +31,7 @@ export default function NoticeBanner({
       <div className="w-full px-4 py-2 bg-gray-100 rounded-lg flex items-center justify-between">
         {/* 왼쪽 텍스트 영역 */}
         <div className="flex flex-col gap-1 flex-1">
-          <div className="text-black text-[17px] font-bold">{title}</div>
+          <div className="text-black text-[15px] min-[375px]:text-[17px] font-bold">{title}</div>
           {buttonText && (
             <button
               onClick={handleButtonClick}
@@ -46,8 +46,8 @@ export default function NoticeBanner({
         {/* 오른쪽 이미지 영역 */}
         <div className="relative flex-shrink-0">
           {/* 메가폰 이미지 */}
-          <div className="w-18 h-18 flex items-center justify-center mr-8">
-            <Image src={imageSrc} alt={imageAlt} width={75} height={75} />
+          <div className="w-18 h-20 flex mr-2">
+            <Image src={imageSrc} alt={imageAlt} width={80} height={80} />
           </div>
 
           {/* 배지 */}
