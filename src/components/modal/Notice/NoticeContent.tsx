@@ -52,7 +52,7 @@ export default function NoticeContent({ onClose, onHideForToday }: NoticeContent
       {/* 하단 액션 영역 */}
       <div className="w-full h-[58px] flex justify-between items-center bg-white text-[16px] text-semibold">
         <button onClick={onHideForToday} className="w-[50%] h-full hover:bg-gray-100 transition-colors text-gray-400">
-          오늘 하루 보지 않기
+          다시 보지 않기
         </button>
         <button onClick={onClose} className="w-[50%] h-full text-[16px] hover:bg-gray-100 transition-colors text-black">
           닫기

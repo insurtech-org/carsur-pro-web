@@ -1,56 +1,50 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import dayjs from "dayjs";
 
 /**
  * 공지사항 체크 및 모달 관리 훅
  * - 앱 진입 시 공지사항 표시 여부 자동 체크
  * - 모달 열림/닫힘 상태 관리
  * - body 스크롤 제어
- * - 오늘 하루 숨기기 기능 제공
- * - localStorage를 사용하여 "오늘 하루 보지 않기" 상태 저장
- * @param noticeId - 공지사항 식별자 (기본값: 캐시 제도 공지사항)
+ * - 다시 보지 않기 기능 제공 (localStorage에 날짜 저장)
+ * @param noticeId - 공지사항 식별자 (기본값: notice-2025-11-18)
  */
 
-// 오늘 자정 시간 계산 (ISO 문자열로 반환)
-const getTodayMidnightISO = () => {
-  return dayjs().add(1, "day").startOf("day").toISOString();
+// 공지사항별 스토리지 키 생성
+const getStorageKey = (noticeId: string) => `notice_dismissed_${noticeId}`;
+
+// 오늘 날짜 문자열 반환 (YYYY-MM-DD 형식)
+const getTodayDateString = () => {
+  const today = new Date();
+  return today.toISOString().split("T")[0]; // YYYY-MM-DD
 };
 
-// 공지사항별 스토리지 키 생성
-const getStorageKey = (noticeId: string) => `notice_hideUntil_${noticeId}`;
-
-// localStorage에서 숨김 기한 읽기
-const getNoticeHideUntil = (noticeId: string) => {
+// localStorage에서 날짜 읽기
+const getDismissedDate = (noticeId: string): string | null => {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(getStorageKey(noticeId));
 };
 
-// 세션 동안 닫힘 상태는 ref로 관리 (페이지 새로고침 시 초기화)
-
-// 오늘 하루 숨기기 설정 (오늘 자정까지 localStorage에 저장)
-const setNoticeHideForToday = (noticeId: string) => {
+// 다시 보지 않기 설정 (localStorage에 오늘 날짜 저장)
+const setNoticeDismissed = (noticeId: string) => {
   if (typeof window === "undefined") return;
-  localStorage.setItem(getStorageKey(noticeId), getTodayMidnightISO());
+  localStorage.setItem(getStorageKey(noticeId), getTodayDateString());
 };
 
-// 공지사항을 보여줘야 하는지 확인
-// - 저장된 값이 없으면 보여줌 (최초 진입)
-// - 저장된 기한이 지났으면 다시 보여줌
-const shouldShowNotice = (noticeId: string) => {
-  const raw = getNoticeHideUntil(noticeId);
-  if (!raw) return true;
-  return dayjs().isAfter(dayjs(raw));
+// 공지사항을 보여줘야 하는지 확인 (날짜가 있으면 숨김, 없으면 표시)
+const shouldShowNotice = (noticeId: string): boolean => {
+  const dismissedDate = getDismissedDate(noticeId);
+  return dismissedDate === null; // 날짜가 없으면 표시
 };
 
-export const useNoticeCheck = (noticeId: string = "cash-2025-11") => {
+export const useNoticeCheck = (noticeId: string = "notice-2025-11-18") => {
   const [isOpen, setIsOpen] = useState(false);
   const isDismissedRef = useRef(false); // 세션 동안 닫힘 상태 관리
 
   // 앱 진입 시 한 번만 체크 (마운트 시)
   useEffect(() => {
-    // ref로 관리되는 닫힘 상태가 아니고, 숨김 기한이 지났으면 표시
+    // 세션 동안 닫힌 상태가 아니고, localStorage에 날짜가 없으면 표시
     if (!isDismissedRef.current && shouldShowNotice(noticeId)) {
       setIsOpen(true);
     }
@@ -78,9 +72,9 @@ export const useNoticeCheck = (noticeId: string = "cash-2025-11") => {
     setIsOpen(false);
   };
 
-  // 오늘 하루 숨기고 닫기
+  // 다시 보지 않기 설정하고 닫기 (localStorage에 영구 저장)
   const hideForTodayAndClose = () => {
-    setNoticeHideForToday(noticeId);
+    setNoticeDismissed(noticeId);
     setIsOpen(false);
   };
 
