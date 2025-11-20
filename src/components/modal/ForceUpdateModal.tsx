@@ -33,33 +33,13 @@ const ForceUpdateModal = ({ isOpen, platform, onClose }: ForceUpdateModalProps) 
       {/* 배경 오버레이 - 불투명 */}
       <div className="absolute inset-0 bg-black bg-opacity-50" />
 
-      {/* 모달 및 닫기 버튼 컨테이너 */}
-      <div className="relative flex flex-col items-center gap-4">
-        {/* 모달 컨텐츠 */}
-        <div className="relative max-w-[380px] min-w-80 bg-white rounded-xl inline-flex flex-col justify-start items-start overflow-hidden p-5 gap-7">
-          {/* 헤더 영역 */}
-          <div className="justify-center text-black text-lg font-semibold">업데이트 안내</div>
-
-          {/* 본문 및 버튼 영역 */}
-          <div className="self-stretch flex flex-col justify-start items-start">
-            {/* 설명 텍스트 */}
-            <div className="self-stretch min-h-16 flex flex-col justify-start items-start">
-              <div className="self-stretch justify-start text-neutral-800 text-base font-normal whitespace-pre-line">
-                {"최신 버전으로 업데이트가 필요합니다.\n더 나은 서비스 이용을 위해 앱을 업데이트해 주세요."}
-              </div>
-            </div>
-
-            {/* 버튼 영역 */}
-            <div className="self-stretch bg-white flex flex-col justify-start items-start mt-4">
-              <div className="self-stretch flex flex-row justify-start items-start">
-                <MainButton text="업데이트" onClick={handleUpdate} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/*닫기 버튼*/}
-        <button onClick={onClose} className="flex flex-row justify-center items-center gap-2 text-white cursor-pointer">
+      {/* 모달 컨테이너 */}
+      <div className="relative flex flex-col items-center">
+        {/* 닫기 버튼 - 모달 박스 오른쪽 위 */}
+        <button
+          onClick={onClose}
+          className="absolute -top-8 right-0 flex flex-row justify-center items-center gap-2 text-white cursor-pointer z-10"
+        >
           <div className="w-[24px] h-[24px]">
             <svg
               width="24"
@@ -75,8 +55,30 @@ const ForceUpdateModal = ({ isOpen, platform, onClose }: ForceUpdateModalProps) 
               />
             </svg>
           </div>
-          <div>닫기</div>
         </button>
+
+        {/* 모달 컨텐츠 */}
+        <div className="relative max-w-[380px] min-w-80 bg-white rounded-xl inline-flex flex-col justify-start items-start overflow-hidden p-5 gap-7">
+          {/* 헤더 영역 */}
+          <div className="justify-center text-black text-lg font-semibold">업데이트 안내</div>
+
+          {/* 본문 및 버튼 영역 */}
+          <div className="self-stretch flex flex-col justify-start items-start">
+            {/* 설명 텍스트 */}
+            <div className="self-stretch min-h-16 flex flex-col justify-start items-start">
+              <div className="self-stretch justify-center text-center text-neutral-800 text-base font-normal whitespace-pre-line">
+                {"최신 버전으로 업데이트가 필요합니다.\n업무 지연이 발생하지 않도록 반드시 \n업데이트해 주세요."}
+              </div>
+            </div>
+
+            {/* 버튼 영역 */}
+            <div className="self-stretch bg-white flex flex-col justify-start items-start mt-4">
+              <div className="self-stretch flex flex-row justify-start items-start">
+                <MainButton text="업데이트" onClick={handleUpdate} />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
