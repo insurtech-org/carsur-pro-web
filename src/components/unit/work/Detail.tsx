@@ -325,7 +325,12 @@ export default function WorkDetail() {
               <DetailInfoRow label="사고접수번호" value={workData?.insuranceClaimNo || "-"} />
               <DetailInfoRow label="보험사" value={workData?.insuranceCompanyName || "-"} />
               <DetailInfoRow label="사고구분" value={getCarTypeText(workData?.coverageType || "-")} />
-              <DetailInfoRow label="예상과실율" value={`${workData?.faultRate ? `${workData?.faultRate}%` : "-"}`} />
+              <DetailInfoRow
+                label="예상과실율"
+                value={`${
+                  workData?.faultRate ? (workData?.faultRate === "N" ? "미확정" : `${workData?.faultRate}%`) : "-"
+                }`}
+              />
               {!isCancelled && <DetailInfoRow label="보험담당자" value={workData?.contactManagerName || "-"} />}
               {!isCancelled && (
                 <DetailInfoRow

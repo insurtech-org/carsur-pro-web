@@ -7,6 +7,7 @@ import { FILTER_STATUS } from "@/utils/enum";
 import { IWorkStatusCount } from "@/type/work.type";
 import { convertSnakeToCamel } from "@/utils/util";
 import { useRouter, useSearchParams } from "next/navigation";
+import NoticeBanner from "@/components/common/NoticeBanner";
 
 // useSearchParams를 사용하는 컴포넌트를 별도로 분리
 export default function WorkPage() {
@@ -89,6 +90,9 @@ export default function WorkPage() {
         <div className="h-11 w-full flex flex-row justify-start items-center px-5">
           <span className="text-primary-normal text-xl font-semibold">내 작업 일정</span>
         </div>
+
+        {/* 공지 배너 */}
+        <NoticeBanner title="메시지 및 푸시 기능 업데이트" buttonText="확인하기" badgeText="1 / 1" />
 
         {/* 필터 */}
         <div

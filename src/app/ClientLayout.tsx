@@ -13,6 +13,7 @@ import AuthGuard from "@/components/common/AuthGuard";
 import { useUserStore } from "@/store/user";
 import { registerTokenApi } from "@/api/push.api";
 import { waitForAppVersion, isVersionTooOld } from "@/utils/versionCheck";
+import NoticeModal from "@/components/modal/Notice/NoticeModal";
 
 // 최소 요구 앱 버전 (필요 시 이 값을 변경)
 const MINIMUM_APP_VERSION = "1.1.1";
@@ -253,6 +254,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <ProposeModal />
       {/* 강제 업데이트 모달 (최상위 z-index) */}
       <ForceUpdateModal isOpen={showForceUpdate} platform={platform} onClose={() => setShowForceUpdate(false)} />
+      <NoticeModal />
     </div>
   );
 }
