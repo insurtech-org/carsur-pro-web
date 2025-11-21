@@ -466,14 +466,27 @@ export default function WorkComments() {
           <div className="absolute bottom-full left-0 right-0 px-5 mb-[10px] pointer-events-none">
             <div
               onClick={() => setIsMessageVisible(false)}
-              className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-[#E6E7EC]/80 backdrop-blur-sm pointer-events-auto cursor-pointer transition-all duration-200 hover:bg-[#E6E7EC]/60"
+              className="flex items-start gap-2 px-4 py-3 rounded-xl bg-[#E6E7EC]/80 backdrop-blur-sm pointer-events-auto cursor-pointer transition-all duration-200 hover:bg-[#E6E7EC]/60"
             >
-              {controlMessage ? (
-                <>
-                  <span className="text-[13px] leading-[18px] font-semibold text-gray-500">안내</span>
-                  <span className="text-[13px] leading-[18px] font-normal flex-1 text-gray-500">{controlMessage}</span>
-                </>
-              ) : null}
+              <span className="text-[13px] leading-[18px] font-semibold text-gray-500">안내</span>
+              <span className="text-[13px] leading-[18px] font-normal flex-1 text-gray-500">{controlMessage}</span>
+              <div className="flex-shrink-0 w-3 h-3 flex items-center justify-center text-gray-400">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M11 1L1 11M1 1L11 11"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         )}
@@ -495,7 +508,6 @@ export default function WorkComments() {
                     }
                   }}
                   className="flex-1 bg-transparent text-sm outline-none placeholder:text-primary-assistive text-primary-alternative"
-                  disabled={isSubmitting}
                 />
                 <button
                   onClick={handleSubmit}
