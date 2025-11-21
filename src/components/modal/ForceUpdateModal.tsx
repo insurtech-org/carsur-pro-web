@@ -16,16 +16,19 @@ const ForceUpdateModal = ({ isOpen, platform, onClose }: ForceUpdateModalProps) 
   if (!isOpen) return null;
 
   const handleUpdate = () => {
-    // iOS와 Android 앱스토어 링크
-    const storeLinks = {
-      ios: "https://apps.apple.com/kr/app/%EC%B9%B4%EC%8A%88%EC%96%B4%ED%94%84%EB%A1%9C-%EA%B3%B5%EC%97%85%EC%82%AC/id6751558142",
-      android: "https://play.google.com/store/apps/details?id=com.suretech.carsurpromobile",
-    };
+    // 임시: Notion 페이지로 이동 (플랫폼 판단 에러 때문에)
+    window.location.href = "https://insurtech-kr.notion.site/2af19a26799880bd94b2e69fcdfa203a";
 
-    const link = platform === "ios" ? storeLinks.ios : storeLinks.android;
+    // // iOS와 Android 앱스토어 링크
+    // const storeLinks = {
+    //   ios: "https://apps.apple.com/kr/app/%EC%B9%B4%EC%8A%88%EC%96%B4%ED%94%84%EB%A1%9C-%EA%B3%B5%EC%97%85%EC%82%AC/id6751558142",
+    //   android: "https://play.google.com/store/apps/details?id=com.suretech.carsurpromobile",
+    // };
 
-    // 앱스토어로 이동
-    window.location.href = link;
+    // const link = platform === "ios" ? storeLinks.ios : storeLinks.android;
+
+    // // 앱스토어로 이동
+    // window.location.href = link;
   };
 
   return (

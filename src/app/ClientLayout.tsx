@@ -12,7 +12,7 @@ import { useToastStore } from "@/store/toast";
 import AuthGuard from "@/components/common/AuthGuard";
 import { useUserStore } from "@/store/user";
 import { registerTokenApi } from "@/api/push.api";
-import { waitForAppVersion, isVersionTooOld } from "@/utils/versionCheck";
+import { waitForAppVersion, isVersionTooOld, type AppVersionInfo } from "@/utils/versionCheck";
 import NoticeModal from "@/components/modal/Notice/NoticeModal";
 
 // 최소 요구 앱 버전 (필요 시 이 값을 변경)
@@ -134,24 +134,37 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       try {
         const VERSION_CHECK_TIMEOUT = 2000; // 2초 타임아웃
 
-        // RN으로부터 앱 버전 받아오기 (타임아웃 2초)
-        const appVersion = await waitForAppVersion(VERSION_CHECK_TIMEOUT);
+        // RN으로부터 앱 버전 및 플랫폼 정보 받아오기 (타임아웃 2초)
+        const appInfo = await waitForAppVersion(VERSION_CHECK_TIMEOUT);
 
         console.log("\n========================================");
         console.log("📊 [웹] 버전 체크 결과");
-        console.log(`   받은 앱 버전: ${appVersion || "null (타임아웃 또는 구버전)"}`);
+        console.log(`   받은 앱 버전: ${appInfo.version || "null (타임아웃 또는 구버전)"}`);
+        console.log(`   받은 플랫폼: ${appInfo.platform || "null"}`);
         console.log(`   최소 요구 버전: ${MINIMUM_APP_VERSION}`);
         console.log("========================================\n");
 
+        // 플랫폼 정보가 있으면 설정, 없으면 User-Agent로 감지
+        if (appInfo.platform) {
+          setPlatform(appInfo.platform);
+          console.log(`📱 [웹] 플랫폼 설정: ${appInfo.platform}`);
+        } else {
+          // Fallback: User-Agent 기반 플랫폼 감지
+          const isiOSWebView = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+          const detectedPlatform = isiOSWebView ? "ios" : "android";
+          setPlatform(detectedPlatform);
+          console.log(`📱 [웹] User-Agent 기반 플랫폼 감지: ${detectedPlatform}`);
+        }
+
         // 버전이 없으면 구버전으로 간주하여 강제 업데이트
-        if (!appVersion) {
+        if (!appInfo.version) {
           console.warn("⚠️ [웹] 앱 버전 정보 없음 → 강제 업데이트 팝업 표시");
           setShowForceUpdate(true);
           return;
         }
 
         // 버전이 있으면 최소 요구 버전과 비교
-        const isTooOld = isVersionTooOld(appVersion, MINIMUM_APP_VERSION);
+        const isTooOld = isVersionTooOld(appInfo.version, MINIMUM_APP_VERSION);
         console.log(`🔢 [웹] 버전 비교 결과: ${isTooOld ? "구버전 (업데이트 필요)" : "최신 버전"}`);
 
         if (isTooOld) {
@@ -161,7 +174,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           console.log("✅ [웹] 최신 버전 사용 중 - 정상 진행");
         }
       } catch (error) {
-        // 에러 발생 시 강제 업데이트 표시
+        // 에러 발생 시 User-Agent로 플랫폼 감지하고 강제 업데이트 표시
+        const isiOSWebView = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const detectedPlatform = isiOSWebView ? "ios" : "android";
+        setPlatform(detectedPlatform);
+        console.log(`📱 [웹] 에러 발생 시 User-Agent 기반 플랫폼 감지: ${detectedPlatform}`);
+
         console.error("❌ [웹] 버전 체크 중 오류 발생:", error);
         console.warn("⚠️ [웹] 오류로 인한 강제 업데이트 팝업 표시");
         setShowForceUpdate(true);
