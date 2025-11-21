@@ -495,7 +495,6 @@ export default function WorkComments() {
                     }
                   }}
                   className="flex-1 bg-transparent text-sm outline-none placeholder:text-primary-assistive text-primary-alternative"
-                  disabled={isSubmitting}
                 />
                 <button
                   onClick={handleSubmit}
