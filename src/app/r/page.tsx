@@ -41,18 +41,27 @@ export default function R() {
         // 앱이 설치되어 있는지 확인하기 위해 딥링크 시도
         const appUrl = action ? `suretech://${action}` : "suretech://";
 
+        let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+
+        // 타이머 클리어 함수
+        const cleanup = () => {
+          if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+            fallbackTimer = null;
+          }
+        };
+
         // 앱이 설치되어 있지 않으면 앱스토어로 이동
-        const fallbackTimer = setTimeout(() => {
+        fallbackTimer = setTimeout(() => {
           window.location.href = iosStoreUrl;
-        }, 1000);
+        }, 1000); // 타이머를 1초로 단축
+
+        // 앱이 열리면 타이머 클리어 (이벤트 리스너는 한 번만 실행)
+        window.addEventListener("pagehide", cleanup, { once: true });
+        window.addEventListener("blur", cleanup, { once: true });
 
         // 앱이 설치되어 있으면 앱으로 이동
         window.location.href = appUrl;
-
-        // 앱이 열리면 타이머 클리어
-        window.addEventListener("pagehide", () => {
-          clearTimeout(fallbackTimer);
-        });
       }
     } else {
       // PC인 경우 웹으로 리다이렉트 (action이 있으면 해당 경로로)

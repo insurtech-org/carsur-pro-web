@@ -4,6 +4,13 @@ import { useUserStore } from "@/store/user";
 import { useLoadingStore } from "@/store/loading";
 import { refreshToken as refreshTokenApi } from "./auth.api";
 
+// axios config 타입 확장 - skipLoading 옵션 추가
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    skipLoading?: boolean; // skipLoading 옵션이 true인 경우 로딩을 건너뜀
+  }
+}
+
 // axios 인스턴스 생성
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -40,13 +47,19 @@ const retryOriginalRequest = (originalRequest: InternalAxiosRequestConfig) => {
 // 응답 인터셉터 - 로딩 종료
 instance.interceptors.response.use(
   response => {
-    const { endLoading } = useLoadingStore.getState();
-    endLoading();
+    // skipLoading 옵션이 true인 경우 로딩 종료를 건너뜀
+    if (!response.config.skipLoading) {
+      const { endLoading } = useLoadingStore.getState();
+      endLoading();
+    }
     return response;
   },
   async error => {
-    const { endLoading } = useLoadingStore.getState();
-    endLoading();
+    // skipLoading 옵션이 true인 경우 로딩 종료를 건너뜀
+    if (!error.config?.skipLoading) {
+      const { endLoading } = useLoadingStore.getState();
+      endLoading();
+    }
 
     const originalRequest = error.config;
 
@@ -117,8 +130,11 @@ instance.interceptors.response.use(
 
 // 요청 인터셉터 - 로딩 시작
 instance.interceptors.request.use(config => {
-  const { startLoading } = useLoadingStore.getState();
-  startLoading();
+  // skipLoading 옵션이 true인 경우 로딩을 건너뜀
+  if (!config.skipLoading) {
+    const { startLoading } = useLoadingStore.getState();
+    startLoading();
+  }
 
   // 로그인 API와 토큰 갱신 API는 토큰을 추가하지 않음
   const isLoginApi = config.url?.includes("/auth/factory/login");
