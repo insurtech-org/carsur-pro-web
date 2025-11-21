@@ -22,12 +22,17 @@ export const isVersionTooOld = (
   return false; // 버전이 같으면 false
 };
 
+export interface AppVersionInfo {
+  version: string | null;
+  platform: "ios" | "android" | null;
+}
+
 /**
  * RN으로부터 앱 버전을 받아오는 함수
  * @param timeout 타임아웃 시간 (ms)
- * @returns Promise<string | null> 앱 버전 또는 null
+ * @returns Promise<AppVersionInfo> 앱 버전 및 플랫폼 정보 또는 null
  */
-export const waitForAppVersion = (timeout: number): Promise<string | null> => {
+export const waitForAppVersion = (timeout: number): Promise<AppVersionInfo> => {
   console.log("🔍 [웹] RN 앱 버전 요청 시작");
   console.log(`⏱️ [웹] 타임아웃 설정: ${timeout}ms`);
 
@@ -39,7 +44,7 @@ export const waitForAppVersion = (timeout: number): Promise<string | null> => {
       if (!isResolved) {
         isResolved = true;
         console.warn("⚠️ [웹] RN 앱 버전 수신 타임아웃 - 구버전 앱으로 간주");
-        resolve(null);
+        resolve({ version: null, platform: null });
       }
     }, timeout);
 
@@ -57,14 +62,17 @@ export const waitForAppVersion = (timeout: number): Promise<string | null> => {
           console.log(`📱 [웹] 받은 버전: ${data.version}`);
           console.log(`📱 [웹] 플랫폼: ${data.platform}`);
 
+          // 플랫폼 정보 처리
+          const platform = data.platform?.toLowerCase() === "ios" ? "ios" : "android";
+
           // 버전 정보 저장
           if (data.version) {
             localStorage.setItem("rn_app_version", data.version);
             console.log("💾 [웹] localStorage에 버전 저장 완료");
-            resolve(data.version);
+            resolve({ version: data.version, platform });
           } else {
             console.warn("⚠️ [웹] 버전 정보가 비어있음");
-            resolve(null);
+            resolve({ version: null, platform });
           }
 
           // 리스너 제거
@@ -93,7 +101,7 @@ export const waitForAppVersion = (timeout: number): Promise<string | null> => {
       isResolved = true;
       clearTimeout(timeoutId);
       console.log("ℹ️ [웹] RN 환경이 아님 - 웹 브라우저에서 실행 중");
-      resolve(null);
+      resolve({ version: null, platform: null });
     }
   });
 };
