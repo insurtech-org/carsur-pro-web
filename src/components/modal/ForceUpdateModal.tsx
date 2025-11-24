@@ -38,8 +38,9 @@ const ForceUpdateModal = ({ isOpen, platform, onClose }: ForceUpdateModalProps) 
 
       {/* 모달 컨테이너 */}
       <div className="relative flex flex-col items-center">
+        {/* NOTE : 강제 업데이트를 위해 닫기 버튼 제거 251124 */}
         {/* 닫기 버튼 - 모달 박스 오른쪽 위 */}
-        <button
+        {/* <button
           onClick={onClose}
           className="absolute -top-8 right-0 flex flex-row justify-center items-center gap-2 text-white cursor-pointer z-10"
         >
@@ -58,7 +59,7 @@ const ForceUpdateModal = ({ isOpen, platform, onClose }: ForceUpdateModalProps) 
               />
             </svg>
           </div>
-        </button>
+        </button> */}
 
         {/* 모달 컨텐츠 */}
         <div className="relative max-w-[380px] min-w-80 bg-white rounded-xl inline-flex flex-col justify-start items-start overflow-hidden p-5 gap-7">
