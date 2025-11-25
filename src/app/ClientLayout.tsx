@@ -14,6 +14,7 @@ import { useUserStore } from "@/store/user";
 import { registerTokenApi } from "@/api/push.api";
 import { waitForAppVersion, isVersionTooOld, type AppVersionInfo } from "@/utils/versionCheck";
 import NoticeModal from "@/components/modal/Notice/NoticeModal";
+import { initDatadog } from "@/lib/datadog";
 
 // 최소 요구 앱 버전 (필요 시 이 값을 변경)
 const MINIMUM_APP_VERSION = "1.1.0";
@@ -47,6 +48,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // 버전 체크 완료 여부
   const hasCheckedVersion = useRef(false);
+
+  // Datadog RUM 초기화 (최초 1회만)
+  useEffect(() => {
+    initDatadog();
+  }, []);
 
   // user가 변경될 때 (로그인/로그아웃) 토큰 요청 플래그 리셋
   useEffect(() => {
