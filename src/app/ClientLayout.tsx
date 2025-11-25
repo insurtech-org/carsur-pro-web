@@ -57,7 +57,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // user가 변경될 때 (로그인/로그아웃) 토큰 요청 플래그 리셋
   useEffect(() => {
     hasRequestedToken.current = false;
-  }, [user?.id]);
+  }, [user?.id, !!user]);
 
   // 마지막으로 등록된 FCM 토큰을 localStorage에서 가져오기
   const getLastRegisteredToken = useCallback((userId: number | string): string | null => {
@@ -224,6 +224,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           const deviceId = data.deviceId || "unknown_device_id";
           const deviceType = data.deviceType || data.platform || "ANDROID";
           const deviceName = data.deviceName || "unknown_device";
+
+          // 디버깅을 위한 로그
+          console.log("📱 [웹] FCM 토큰 메시지 수신:", {
+            fcmToken: fcmToken ? `${fcmToken.substring(0, 20)}...` : "없음",
+            deviceId,
+            deviceType,
+            deviceName,
+            원본메시지: data,
+          });
 
           // 플랫폼 정보 저장
           setPlatform(deviceType.toLowerCase() === "ios" ? "ios" : "android");
