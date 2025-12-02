@@ -20,13 +20,13 @@ export interface NoticePopupItem {
 export const NOTICE_POPUPS: NoticePopupItem[] = [
   {
     id: 1,
-    imageSrc: "/images/img/notice/notice_popup_1.png",
-    link: "https://insurtech-kr.notion.site/2af19a26799880bd94b2e69fcdfa203a",
+    imageSrc: "/images/img/notice/notice_popup_2.png",
+    link: "https://insurtech-kr.notion.site/2bd19a2679988005a15dcddc7c7af023",
   },
   {
     id: 2,
-    imageSrc: "/images/img/notice/notice_popup_2.png",
-    link: "https://insurtech-kr.notion.site/2bd19a2679988005a15dcddc7c7af023",
+    imageSrc: "/images/img/notice/notice_popup_1.png",
+    link: "https://insurtech-kr.notion.site/2af19a26799880bd94b2e69fcdfa203a",
   },
 ];
 

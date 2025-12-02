@@ -2,6 +2,7 @@
 
 import ArrowButton from "@/components/unit/mypage/elements/ArrowButton";
 import { useUserStore } from "@/store/user";
+import { openExternalLink } from "@/utils/util";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
@@ -71,9 +72,7 @@ export default function MyPageList() {
             <ArrowButton text="계정관리" onClick={() => router.push("/mypage/account")} />
             <ArrowButton
               text="공지사항"
-              onClick={() =>
-                window.open("https://insurtech-kr.notion.site/carsurpro-notificaiton", "_blank", "noopener,noreferrer")
-              }
+              onClick={() => openExternalLink("https://insurtech-kr.notion.site/carsurpro-notificaiton")}
             />
 
             <ArrowButton text="이용약관" onClick={() => router.push("/mypage/terms")} isUnderLine={false} />
