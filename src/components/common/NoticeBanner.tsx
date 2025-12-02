@@ -28,18 +28,18 @@ export default function NoticeBanner({
 
   return (
     <div className="w-full px-5 py-2">
-      <div className="w-full px-4 py-2 bg-gray-100 rounded-lg flex items-center justify-between">
+      <div
+        onClick={handleButtonClick}
+        className="w-full px-4 py-2 bg-gray-100 rounded-lg flex items-center justify-between cursor-pointer active:bg-gray-200 transition-colors"
+      >
         {/* 왼쪽 텍스트 영역 */}
         <div className="flex flex-col gap-1 flex-1">
           <div className="text-black text-[15px] min-[375px]:text-[17px] font-bold">{title}</div>
           {buttonText && (
-            <button
-              onClick={handleButtonClick}
-              className="text-orange-500 text-[14px] font-medium flex items-center gap-1 hover:text-orange-600 transition-colors"
-            >
+            <div className="text-orange-500 text-[14px] font-medium flex items-center gap-1">
               {buttonText}
               <span className="text-orange-500">&gt;</span>
-            </button>
+            </div>
           )}
         </div>
 
