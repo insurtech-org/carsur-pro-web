@@ -263,3 +263,36 @@ export const formatDateTime = (dateTime: string, format = "YYYY.MM.DD HH:mm") =>
   if (!dateTime) return "-";
   return dayjs(dateTime).format(format);
 };
+
+/**
+ * 외부 링크를 외부 브라우저로 여는 함수
+ * React Native 웹뷰 환경에서는 postMessage를 통해 네이티브 앱에 요청하고,
+ * 일반 웹 환경이거나 RN 쪽에서 처리하지 않는 경우 window.open을 사용합니다.
+ * @param url 열고자 하는 외부 링크 URL
+ */
+export const openExternalLink = (url: string) => {
+  if (!url) return;
+  // React Native 웹뷰 환경인지 확인
+  if (typeof window !== "undefined" && window.ReactNativeWebView) {
+    // 네이티브 앱에 외부 브라우저로 열도록 메시지 전송
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: "OPEN_EXTERNAL_LINK",
+        url: url,
+      })
+    );
+    // RN 쪽에서 메시지를 처리하지 않는 경우를 대비한 fallback
+    // 짧은 딜레이 후에도 링크가 열리지 않으면 window.open 시도
+    setTimeout(() => {
+      try {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } catch {
+        // 웹뷰 환경에서 window.open이 차단될 수 있음 (정상 동작)
+        console.log("외부 링크 열기 실패 (웹뷰 환경일 수 있음)");
+      }
+    }, 100);
+  } else {
+    // 일반 웹 환경에서는 기본 동작 사용
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+};

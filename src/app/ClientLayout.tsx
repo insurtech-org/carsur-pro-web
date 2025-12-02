@@ -12,7 +12,7 @@ import { useToastStore } from "@/store/toast";
 import AuthGuard from "@/components/common/AuthGuard";
 import { useUserStore } from "@/store/user";
 import { registerTokenApi } from "@/api/push.api";
-import { waitForAppVersion, isVersionTooOld, type AppVersionInfo } from "@/utils/versionCheck";
+import { waitForAppVersion, isVersionTooOld } from "@/utils/versionCheck";
 import NoticeModal from "@/components/modal/Notice/NoticeModal";
 import { initDatadog } from "@/lib/datadog";
 
@@ -41,6 +41,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // FCM 토큰 요청 여부를 추적 (세션당 한 번만)
   const hasRequestedToken = useRef(false);
+
+  // RN 환경인지 체크 (window.ReactNativeWebView가 있는 경우만)
+  const isReactNative = typeof window !== "undefined" && !!window.ReactNativeWebView;
 
   // 강제 업데이트 모달 상태
   const [showForceUpdate, setShowForceUpdate] = useState(false);
@@ -113,19 +116,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // 앱 버전 체크 (RN 환경에서만, 최초 1회)
   useEffect(() => {
-    // Check RN environment inside useEffect for Next.js hydration
-    // 구버전 앱에는 window.ReactNativeWebView가 없으므로 User-Agent도 체크
-    const hasReactNativeWebView = typeof window !== "undefined" && !!window.ReactNativeWebView;
-    const isAndroidWebView = /wv|WebView/i.test(navigator.userAgent) && /Android/i.test(navigator.userAgent);
-    const isiOSWebView = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent);
-    const isReactNative = hasReactNativeWebView || isAndroidWebView || isiOSWebView;
-
     if (!isReactNative || hasCheckedVersion.current) {
       console.log("ℹ️ [웹] 버전 체크 건너뜀:", {
         isReactNative,
-        hasReactNativeWebView,
-        isAndroidWebView,
-        isiOSWebView,
         hasCheckedVersion: hasCheckedVersion.current,
       });
       return;
@@ -198,12 +191,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // RN으로부터 FCM 토큰을 받기 위한 메시지 리스너
   useEffect(() => {
-    // Check RN environment inside useEffect for Next.js hydration
-    // 구버전 앱에는 window.ReactNativeWebView가 없으므로 User-Agent도 체크
-    const hasReactNativeWebView = typeof window !== "undefined" && !!window.ReactNativeWebView;
-    const isAndroidWebView = /wv|WebView/i.test(navigator.userAgent) && /Android/i.test(navigator.userAgent);
-    const isiOSWebView = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent);
-    const isReactNative = hasReactNativeWebView || isAndroidWebView || isiOSWebView;
+    // RN 환경인지 체크 (window.ReactNativeWebView가 있는 경우만)
+    const isReactNative = typeof window !== "undefined" && !!window.ReactNativeWebView;
 
     if (!isReactNative) {
       return;

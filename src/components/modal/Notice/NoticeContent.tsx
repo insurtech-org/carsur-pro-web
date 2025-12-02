@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { openExternalLink } from "@/utils/util";
 
 /** 공지 팝업 아이템 타입 */
 export interface NoticePopupItem {
@@ -141,10 +142,10 @@ export default function NoticeContent({
     }
   };
 
-  // 상세보기 클릭 시 해당 공지의 링크로 이동
+  // 상세보기 클릭 시 해당 공지의 링크를 외부 브라우저로 열기
   const handleDetailClick = () => {
     if (currentNotice?.link) {
-      window.open(currentNotice.link, "_blank", "noopener,noreferrer");
+      openExternalLink(currentNotice.link);
     }
   };
 
