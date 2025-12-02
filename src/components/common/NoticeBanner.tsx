@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { openExternalLink } from "@/utils/util";
 
 /** 개별 공지 아이템 타입 */
 export interface NoticeItem {
@@ -26,10 +27,7 @@ interface NoticeBannerProps {
  * - 오른쪽에서 왼쪽으로 끊김 없는 슬라이드 애니메이션
  * - 배지: 2개 이상일 때만 표시
  */
-export default function NoticeBanner({
-  notices,
-  autoSlideInterval = 5000,
-}: NoticeBannerProps) {
+export default function NoticeBanner({ notices, autoSlideInterval = 5000 }: NoticeBannerProps) {
   const noticesLength = notices?.length || 0;
 
   // 클론 슬라이드 기법: 2개 이상일 때 앞뒤에 클론 추가
@@ -58,14 +56,14 @@ export default function NoticeBanner({
   const goNext = useCallback(() => {
     if (isAnimating || noticesLength <= 1) return;
     setIsAnimating(true);
-    setCurrentIndex((prev) => prev + 1);
+    setCurrentIndex(prev => prev + 1);
   }, [isAnimating, noticesLength]);
 
   // 이전 슬라이드
   const goPrev = useCallback(() => {
     if (isAnimating || noticesLength <= 1) return;
     setIsAnimating(true);
-    setCurrentIndex((prev) => prev - 1);
+    setCurrentIndex(prev => prev - 1);
   }, [isAnimating, noticesLength]);
 
   // 트랜지션 종료 핸들러 - 클론 위치에서 실제 위치로 순간이동
@@ -130,7 +128,7 @@ export default function NoticeBanner({
   // 클릭 시 해당 공지의 링크로 이동
   const handleClick = (notice: NoticeItem) => {
     if (notice.link) {
-      window.open(notice.link, "_blank", "noopener,noreferrer");
+      openExternalLink(notice.link);
     }
   };
 
@@ -162,9 +160,7 @@ export default function NoticeBanner({
             >
               {/* 왼쪽 텍스트 영역 */}
               <div className="flex flex-col gap-1 flex-1">
-                <div className="text-black text-[15px] min-[375px]:text-[17px] font-bold">
-                  {notice.title}
-                </div>
+                <div className="text-black text-[15px] min-[375px]:text-[17px] font-bold">{notice.title}</div>
                 {notice.buttonText && (
                   <div className="text-orange-500 text-[14px] font-medium flex items-center gap-1">
                     {notice.buttonText}
