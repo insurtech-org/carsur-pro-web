@@ -1,21 +1,31 @@
 "use client";
 
 import { useNoticeCheck } from "@/hook/useNoticeCheck";
-import NoticeContent from "./NoticeContent";
+import NoticeContent, { NOTICE_POPUPS, NoticePopupItem } from "./NoticeContent";
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 
 /**
  * 공지사항 팝업 모달
  * - 앱 진입 시 자동으로 표시 여부 체크
  * - 하단에서 올라오는 모달 형태, 다크 테마 디자인
  * - 모달 래퍼와 컨텐츠를 분리하여 확장성 확보
- * @param noticeId - 공지사항 식별자 (기본값: 캐시 제도 공지사항)
+ * - 공지사항 배열 변경 시 자동으로 다시 표시
+ * @param notices - 공지사항 배열 (기본값: NOTICE_POPUPS)
  */
 interface NoticeModalProps {
-  noticeId?: string;
+  notices?: NoticePopupItem[];
 }
 
-export default function NoticeModal({ noticeId = "notice-2025-11-18" }: NoticeModalProps = {}) {
+export default function NoticeModal({ notices = NOTICE_POPUPS }: NoticeModalProps = {}) {
+  // 공지사항 배열을 기반으로 동적으로 noticeId 생성
+  // 마지막 공지 ID가 바뀌면 새로운 noticeId가 생성되어 모달이 다시 표시됨
+  const noticeId = useMemo(() => {
+    if (!notices || notices.length === 0) return "notice-empty";
+    const lastNoticeId = notices[notices.length - 1].id;
+    return `notice-lastId-${lastNoticeId}`;
+  }, [notices]);
+
   const { isOpen, close, hideForTodayAndClose } = useNoticeCheck(noticeId);
 
   const pathname = usePathname();
@@ -33,7 +43,7 @@ export default function NoticeModal({ noticeId = "notice-2025-11-18" }: NoticeMo
       <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300" />
       {/* 모달 컨텐츠 - 아래에서 위로 올라오는 애니메이션 */}
       <div className="relative w-full max-w-[433px] transform transition-transform duration-300 ease-out translate-y-full animate-slide-up">
-        <NoticeContent onClose={close} onHideForToday={hideForTodayAndClose} />
+        <NoticeContent onClose={close} onHideForToday={hideForTodayAndClose} notices={notices} />
       </div>
     </div>
   );
