@@ -92,7 +92,24 @@ export default function WorkPage() {
         </div>
 
         {/* 공지 배너 */}
-        <NoticeBanner title="메시지 및 푸시 기능 업데이트" buttonText="확인하기" badgeText="" />
+        <NoticeBanner
+          notices={[
+            {
+              id: 1,
+              title: "메시지 및 푸시 기능 업데이트",
+              buttonText: "확인하기",
+              imageSrc: "/images/img/notice/notice_ banner.png",
+              link: "https://insurtech-kr.notion.site/2af19a26799880bd94b2e69fcdfa203a",
+            },
+            {
+              id: 2,
+              title: "담당자 배정/변경 푸시알림 기능",
+              buttonText: "확인하기",
+              imageSrc: "/images/img/notice/notice_banner_2.png",
+              link: "https://insurtech-kr.notion.site/2bd19a2679988005a15dcddc7c7af023",
+            },
+          ]}
+        />
 
         {/* 필터 */}
         <div
