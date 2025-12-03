@@ -1,6 +1,9 @@
 import { workSteps } from "@/utils/workStatus";
 import { IWorkList } from "@/type/work.type";
 import dayjs from "dayjs";
+import "dayjs/locale/ko";
+
+dayjs.locale("ko");
 
 export const statusColor = (status: string) => {
   switch (status) {
