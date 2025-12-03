@@ -320,7 +320,7 @@ export default function WorkComments() {
   // - 날짜 형식: "YYYY년 MM월 DD일"
   const groupedComments = useMemo(() => {
     return comments.reduce((groups, comment) => {
-      const date = dayjs(comment.createdAt).format("YYYY년 MM월 DD일");
+      const date = dayjs(comment.createdAt).format("YYYY년 MM월 DD일 dddd");
       if (!groups[date]) {
         groups[date] = [];
       }
@@ -341,7 +341,7 @@ export default function WorkComments() {
       // 어드민 아이콘
       return (
         <div className="w-9 h-9 bg-common-white rounded-full border border-line-neutral flex items-center justify-center">
-          <img src="/images/img/img-carsur_manager_profile.png" alt="manager" />
+          <img src="/images/img/img-carsur_manager_profile.png" alt="manager" className="rounded-full" />
         </div>
       );
     } else if (comment.authorType === "FACTORY_MEMBER") {
@@ -364,14 +364,14 @@ export default function WorkComments() {
       // 보험사 직원 아이콘
       return (
         <div className="w-9 h-9 bg-common-white rounded-full border border-line-neutral flex items-center justify-center">
-          <img src="/images/img/img-insurance_manager_profile.png" alt="insurance" />
+          <img src="/images/img/img-insurance_manager_profile.png" alt="insurance" className="rounded-full" />
         </div>
       );
     }
   };
 
   return (
-    <div className="flex flex-col w-full h-svh bg-bg-main">
+    <div className="flex flex-col w-full h-svh bg-[#F2F3F6]">
       {/* 상단 헤더 */}
       <div className="sticky top-0 z-10 w-full flex flex-row px-5 py-3 justify-between items-center bg-common-white border-b border-line-neutral">
         {/* 뒤로 가기 버튼 */}
@@ -408,11 +408,19 @@ export default function WorkComments() {
 
       {/* 댓글 목록 */}
       <div className="flex-1 overflow-y-auto">
-        <div className="px-5 py-6">
+        <div className={`px-5 py-6 ${isMessageVisible ? "pb-[78px]" : ""}`}>
           <div className="flex flex-col gap-6">
             {Object.entries(groupedComments).map(([date, dateComments]) => (
               <div key={date} className="flex flex-col items-center gap-6">
-                <div className="text-center text-neutral-600 text-xs">{date}</div>
+                <div
+                  className="text-center text-neutral-600 text-xs"
+                  style={{
+                    lineHeight: "133%",
+                    letterSpacing: "0.0252em",
+                  }}
+                >
+                  {date}
+                </div>
 
                 <div className="w-full flex flex-col gap-4">
                   {dateComments.map(comment =>
@@ -434,10 +442,18 @@ export default function WorkComments() {
                         {renderAvatar(comment)}
 
                         <div className="flex flex-col gap-2">
-                          <div className="text-primary-normal text-xs">{comment.authorName}</div>
+                          <div
+                            className="text-primary-normal text-xs"
+                            style={{
+                              lineHeight: "133%",
+                              letterSpacing: "0.0252em",
+                            }}
+                          >
+                            {comment.authorName}
+                          </div>
 
                           <div className="flex items-end gap-1">
-                            <div className="max-w-[240px] px-3 py-2 bg-bg-normal rounded-tr-xl rounded-bl-xl rounded-br-xl shadow-[0px_4px_12px_0px_rgba(0,0,0,0.08)] border border-line-alternative">
+                            <div className="max-w-[240px] px-3 py-2 bg-bg-normal rounded-tr-xl rounded-bl-xl rounded-br-xl border border-line-alternative">
                               <div className="text-primary-neutral text-sm leading-tight whitespace-pre-wrap break-words">
                                 {comment.commentContent}
                               </div>
@@ -471,13 +487,7 @@ export default function WorkComments() {
               <span className="text-[13px] leading-[18px] font-semibold text-gray-500">안내</span>
               <span className="text-[13px] leading-[18px] font-normal flex-1 text-gray-500">{controlMessage}</span>
               <div className="flex-shrink-0 w-3 h-3 flex items-center justify-center text-gray-400">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M11 1L1 11M1 1L11 11"
                     stroke="currentColor"
@@ -490,7 +500,6 @@ export default function WorkComments() {
             </div>
           </div>
         )}
-
         {/* 입력창 - 입력 불가능할 때는 완전히 숨김 */}
         {!isInputDisabled && (
           <div className="px-5 p-4 bg-common-white">
@@ -514,14 +523,7 @@ export default function WorkComments() {
                   disabled={!commentText.trim() || isSubmitting}
                   className="w-8 h-8 rounded-full flex items-center justify-center disabled:bg-primary-disabled disabled:opacity-30 bg-secondary-normal transition-all duration-200 hover:opacity-90 active:scale-95"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="rotate-90"
-                  >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M12 4L12 20M12 4L6 10M12 4L18 10"
                       stroke="white"

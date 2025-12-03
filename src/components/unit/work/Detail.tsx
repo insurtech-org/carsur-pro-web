@@ -312,10 +312,12 @@ export default function WorkDetail() {
           </div>
         )}
 
-        {/* 댓글 섹션 */}
-        <div className="flex flex-col items-start self-stretch mx-5">
-          <CommentsCard workId={detailId} comments={comments} unreadCommentCount={workData?.unreadCommentCount || 0} />
-        </div>
+        {/* 댓글 섹션 - 취소 상태에서는 숨김 */}
+        {!isCancelled && (
+          <div className="flex flex-col items-start self-stretch mx-5">
+            <CommentsCard workId={detailId} comments={comments} unreadCommentCount={workData?.unreadCommentCount || 0} />
+          </div>
+        )}
 
         <div className="flex flex-col items-start self-stretch mx-5 gap-4">
           <span className="text-primary-normal text-lg font-semibold ml-1">예약 정보</span>
