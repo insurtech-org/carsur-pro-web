@@ -3,6 +3,7 @@ import axios, { InternalAxiosRequestConfig } from "axios";
 import { useUserStore } from "@/store/user";
 import { useLoadingStore } from "@/store/loading";
 import { refreshToken as refreshTokenApi } from "./auth.api";
+import { deleteTokenApi } from "./push.api";
 
 // axios config 타입 확장 - skipLoading 옵션 추가
 declare module "axios" {
@@ -109,7 +110,32 @@ instance.interceptors.response.use(
           console.error("토큰 갱신 실패:", refreshError);
           processQueue(refreshError as Error, null);
 
-          const { clearUserStore } = useUserStore.getState();
+          // 서버에 FCM 토큰 삭제 요청
+          const { user, clearUserStore } = useUserStore.getState();
+          if (user?.id) {
+            try {
+              const deviceId = localStorage.getItem(`device_id_${user.id}`);
+              if (deviceId) {
+                await deleteTokenApi({
+                  userType: "FACTORY_MEMBER",
+                  userId: user.id,
+                  deviceId: deviceId,
+                });
+                console.log("✅ [자동 로그아웃] FCM 토큰 삭제 성공");
+              }
+            } catch (tokenError) {
+              console.log("❌ [자동 로그아웃] FCM 토큰 삭제 실패:", tokenError);
+            }
+
+            // localStorage에 저장된 FCM 토큰 및 deviceId 삭제
+            try {
+              localStorage.removeItem(`fcm_token_${user.id}`);
+              localStorage.removeItem(`device_id_${user.id}`);
+            } catch (storageError) {
+              console.log("localStorage 삭제 실패:", storageError);
+            }
+          }
+
           clearUserStore();
 
           window.location.href = "/login";
