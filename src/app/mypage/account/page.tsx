@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useModalStore } from "@/store/modal";
 import { useUserStore } from "@/store/user";
 import { logout } from "@/api/auth.api";
+import { deleteTokenApi } from "@/api/push.api";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -24,12 +25,28 @@ export default function AccountPage() {
         } catch (error) {
           console.log(error);
         } finally {
-          // localStorage에 저장된 FCM 토큰 삭제
+          // 서버에 FCM 토큰 삭제 요청
           if (user?.id) {
             try {
-              localStorage.removeItem(`fcm_token_${user.id}`);
+              const deviceId = localStorage.getItem(`device_id_${user.id}`);
+              if (deviceId) {
+                await deleteTokenApi({
+                  userType: "FACTORY_MEMBER",
+                  userId: user.id,
+                  deviceId: deviceId,
+                });
+                console.log("✅ FCM 토큰 삭제 성공");
+              }
             } catch (error) {
-              console.log("FCM 토큰 삭제 실패:", error);
+              console.log("❌ FCM 토큰 삭제 실패:", error);
+            }
+
+            // localStorage에 저장된 FCM 토큰 및 deviceId 삭제
+            try {
+              localStorage.removeItem(`fcm_token_${user.id}`);
+              localStorage.removeItem(`device_id_${user.id}`);
+            } catch (error) {
+              console.log("localStorage 삭제 실패:", error);
             }
           }
 

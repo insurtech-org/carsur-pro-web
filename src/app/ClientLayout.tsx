@@ -81,6 +81,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
   }, []);
 
+  // deviceId를 localStorage에 저장
+  const saveDeviceId = useCallback((userId: number | string, deviceId: string) => {
+    try {
+      localStorage.setItem(`device_id_${userId}`, deviceId);
+    } catch {
+      // 저장 실패 시 무시
+    }
+  }, []);
+
   // FCM 토큰 전송 함수
   const sendFCMToken = useCallback(
     async (token: string, deviceId: string, deviceType: string, deviceName: string) => {
@@ -105,13 +114,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           deviceName: deviceName,
         });
 
-        // 등록 성공 시 토큰 저장
+        // 등록 성공 시 토큰 및 deviceId 저장
         saveLastRegisteredToken(user.id, token);
+        saveDeviceId(user.id, deviceId);
       } catch {
         // 에러 발생 시 무시
       }
     },
-    [user?.id, getLastRegisteredToken, saveLastRegisteredToken]
+    [user?.id, getLastRegisteredToken, saveLastRegisteredToken, saveDeviceId]
   );
 
   // 앱 버전 체크 (RN 환경에서만, 최초 1회)
