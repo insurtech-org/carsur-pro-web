@@ -3,7 +3,6 @@ import axios, { InternalAxiosRequestConfig } from "axios";
 import { useUserStore } from "@/store/user";
 import { useLoadingStore } from "@/store/loading";
 import { refreshToken as refreshTokenApi } from "./auth.api";
-import { deleteTokenApi } from "./push.api";
 
 // axios config 타입 확장 - skipLoading 옵션 추가
 declare module "axios" {
@@ -64,10 +63,9 @@ instance.interceptors.response.use(
 
     const originalRequest = error.config;
 
-    // 로그인 API 또는 토큰 삭제 API 요청인 경우 토큰 갱신을 시도하지 않음
+    // 로그인 API 요청인 경우 토큰 갱신을 시도하지 않음
     const isLoginRequest = originalRequest.url?.includes("/auth/factory/login");
-    const isDeleteTokenRequest = originalRequest.url?.includes("/api/push/tokens");
-    if (isLoginRequest || isDeleteTokenRequest) {
+    if (isLoginRequest) {
       return Promise.reject(error);
     }
 
@@ -111,32 +109,7 @@ instance.interceptors.response.use(
           console.error("토큰 갱신 실패:", refreshError);
           processQueue(refreshError as Error, null);
 
-          // 서버에 FCM 토큰 삭제 요청
-          const { user, clearUserStore } = useUserStore.getState();
-          if (user?.id) {
-            try {
-              const deviceId = localStorage.getItem(`device_id_${user.id}`);
-              if (deviceId) {
-                await deleteTokenApi({
-                  userType: "FACTORY_MEMBER",
-                  userId: user.id,
-                  deviceId: deviceId,
-                });
-                console.log("✅ [자동 로그아웃] FCM 토큰 삭제 성공");
-              }
-            } catch (tokenError) {
-              console.log("❌ [자동 로그아웃] FCM 토큰 삭제 실패:", tokenError);
-            }
-
-            // localStorage에 저장된 FCM 토큰 및 deviceId 삭제
-            try {
-              localStorage.removeItem(`fcm_token_${user.id}`);
-              localStorage.removeItem(`device_id_${user.id}`);
-            } catch (storageError) {
-              console.log("localStorage 삭제 실패:", storageError);
-            }
-          }
-
+          const { clearUserStore } = useUserStore.getState();
           clearUserStore();
 
           window.location.href = "/login";

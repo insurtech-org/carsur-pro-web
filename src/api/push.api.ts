@@ -33,9 +33,6 @@ export const clearTokensApi = async (daysOld: number) => {
 
 // 푸시토큰 삭제 (알림 비활성화 시)
 export const deleteTokenApi = async (body: IDeleteTokenForm) => {
-  const response = await apiInstance.delete(prefix, {
-    data: body,
-    skipLoading: true // 로딩 인터셉터 건너뛰기
-  });
+  const response = await apiInstance.delete(prefix, { data: body });
   return response?.data;
 };
