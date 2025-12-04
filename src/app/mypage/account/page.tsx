@@ -20,41 +20,47 @@ export default function AccountPage() {
       confirmButtonText: "로그아웃",
       cancelButtonText: "취소",
       onConfirm: async () => {
+        // 1. 먼저 FCM 토큰 삭제 (토큰이 유효할 때)
+        if (user?.id) {
+          try {
+            const deviceId = localStorage.getItem(`device_id_${user.id}`);
+            if (deviceId) {
+              await deleteTokenApi({
+                userType: "FACTORY_MEMBER",
+                userId: user.id,
+                deviceId: deviceId,
+              });
+              console.log("✅ FCM 토큰 삭제 성공");
+            }
+          } catch (error) {
+            console.log("❌ FCM 토큰 삭제 실패:", error);
+            // 실패해도 로그아웃은 계속 진행
+          }
+        }
+
+        // 2. 로그아웃 API 호출
         try {
           await logout();
         } catch (error) {
-          console.log(error);
-        } finally {
-          // 서버에 FCM 토큰 삭제 요청
-          if (user?.id) {
-            try {
-              const deviceId = localStorage.getItem(`device_id_${user.id}`);
-              if (deviceId) {
-                await deleteTokenApi({
-                  userType: "FACTORY_MEMBER",
-                  userId: user.id,
-                  deviceId: deviceId,
-                });
-                console.log("✅ FCM 토큰 삭제 성공");
-              }
-            } catch (error) {
-              console.log("❌ FCM 토큰 삭제 실패:", error);
-            }
-
-            // localStorage에 저장된 FCM 토큰 및 deviceId 삭제
-            try {
-              localStorage.removeItem(`fcm_token_${user.id}`);
-              localStorage.removeItem(`device_id_${user.id}`);
-            } catch (error) {
-              console.log("localStorage 삭제 실패:", error);
-            }
-          }
-
-          const { clearUserStore } = useUserStore.getState();
-          clearUserStore();
-
-          router.replace("/login");
+          console.log("로그아웃 API 실패:", error);
+          // 실패해도 클라이언트 상태는 초기화
         }
+
+        // 3. localStorage 정리
+        if (user?.id) {
+          try {
+            localStorage.removeItem(`fcm_token_${user.id}`);
+            localStorage.removeItem(`device_id_${user.id}`);
+          } catch (error) {
+            console.log("localStorage 삭제 실패:", error);
+          }
+        }
+
+        // 4. 사용자 정보 초기화 및 로그인 페이지로 이동
+        const { clearUserStore } = useUserStore.getState();
+        clearUserStore();
+
+        router.replace("/login");
       },
     });
   };
