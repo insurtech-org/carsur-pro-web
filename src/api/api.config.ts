@@ -64,9 +64,10 @@ instance.interceptors.response.use(
 
     const originalRequest = error.config;
 
-    // 로그인 API 요청인 경우 토큰 갱신을 시도하지 않음
+    // 로그인 API 또는 토큰 삭제 API 요청인 경우 토큰 갱신을 시도하지 않음
     const isLoginRequest = originalRequest.url?.includes("/auth/factory/login");
-    if (isLoginRequest) {
+    const isDeleteTokenRequest = originalRequest.url?.includes("/api/push/tokens");
+    if (isLoginRequest || isDeleteTokenRequest) {
       return Promise.reject(error);
     }
 
