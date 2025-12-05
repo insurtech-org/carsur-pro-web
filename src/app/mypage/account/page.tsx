@@ -22,9 +22,11 @@ export default function AccountPage() {
           await logout();
         } catch (error) {
           console.log("로그아웃 API 실패:", error);
-          // 실패해도 클라이언트 상태는 초기화
+          // API 실패 시에도 클라이언트 측 로그아웃은 진행
+          // (서버와 동기화 실패했지만 보안상 로컬 토큰은 삭제)
         }
 
+        // API 성공/실패 여부와 관계없이 로컬 스토어 초기화
         const { clearUserStore } = useUserStore.getState();
         clearUserStore();
 
