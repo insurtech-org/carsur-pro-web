@@ -204,7 +204,7 @@ const EmptyWork = ({ status }: { status: string }) => {
       <span className="text-primary-assistive text-[15px] font-medium">
         {status === "CANCELLED"
           ? `아직 취소가 없어요.`
-          : `아직 ${WORK_STATUS[status as keyof typeof WORK_STATUS]} 작업이 없어요.`}
+          : `아직 ${WORK_STATUS[status as keyof typeof WORK_STATUS] || ""} 작업이 없어요.`}
       </span>
     </div>
   );
