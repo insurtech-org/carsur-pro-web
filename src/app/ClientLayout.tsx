@@ -95,17 +95,22 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // FCM 토큰 전송 함수
   const sendFCMToken = useCallback(
-    async (token: string, deviceId: string, deviceType: string, deviceName: string) => {
+    async (token: string, deviceId: string, deviceType: string, deviceName: string, forceRegister = false) => {
       // user 정보가 없으면 토큰 등록을 건너뜀
       if (!user?.id) {
         return;
       }
 
-      // 이미 이 사용자에게 같은 토큰을 등록한 적이 있는지 확인
-      const lastToken = getLastRegisteredToken(user.id);
-      if (lastToken === token) {
-        console.log("ℹ️ 이미 등록된 토큰으로 서버 전송 건너뜀");
-        return;
+      // forceRegister가 false인 경우에만 중복 체크
+      if (!forceRegister) {
+        // 이미 이 사용자에게 같은 토큰을 등록한 적이 있는지 확인
+        const lastToken = getLastRegisteredToken(user.id);
+        if (lastToken === token) {
+          console.log("ℹ️ 이미 등록된 토큰으로 서버 전송 건너뜀");
+          return;
+        }
+      } else {
+        console.log("🔄 포그라운드 전환 - 강제 재등록 모드");
       }
 
       // 서버에 토큰 등록 (같은 user.id + deviceId면 서버에서 update)
@@ -230,6 +235,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           const deviceId = data.deviceId || "unknown_device_id";
           const deviceType = data.deviceType || data.platform || "ANDROID";
           const deviceName = data.deviceName || "unknown_device";
+          const forceRegister = data.forceRegister || false; // 강제 재등록 플래그
 
           // 디버깅을 위한 로그
           console.log("📱 [웹] FCM 토큰 메시지 수신:", {
@@ -237,6 +243,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             deviceId,
             deviceType,
             deviceName,
+            forceRegister,
             원본메시지: data,
           });
 
@@ -244,7 +251,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           setPlatform(deviceType.toLowerCase() === "ios" ? "ios" : "android");
 
           // 토큰 및 디바이스 정보를 서버에 전송
-          sendFCMToken(fcmToken, deviceId, deviceType, deviceName);
+          sendFCMToken(fcmToken, deviceId, deviceType, deviceName, forceRegister);
         }
       } catch {
         // 메시지 파싱 오류 무시
