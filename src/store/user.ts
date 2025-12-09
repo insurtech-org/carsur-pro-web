@@ -71,6 +71,16 @@ export const useUserStore = create<IUserStore>()(
 
       // 로그아웃 (API 호출 후 데이터 초기화)
       logout: () => {
+        const state = get();
+        // FCM 토큰 및 deviceId localStorage 삭제
+        if (state.user?.id) {
+          try {
+            localStorage.removeItem(`fcm_token_${state.user.id}`);
+            localStorage.removeItem(`device_id_${state.user.id}`);
+          } catch {
+            // localStorage 삭제 실패 시 무시
+          }
+        }
         set({ user: null, tokens: null });
       },
 
@@ -80,7 +90,19 @@ export const useUserStore = create<IUserStore>()(
       },
 
       // 스토어 초기화 함수 추가
-      clearUserStore: () => set({ user: null, tokens: null }),
+      clearUserStore: () => {
+        const state = get();
+        // FCM 토큰 및 deviceId localStorage 삭제
+        if (state.user?.id) {
+          try {
+            localStorage.removeItem(`fcm_token_${state.user.id}`);
+            localStorage.removeItem(`device_id_${state.user.id}`);
+          } catch {
+            // localStorage 삭제 실패 시 무시
+          }
+        }
+        set({ user: null, tokens: null });
+      },
     }),
     {
       name: "user-storage", // localStorage에 저장될 키 이름

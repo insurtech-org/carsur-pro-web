@@ -57,10 +57,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     initDatadog();
   }, []);
 
-  // user가 변경될 때 (로그인/로그아웃) 토큰 요청 플래그 리셋
+  // user가 로그인할 때마다 토큰 요청 플래그 리셋
   useEffect(() => {
-    hasRequestedToken.current = false;
-  }, [user?.id, !!user]);
+    // user가 존재하면 (로그인 상태) 토큰 요청 플래그 리셋
+    if (user?.id) {
+      hasRequestedToken.current = false;
+    }
+  }, [user?.id]);
 
   // 마지막으로 등록된 FCM 토큰을 localStorage에서 가져오기
   const getLastRegisteredToken = useCallback((userId: number | string): string | null => {
@@ -81,20 +84,36 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
   }, []);
 
+  // deviceId를 localStorage에 저장
+  const saveDeviceId = useCallback((userId: number | string, deviceId: string) => {
+    try {
+      localStorage.setItem(`device_id_${userId}`, deviceId);
+    } catch {
+      // 저장 실패 시 무시
+    }
+  }, []);
+
   // FCM 토큰 전송 함수
   const sendFCMToken = useCallback(
-    async (token: string, deviceId: string, deviceType: string, deviceName: string) => {
+    async (token: string, deviceId: string, deviceType: string, deviceName: string, forceRegister = false) => {
       // user 정보가 없으면 토큰 등록을 건너뜀
       if (!user?.id) {
         return;
       }
 
-      // 이미 등록된 토큰과 동일한지 확인
-      const lastToken = getLastRegisteredToken(user.id);
-      if (lastToken === token) {
-        return;
+      // forceRegister가 false인 경우에만 중복 체크
+      if (!forceRegister) {
+        // 이미 이 사용자에게 같은 토큰을 등록한 적이 있는지 확인
+        const lastToken = getLastRegisteredToken(user.id);
+        if (lastToken === token) {
+          console.log("ℹ️ 이미 등록된 토큰으로 서버 전송 건너뜀");
+          return;
+        }
+      } else {
+        console.log("🔄 포그라운드 전환 - 강제 재등록 모드");
       }
 
+      // 서버에 토큰 등록 (같은 user.id + deviceId면 서버에서 update)
       try {
         await registerTokenApi({
           userType: "FACTORY_MEMBER",
@@ -105,13 +124,16 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           deviceName: deviceName,
         });
 
-        // 등록 성공 시 토큰 저장
+        console.log("✅ FCM 토큰 등록/업데이트 성공");
+
+        // 등록 성공 시 토큰 및 deviceId 저장
         saveLastRegisteredToken(user.id, token);
-      } catch {
-        // 에러 발생 시 무시
+        saveDeviceId(user.id, deviceId);
+      } catch (error) {
+        console.log("❌ FCM 토큰 등록 실패:", error);
       }
     },
-    [user?.id, getLastRegisteredToken, saveLastRegisteredToken]
+    [user?.id, getLastRegisteredToken, saveLastRegisteredToken, saveDeviceId]
   );
 
   // 앱 버전 체크 (RN 환경에서만, 최초 1회)
@@ -213,6 +235,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           const deviceId = data.deviceId || "unknown_device_id";
           const deviceType = data.deviceType || data.platform || "ANDROID";
           const deviceName = data.deviceName || "unknown_device";
+          const forceRegister = data.forceRegister || false; // 강제 재등록 플래그
 
           // 디버깅을 위한 로그
           console.log("📱 [웹] FCM 토큰 메시지 수신:", {
@@ -220,6 +243,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             deviceId,
             deviceType,
             deviceName,
+            forceRegister,
             원본메시지: data,
           });
 
@@ -227,7 +251,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           setPlatform(deviceType.toLowerCase() === "ios" ? "ios" : "android");
 
           // 토큰 및 디바이스 정보를 서버에 전송
-          sendFCMToken(fcmToken, deviceId, deviceType, deviceName);
+          sendFCMToken(fcmToken, deviceId, deviceType, deviceName, forceRegister);
         }
       } catch {
         // 메시지 파싱 오류 무시
