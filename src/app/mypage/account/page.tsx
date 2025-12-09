@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useModalStore } from "@/store/modal";
 import { useUserStore } from "@/store/user";
 import { logout } from "@/api/auth.api";
+import { deleteTokenApi } from "@/api/push.api";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -18,10 +19,31 @@ export default function AccountPage() {
       confirmButtonText: "로그아웃",
       cancelButtonText: "취소",
       onConfirm: async () => {
+        const { user } = useUserStore.getState();
+
+        // FCM 토큰 삭제 (로그아웃 전에 실행)
+        if (user?.id) {
+          try {
+            const deviceId = localStorage.getItem(`device_id_${user.id}`);
+            if (deviceId) {
+              await deleteTokenApi({
+                userType: "FACTORY_MEMBER",
+                userId: user.id,
+                deviceId: deviceId,
+              });
+              console.log("✅ FCM 토큰 삭제 성공");
+            }
+          } catch (error) {
+            console.log("❌ FCM 토큰 삭제 실패:", error);
+            // 토큰 삭제 실패해도 로그아웃은 진행
+          }
+        }
+
+        // 로그아웃 API 호출
         try {
           await logout();
         } catch (error) {
-          console.log("로그아웃 API 실패:", error);
+          console.log("❌ 로그아웃 API 실패:", error);
           // API 실패 시에도 클라이언트 측 로그아웃은 진행
           // (서버와 동기화 실패했지만 보안상 로컬 토큰은 삭제)
         }
