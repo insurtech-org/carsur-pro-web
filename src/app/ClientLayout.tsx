@@ -258,9 +258,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       }
     };
 
-    // 이벤트 리스너 등록
+    // 이벤트 리스너 등록 (window만 사용)
     window.addEventListener("message", handleMessage);
-    document.addEventListener("message", handleMessage as EventListener);
 
     // 로그인 후 user 정보가 있으면 FCM 토큰 요청 (세션당 한 번만)
     if (user?.id && window.ReactNativeWebView && !hasRequestedToken.current) {
@@ -275,7 +274,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     // 클린업
     return () => {
       window.removeEventListener("message", handleMessage);
-      document.removeEventListener("message", handleMessage as EventListener);
     };
   }, [user?.id, sendFCMToken]);
 
