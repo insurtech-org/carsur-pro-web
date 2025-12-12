@@ -19,7 +19,9 @@ export interface IDeleteTokenForm {
 
 // 토큰 등록
 export const registerTokenApi = async (body: IRegisterTokenForm) => {
-  const response = await apiInstance.post(`${prefix}/register`, body);
+  const response = await apiInstance.post(`${prefix}/register`, body, {
+    skipLoading: true, // 로딩 페이지 표시 안함
+  });
   return response?.data?.data;
 };
 
